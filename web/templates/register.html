@@ -10,29 +10,55 @@
 
 <main>
     <div class="container">
-        <form class="form-add" method="POST" action="/register">
-            <label><input name="login" placeholder="Login" required></label>
-            <label><input name="password" type="password" placeholder="Password" required></label>
-            <label><input name="username" placeholder="Username" required></label>
-            <label><input name="email" type="email" placeholder="E-mail" required></label>
-            <label><input value="user" disabled></label>
-            <input type="hidden" name="role" value="user">
-            <label><input name="color" placeholder="Color" value="#FF5733" readonly></label>
+        <div class="auth-box">
+            <form class="form-add" method="POST" action="/register">
+                {{ template "component.inputWithClear" dict
+                "Name" "login"
+                "Placeholder" "Введите логин"
+                "MaxLength" "30"
+                "Required" "true"
+                }}
+                {{ template "component.inputWithClear" dict
+                "Name" "password"
+                "Placeholder" "Введите пароль"
+                "Type" "password"
+                "MaxLength" "255"
+                "Required" "true"
+                }}
 
-            <div>
-                <button id="submitBtn" class="btn" type="submit">Create account</button>
+                {{ template "component.inputWithClear" dict
+                "Name" "username"
+                "Placeholder" "Введите никнейм"
+                "MaxLength" "30"
+                "Required" "true"
+                }}
+
+                {{ template "component.inputWithClear" dict
+                "Name" "email"
+                "Placeholder" "Введите вашу почту"
+                "Type" "email"
+                "MaxLength" "30"
+                "Required" "true"
+                }}
+
+                <label><input value="user" disabled></label>
+                <input type="hidden" name="role" value="user">
+                <label><input name="color" placeholder="Color" value="#FF5733" readonly></label>
+
                 {{if .error}}<span class="error-msg">{{.error}}</span>{{end}}
-            </div>
+                <button id="submitBtn" class="btn" type="submit">Создать аккаунт</button>
 
-            <span>
-                <a href="/login">Sign in</a>
+                <span>
+                <a href="/login">Вход</a>
             </span>
-        </form>
+            </form>
+        </div>
     </div>
 </main>
 
 {{ template "footer" . }}
 
+<script src="/static/js/ui.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         const loginInput = document.querySelector('input[name="login"]')
@@ -46,7 +72,7 @@
 
             if (v) {
                 passwordInput.value = v;
-                emailInput.value = `${v}@${v}.ru`;
+                emailInput.value = `${v}@mail.ru`;
                 usernameInput.value = `User${v}`;
             }
 

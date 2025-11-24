@@ -9,7 +9,7 @@ import (
 
 func Grpc(c *gin.Context) {
 	token, _ := c.Cookie(code.VagoToken)
-	data := tplWithCapture(c, "Test gRPC")
+	data := tplWithCapture(c, "Проверка gRPC")
 	data[code.VagoToken] = token
 	c.HTML(http.StatusOK, "grpc-test.html", data)
 }

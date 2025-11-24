@@ -11,43 +11,88 @@
 
 <main>
     <div class="container">
-        {{if .user_id}}
-        <div class="list">
-            <div class="item">
-                <div>
-                    <h3>Token</h3>
-                    <div>Status: {{.token_status}}</div>
-                    <div>Expires: {{.token_expire_at}}</div>
+        <div class="scrollable-content">
+            {{ if not .user_id }}
+            <div>
+                <span class="greetings">Приветствую, {{.username}}!</span>
+                <a href="/login">Вход</a>
+                <a href="/register">Регистрация</a>
+            </div>
+            {{ end }}
+
+            {{if .user_id}}
+            <div class="list">
+                <div class="item">
+                    <div>
+                        <h3>Токен</h3>
+                        <div>Статус: {{.token_status}}</div>
+                        <div>Истекает: {{.token_expire_at}}</div>
+                    </div>
+                </div>
+
+                <div class="item">
+                    <div>
+                        <h3>Пользователь</h3>
+                        <div>Никнейм: {{.username}}</div>
+                        <div>Роль: {{.role}}</div>
+                        <div>E-mail: {{.email}}</div>
+                    </div>
+                </div>
+
+                <div class="item">
+                    <div>
+                        <h3>Токен обновления</h3>
+                        <div>Статус: {{.refresh_token_status}}</div>
+                        <div>Истекает: {{.refresh_token_expire_at}}</div>
+                    </div>
                 </div>
             </div>
+            {{end}}
 
-            <div class="item">
+            <div class="list">
+
+
                 <div>
-                    <h3>User info</h3>
-                    <div>Username: {{.username}}</div>
-                    <div>Role: {{.role}}</div>
-                    <div>E-mail: {{.email}}</div>
+                    <h3>О проекте</h3>
+                    <span>
+                Это портал для изучения языка программирования Go, который объединяет в себе несколько инструментов:
+                живой чат для общения, электронную книгу по Go и удобный TODO-трекер.
+                Всё создано для того, чтобы обучение было комфортным, структурированным и живым.
+            </span>
                 </div>
-            </div>
 
-            <div class="item">
-                <div>
-                    <h3>Refresh token</h3>
-                    <div>Status: {{.refresh_token_status}}</div>
-                    <div>Expires: {{.refresh_token_expire_at}}</div>
+                <div class="item index-card">
+                    <h3>📘 Книга по Go</h3>
+                    <p>
+                        Собранный в одном месте материал по Go — основы, практические главы,
+                        примеры и справочные разделы.
+                    </p>
+                    <a href="/book" class="btn">Читать книгу</a>
+                </div>
+
+                <div class="item index-card">
+                    <h3>📝 TODO-трекер</h3>
+                    <p>
+                        Личный список задач: сохраняй цели, разбивай обучение на шаги, отмечай прогресс.
+                    </p>
+                    <a href="/tasks" class="btn">Открыть список</a>
+                </div>
+
+                <div class="item index-card">
+                    <h3>💬 Чат</h3>
+                    <p>
+                        Живой чат для общения с другими учениками. Можно задавать вопросы, обсуждать задачи
+                        и просто общаться.
+                    </p>
+                    <a href="/chat" class="btn">Перейти в чат</a>
                 </div>
             </div>
         </div>
-        {{else}}
-        <span class="greetings">Hello, {{.username}}!</span>
-        <a href="/login">Sign in</a>
-        <a href="/register">Sign up</a>
-        {{end}}
     </div>
 </main>
 
 <footer>
-    <span>© 2025 Vago (<a href="https://www.instagram.com/vadmark_in_kyrgyzstan/" target="_blank">Автор</a>)</span>
+    <span>© 2025 Vago (<a href="https://www.instagram.com/vadmark_in_kyrgyzstan/" target="_blank">Автор</a>) Версия 0.0.1</span>
 </footer>
 </body>
 </html>

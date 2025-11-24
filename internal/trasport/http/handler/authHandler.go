@@ -2,11 +2,11 @@ package handler
 
 import (
 	"net/http"
-	"strings"
 	"vago/internal/config/code"
 	"vago/internal/config/route"
 	"vago/internal/domain/auth"
 	"vago/internal/domain/user"
+	"vago/pkg/strx"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -35,7 +35,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	_, tokens, err := h.service.Login(login, password)
 	if err != nil {
-		c.Set(code.Error, strings.ToUpper(err.Error()[:1])+err.Error()[1:])
+		c.Set(code.Error, strx.Capitalize(err.Error()))
 		ShowLogin(c)
 		return
 	}
@@ -68,7 +68,7 @@ func PerformRegister(service *user.Service) gin.HandlerFunc {
 		err := service.CreateUser(user.DTO{Login: login, Email: email, Password: password, Role: user.Role(role), Color: color, Username: username})
 
 		if err != nil {
-			c.Set(code.Error, strings.ToUpper(err.Error()[:1])+err.Error()[1:])
+			c.Set(code.Error, strx.Capitalize(err.Error()))
 			ShowSignup(c)
 			return
 		}

@@ -10,28 +10,30 @@
 
 <main>
     <div class="container">
-        <form class="form-add" method="POST" action="/login">
-            {{ template "component.inputWithClear" dict
+        <div class="auth-box">
+            <form class="form-add" method="POST" action="/login">
+                {{ template "component.inputWithClear" dict
                 "ID" "loginInput"
                 "Name" "login"
                 "Placeholder" "Введите логин"
+                "MaxLength" "30"
                 "Required" "true"
-            }}
-            {{ template "component.inputWithClear" dict
+                }}
+                {{ template "component.inputWithClear" dict
                 "ID" "passwordInput"
                 "Name" "password"
                 "Placeholder" "Введите пароль"
+                "Type" "password"
+                "MaxLength" "255"
                 "Required" "true"
-            }}
-            <div>
-                <button id="submitBtn" class="btn" type="submit">Войти</button>
+                }}
                 {{if .error}}<span class="error-msg">{{.error}}</span>{{end}}
-
-            </div>
-            <span>
+                <button id="submitBtn" class="btn" type="submit">Войти</button>
+                <span>
                 <a href="/register">Регистрация</a>
-            </span>
-        </form>
+                </span>
+            </form>
+        </div>
     </div>
     <script>
         const loginInput = document.querySelector('input[name="login"]');
@@ -56,18 +58,6 @@
 </main>
 
 {{ template "footer" . }}
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        document.querySelectorAll(".clear-btn[data-clear]").forEach(btn => {
-            btn.addEventListener("click", () => {
-                btn.closest(".input-wrap").querySelector("input").value = "";
-            });
-        });
-
-        document.querySelectorAll("input[data-required='true']").forEach(input => {
-            input.required = true;
-        });
-    });
-</script>
+<script src="/static/js/ui.js"></script>
 </body>
 </html>

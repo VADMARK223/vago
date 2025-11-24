@@ -46,7 +46,7 @@ func (s *AuthServer) Refresh(_ context.Context, req *pb.RefreshRequest) (*pb.Log
 	}
 
 	if u.ID == 0 {
-		return nil, status.Error(codes.Internal, "user not found")
+		return nil, status.Error(codes.Internal, "пользователь не найден")
 	}
 
 	return &pb.LoginResponse{

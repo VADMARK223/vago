@@ -13,13 +13,15 @@ import (
 
 const (
 	UniqueCode      = "23505"
+	ValueToLong     = "22001"
 	ConstraintLogin = "users_login_key"
 	ConstraintEmail = "users_email_key"
 )
 
 var (
-	ErrLoginExists = errors.New("login already exists")
-	ErrEmailExists = errors.New("email already exists")
+	ErrLoginExists = errors.New("пользователь с таким логином уже существует")
+	ErrEmailExists = errors.New("пользователь с такой почтой уже существует")
+	ErrValueToLong = errors.New("значение слишком длинное")
 )
 
 type UserRepository struct {
@@ -38,14 +40,26 @@ func (r *UserRepository) CreateUser(u user.User) error {
 	entity := toEntity(u)
 	if err := r.db.Create(&entity).Error; err != nil {
 		if pgErr := parsePgError(err); pgErr != nil {
-			if pgErr.Code == UniqueCode {
+			switch pgErr.Code {
+			case UniqueCode:
 				switch pgErr.ConstraintName {
 				case ConstraintLogin:
 					return ErrLoginExists
 				case ConstraintEmail:
 					return ErrEmailExists
 				}
+			case ValueToLong:
+				return ErrValueToLong
 			}
+
+			/*if pgErr.Code == UniqueCode {
+				switch pgErr.ConstraintName {
+				case ConstraintLogin:
+					return ErrLoginExists
+				case ConstraintEmail:
+					return ErrEmailExists
+				}
+			}*/
 		}
 		return fmt.Errorf("failed to create user: %w", err)
 	}

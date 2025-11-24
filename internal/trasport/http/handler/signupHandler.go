@@ -8,7 +8,7 @@ import (
 )
 
 func ShowSignup(c *gin.Context) {
-	data := tplWithCapture(c, "Sign up")
+	data := tplWithCapture(c, "Регистрация")
 	if errVal, exists := c.Get(code.Error); exists {
 		data[code.Error] = errVal
 	}

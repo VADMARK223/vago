@@ -12,7 +12,11 @@ import (
 
 func ShowIndex(provider *token.JWTProvider) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		data := tplWithCapture(c, fmt.Sprintf("Vago портал (%s)", gin.Mode()))
+		capture := "Vago портал"
+		if gin.Mode() == gin.DebugMode {
+			capture += " (debug)"
+		}
+		data := tplWithCapture(c, capture)
 
 		updateTokenInfo(c, data, provider)
 		updateRefreshTokenInfo(c, data, provider)

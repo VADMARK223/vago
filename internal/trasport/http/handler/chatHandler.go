@@ -14,7 +14,7 @@ import (
 
 func ShowChat() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		data := tplWithCapture(c, "WebSocket chat")
+		data := tplWithCapture(c, "Чат")
 
 		tokenStr, errTokenCookie := c.Cookie(code.VagoToken)
 		if errTokenCookie == nil && tokenStr != "" {

@@ -60,8 +60,6 @@ func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine
 	r.GET(route.Register, handler.ShowSignup)
 	r.POST(route.Register, handler.PerformRegister(userSvc))
 	r.POST(route.Logout, handler.Logout)
-	r.GET("/ws", handler.ServeSW(hub, ctx.Log, tokenProvider))
-	r.GET("/chat", handler.ShowChat())
 
 	// Защищенные маршруты
 	auth := r.Group("/")
@@ -74,6 +72,9 @@ func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine
 		auth.GET(route.Users, handler.ShowUsers(userSvc))
 		auth.DELETE("/users/:id", handler.DeleteUser(userSvc))
 		auth.GET("/grpc-test", handler.Grpc)
+
+		auth.GET("/ws", handler.ServeSW(hub, ctx.Log, tokenProvider))
+		auth.GET("/chat", handler.ShowChat())
 	}
 
 	return r

@@ -1,12 +1,15 @@
 {{ define "component.inputWithClear" }}
 <div class="input-wrap">
-    <label>
         <input
+                {{ if .ID }}id="{{ .ID }}"{{ end }}
+                {{ if .Class }}class="{{ .Class }}"{{ end }}
                 name="{{ .Name }}"
                 placeholder="{{ .Placeholder }}"
+                {{ if .Type }}type="{{ .Type }}"{{ end }}
+                {{ if .MaxLength }}maxLength="{{ .MaxLength }}"{{ end }}
                 {{ if .Required }}data-required="true"{{ end }}
+                aria-label="{{ .Placeholder }}"
         >
-    </label>
 
     <button type="button" class="clear-btn" data-clear>×</button>
 </div>

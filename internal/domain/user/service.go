@@ -40,11 +40,11 @@ func (s *Service) Login(login, password string) (User, *auth.TokenPair, error) {
 	u, errGetUser := s.repo.GetByLogin(login)
 
 	if errGetUser != nil {
-		return User{}, nil, errors.New("user not found")
+		return User{}, nil, errors.New("пользователь не найден")
 	}
 
 	if bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)) != nil {
-		return u, nil, errors.New("incorrect password")
+		return u, nil, errors.New("неверный пароль")
 	}
 
 	tokens, err := s.tokens.CreateTokenPair(u.ID, string(u.Role))
@@ -62,7 +62,7 @@ func (s *Service) Refresh(token string) (User, string, error) {
 	}
 	u, errGetUser := s.repo.GetByID(claims.UserID())
 	if errGetUser != nil {
-		return User{}, "", errors.New("user not found")
+		return User{}, "", errors.New("пользователь не найден")
 	}
 
 	newToken, errToken := s.tokens.CreateToken(u.ID, string(u.Role), true)
