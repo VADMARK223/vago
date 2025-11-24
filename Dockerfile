@@ -13,6 +13,7 @@ RUN go mod download
 COPY api ./api
 COPY "cmd" "./cmd"
 COPY internal ./internal
+COPY pkg ./pkg
 COPY web ./web
 
 # Сборка бинарника (статическая, без CGO)

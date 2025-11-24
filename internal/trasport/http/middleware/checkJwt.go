@@ -12,53 +12,49 @@ import (
 func CheckJWT(provider *token.JWTProvider, refreshTTL int) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenStr, err := c.Cookie(code.VagoToken)
-		if err != nil || tokenStr == "" {
-			tryRefresh(c, refreshTTL, provider)
+		if err == nil && tokenStr != "" {
+			claims, err := provider.ParseToken(tokenStr)
+			if err == nil && (claims.ExpiresAt == nil || claims.ExpiresAt.Time.After(time.Now())) {
+				setAuth(c, claims.UserID(), claims.Role, claims.ExpiresAt.Time)
+				c.Next()
+				return
+			}
+		}
+
+		if tryRefresh(c, refreshTTL, provider) {
+			c.Next()
 			return
 		}
 
-		claims, err := provider.ParseToken(tokenStr)
-		if err != nil {
-			tryRefresh(c, refreshTTL, provider)
-			return
-		}
-
-		// Проверка срока действия токена
-		if claims.ExpiresAt != nil && claims.ExpiresAt.Time.Before(time.Now()) {
-			tryRefresh(c, refreshTTL, provider)
-			return
-		}
-
-		setAuth(c, claims.UserID(), claims.Role)
+		c.Next()
 	}
 }
 
-func tryRefresh(c *gin.Context, refRefreshTokenTTL int, provider *token.JWTProvider) {
+func tryRefresh(c *gin.Context, refreshTTL int, provider *token.JWTProvider) bool {
 	refreshStr, err := c.Cookie(code.VagoRefreshToken)
 	if err != nil || refreshStr == "" {
-		c.Next()
-		return
+		return false
 	}
 
 	refreshClaims, err := provider.ParseToken(refreshStr)
 	if err != nil || (refreshClaims.ExpiresAt != nil && refreshClaims.ExpiresAt.Time.Before(time.Now())) {
-		c.Next()
-		return
+		return false
 	}
 
 	newAccess, err := provider.CreateToken(refreshClaims.UserID(), refreshClaims.Role, true)
 	if err != nil {
-		c.Next()
-		return
+		return false
 	}
 
-	auth.SetCookie(c, code.VagoToken, newAccess, refRefreshTokenTTL)
+	claims, _ := provider.ParseToken(newAccess)
+	auth.SetCookie(c, code.VagoToken, newAccess, refreshTTL)
 
-	setAuth(c, refreshClaims.UserID(), refreshClaims.Role)
+	setAuth(c, refreshClaims.UserID(), refreshClaims.Role, claims.ExpiresAt.Time)
+	return true
 }
 
-func setAuth(c *gin.Context, id uint, role string) {
+func setAuth(c *gin.Context, id uint, role string, accessExpTime time.Time) {
 	c.Set(code.UserId, id)
 	c.Set(code.Role, role)
-	c.Next()
+	c.Set(code.AccessExpTime, accessExpTime)
 }

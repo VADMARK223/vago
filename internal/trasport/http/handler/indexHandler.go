@@ -18,31 +18,31 @@ func ShowIndex(provider *token.JWTProvider) gin.HandlerFunc {
 		}
 		data := tplWithCapture(c, capture)
 
-		updateTokenInfo(c, data, provider)
+		updateTokenInfo(c, data)
 		updateRefreshTokenInfo(c, data, provider)
 
 		c.HTML(http.StatusOK, "index.html", data)
 	}
 }
 
-func updateTokenInfo(c *gin.Context, data gin.H, provider *token.JWTProvider) {
-	data[code.TokenStatus] = "✅"
+func updateTokenInfo(c *gin.Context, data gin.H) {
+	data[code.TokenStatus] = "❌ время истечения токена не найдено"
 	data[code.TokenExpireAt] = "-"
 
-	tokenStr, errTokenCookie := c.Cookie(code.VagoToken)
-	if errTokenCookie != nil {
-		data[code.TokenStatus] = "❌" + errTokenCookie.Error()
+	expAny, ok := c.Get(code.AccessExpTime)
+	if !ok {
 		return
 	}
 
-	claims, err := provider.ParseToken(tokenStr)
-	if err != nil {
-		data[code.TokenStatus] = "❌" + err.Error()
+	exp, ok := expAny.(time.Time)
+	if !ok {
+		data[code.TokenStatus] = "❌ неверный тип AccessExpTime"
 		return
 	}
-	expTime := claims.ExpiresAt.Time
-	remaining := time.Until(expTime).Truncate(time.Second)
-	data[code.TokenExpireAt] = fmt.Sprintf("%s (via %s)", expTime.Format("02.01.2006 15:04:05"), remaining.String())
+
+	data[code.TokenStatus] = "✅"
+	accessRemainingTime := time.Until(exp).Truncate(time.Second)
+	data[code.TokenExpireAt] = fmt.Sprintf("%s (через %s)", exp.Format("02.01.2006 15:04:05"), accessRemainingTime.String())
 }
 
 func updateRefreshTokenInfo(c *gin.Context, data gin.H, provider *token.JWTProvider) {
@@ -64,5 +64,5 @@ func updateRefreshTokenInfo(c *gin.Context, data gin.H, provider *token.JWTProvi
 
 	expTime := claims.ExpiresAt.Time
 	remaining := time.Until(expTime).Truncate(time.Second)
-	data[code.RefreshTokenExpireAt] = fmt.Sprintf("%s (via %s)", expTime.Format("02.01.2006 15:04:05"), remaining.String())
+	data[code.RefreshTokenExpireAt] = fmt.Sprintf("%s (через %s)", expTime.Format("02.01.2006 15:04:05"), remaining.String())
 }

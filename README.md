@@ -26,7 +26,7 @@ sudo kill -9 PID
 docker exec -it vado_postgres bash
 ```
 
-### psql
+## psql
 Зайти в `psql`
 ```shell
 psql -U vadmark -d vadodb
@@ -107,4 +107,8 @@ sudo chmod -R o+x /home/vadmark/GolandProjects/vago/web/static
 - Gorm
 - JWT (access + refresh)
 
-На будущее: golang-migrate
+### TODO: 
+
+-[ ] Разобраться с токеным
+-[ ] На странице логина и регистрации фокус сразу на первое поле
+-[ ] golang-migrate
