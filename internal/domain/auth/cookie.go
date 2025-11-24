@@ -8,11 +8,11 @@ import (
 )
 
 func SetTokenCookies(c *gin.Context, tokens *TokenPair, refreshTTL int) {
-	SetCookie(c, code.VagoToken, tokens.AccessToken, refreshTTL)
-	SetCookie(c, code.VagoRefreshToken, tokens.RefreshToken, refreshTTL)
+	SetCookie(c, code.VagoToken, tokens.AccessToken, refreshTTL, false)
+	SetCookie(c, code.VagoRefreshToken, tokens.RefreshToken, refreshTTL, true)
 }
 
-func SetCookie(c *gin.Context, name, value string, maxAge int) {
+func SetCookie(c *gin.Context, name, value string, maxAge int, httpOnly bool) {
 	cookie := &http.Cookie{
 		Name:     name,
 		Value:    value,
@@ -20,7 +20,7 @@ func SetCookie(c *gin.Context, name, value string, maxAge int) {
 		Path:     "/",
 		Domain:   "",
 		Secure:   false, // Cookie отправляется даже по HTTP (Надо поменять в production) Защита от MITM
-		HttpOnly: true,  // Нельзя прочитать из JS (document.cookie) Защита от XSS
+		HttpOnly: httpOnly,
 		SameSite: http.SameSiteLaxMode,
 	}
 	c.SetCookieData(cookie)

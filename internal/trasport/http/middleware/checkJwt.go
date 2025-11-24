@@ -15,7 +15,7 @@ func CheckJWT(provider *token.JWTProvider, refreshTTL int) gin.HandlerFunc {
 		if err == nil && tokenStr != "" {
 			claims, err := provider.ParseToken(tokenStr)
 			if err == nil && (claims.ExpiresAt == nil || claims.ExpiresAt.Time.After(time.Now())) {
-				setAuth(c, claims.UserID(), claims.Role, claims.ExpiresAt.Time)
+				setAuth(c, claims.UserID(), claims.Role, claims.ExpiresAt.Time, false)
 				c.Next()
 				return
 			}
@@ -47,14 +47,31 @@ func tryRefresh(c *gin.Context, refreshTTL int, provider *token.JWTProvider) boo
 	}
 
 	claims, _ := provider.ParseToken(newAccess)
-	auth.SetCookie(c, code.VagoToken, newAccess, refreshTTL)
+	auth.SetCookie(c, code.VagoToken, newAccess, refreshTTL, false)
 
-	setAuth(c, refreshClaims.UserID(), refreshClaims.Role, claims.ExpiresAt.Time)
+	setAuth(c, refreshClaims.UserID(), refreshClaims.Role, claims.ExpiresAt.Time, true)
 	return true
 }
 
-func setAuth(c *gin.Context, id uint, role string, accessExpTime time.Time) {
+func setAuth(c *gin.Context, id uint, role string, exp time.Time, refreshed bool) {
 	c.Set(code.UserId, id)
 	c.Set(code.Role, role)
-	c.Set(code.AccessExpTime, accessExpTime)
+
+	c.Set(code.TokenInfo, auth.TokenInfo{
+		UserID:      id,
+		Role:        role,
+		Exp:         exp,
+		Remaining:   time.Until(exp).Truncate(time.Second),
+		IsRefreshed: refreshed,
+	})
+}
+
+func TokenInfo(c *gin.Context) (auth.TokenInfo, bool) {
+	v, ok := c.Get(code.TokenInfo)
+	if !ok {
+		return auth.TokenInfo{}, false
+	}
+
+	info, ok := v.(auth.TokenInfo)
+	return info, ok
 }

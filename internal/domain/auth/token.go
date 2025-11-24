@@ -1,5 +1,15 @@
 package auth
 
+import "time"
+
+type TokenInfo struct {
+	Exp         time.Time     `json:"exp"`
+	Remaining   time.Duration `json:"remaining"`
+	IsRefreshed bool          `json:"is_refreshed"`
+	Role        string        `json:"role"`
+	UserID      uint          `json:"user_id"`
+}
+
 type TokenPair struct {
 	AccessToken  string
 	RefreshToken string

@@ -8194,6 +8194,13 @@ var require_ping_grpc_web_pb = __commonJS({
   }
 });
 
+// web/static/js/common.js
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+}
+
 // web/static/js/grpc.js
 var import_hello_pb = __toESM(require_hello_pb());
 var import_hello_grpc_web_pb = __toESM(require_hello_grpc_web_pb());
@@ -8320,6 +8327,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 export {
+  getCookie,
   initChat,
   ping,
   sayHello

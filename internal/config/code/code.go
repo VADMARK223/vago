@@ -24,6 +24,5 @@ const (
 	Capture              = "capture"
 	Vago                 = "vago"
 	VagoSession          = "vago_session"
-	WsToken              = "ws_token"
-	AccessExpTime        = "access_exp_time"
+	TokenInfo            = "token_info"
 )

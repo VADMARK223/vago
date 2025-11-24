@@ -6,6 +6,7 @@ import (
 	"time"
 	"vago/internal/config/code"
 	"vago/internal/infra/token"
+	"vago/internal/trasport/http/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,23 +27,16 @@ func ShowIndex(provider *token.JWTProvider) gin.HandlerFunc {
 }
 
 func updateTokenInfo(c *gin.Context, data gin.H) {
-	data[code.TokenStatus] = "❌ время истечения токена не найдено"
+	data[code.TokenStatus] = "❌ информации о токене нет в контексте"
 	data[code.TokenExpireAt] = "-"
 
-	expAny, ok := c.Get(code.AccessExpTime)
+	info, ok := middleware.TokenInfo(c)
 	if !ok {
-		return
-	}
-
-	exp, ok := expAny.(time.Time)
-	if !ok {
-		data[code.TokenStatus] = "❌ неверный тип AccessExpTime"
 		return
 	}
 
 	data[code.TokenStatus] = "✅"
-	accessRemainingTime := time.Until(exp).Truncate(time.Second)
-	data[code.TokenExpireAt] = fmt.Sprintf("%s (через %s)", exp.Format("02.01.2006 15:04:05"), accessRemainingTime.String())
+	data[code.TokenExpireAt] = fmt.Sprintf("%s (через %s)", info.Exp.Format("02.01.2006 15:04:05"), info.Remaining.String())
 }
 
 func updateRefreshTokenInfo(c *gin.Context, data gin.H, provider *token.JWTProvider) {

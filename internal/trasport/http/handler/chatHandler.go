@@ -15,15 +15,7 @@ import (
 func ShowChat(port string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		data := tplWithCapture(c, "Чат")
-
 		data[code.Port] = port
-		tokenStr, errTokenCookie := c.Cookie(code.VagoToken)
-		if errTokenCookie == nil && tokenStr != "" {
-			data[code.WsToken] = tokenStr
-		} else {
-			data[code.WsToken] = ""
-		}
-
 		c.HTML(http.StatusOK, "chat.html", data)
 	}
 }

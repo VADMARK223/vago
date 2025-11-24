@@ -22,19 +22,19 @@
 {{ template "footer" . }}
 
 <script type="module">
-    import {sayHello, ping} from '/static/js/bundle.js';
+    import {sayHello, ping, getCookie} from '/static/js/bundle.js';
 
     const resultBox = document.getElementById('result');
     const sayHelloBtn = document.getElementById('sayHelloBtn');
     const pingBtn = document.getElementById('pingHelloBtn');
-    const token ="{{.vago_token}}"
+    const token = getCookie("vago_token");
 
     function setStatus(message, isError = false) {
         resultBox.textContent = (isError ? '❌ ' : '✅ ') + message + '\n';
     }
 
     sayHelloBtn.addEventListener('click', async () => {
-        sayHello("Вадим",token)
+        sayHello("Вадим", token)
             .then((resp) => {
                 setStatus("Response: " + resp.getMessage());
             })
