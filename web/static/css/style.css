@@ -467,12 +467,6 @@ input[type="checkbox"]:checked::after {
     justify-content: center;
 }
 
-@media (max-width: 600px) {
-    .greetings {
-        display: none;
-    }
-}
-
 .input-wrap {
     flex: 1;
     position: relative;
@@ -500,4 +494,22 @@ input[type="checkbox"]:checked::after {
     background: var(--bg-panel);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-md);
+}
+
+.icon-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+@media (max-width: 600px) {
+    .greetings {
+        display: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .menu .icon-item span {
+        display: none;
+    }
 }

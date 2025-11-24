@@ -6414,7 +6414,6 @@ var require_google_protobuf = __commonJS({
 // web/static/js/pb/hello_pb.js
 var require_hello_pb = __commonJS({
   "web/static/js/pb/hello_pb.js"(exports2) {
-    "use strict";
     var jspb2 = require_google_protobuf();
     var goog2 = jspb2;
     var global2 = typeof globalThis !== "undefined" && globalThis || typeof window !== "undefined" && window || typeof global2 !== "undefined" && global2 || typeof self !== "undefined" && self || (function() {
@@ -7944,7 +7943,6 @@ var require_grpc_web = __commonJS({
 // web/static/js/pb/hello_grpc_web_pb.js
 var require_hello_grpc_web_pb = __commonJS({
   "web/static/js/pb/hello_grpc_web_pb.js"(exports2, module2) {
-    "use strict";
     var grpc = {};
     grpc.web = require_grpc_web();
     var proto2 = {};
@@ -8058,7 +8056,6 @@ var require_empty_pb = __commonJS({
 // web/static/js/pb/ping_pb.js
 var require_ping_pb = __commonJS({
   "web/static/js/pb/ping_pb.js"(exports2) {
-    "use strict";
     var jspb2 = require_google_protobuf();
     var goog2 = jspb2;
     var global2 = typeof globalThis !== "undefined" && globalThis || typeof window !== "undefined" && window || typeof global2 !== "undefined" && global2 || typeof self !== "undefined" && self || (function() {
@@ -8145,7 +8142,6 @@ var require_ping_pb = __commonJS({
 // web/static/js/pb/ping_grpc_web_pb.js
 var require_ping_grpc_web_pb = __commonJS({
   "web/static/js/pb/ping_grpc_web_pb.js"(exports2, module2) {
-    "use strict";
     var grpc = {};
     grpc.web = require_grpc_web();
     var google_protobuf_empty_pb = require_empty_pb();
@@ -8198,13 +8194,11 @@ var require_ping_grpc_web_pb = __commonJS({
   }
 });
 
-// web/static/js/main.js
+// web/static/js/grpc.js
 var import_hello_pb = __toESM(require_hello_pb());
 var import_hello_grpc_web_pb = __toESM(require_hello_grpc_web_pb());
-var import_ping_pb = __toESM(require_ping_pb());
 var import_ping_grpc_web_pb = __toESM(require_ping_grpc_web_pb());
 var import_empty_pb = __toESM(require_empty_pb());
-var PORT = "5555";
 var GRPC_WEB_PORT = "8090";
 var PROTOCOL = window.location.protocol;
 var HOSTNAME = window.location.hostname;
@@ -8242,14 +8236,19 @@ function ping() {
     });
   });
 }
+
+// web/static/js/chat.js
+var HOSTNAME2 = window.location.hostname;
 function initChat(cfg) {
   const myUserId = cfg.userId;
   const token = cfg.token;
+  const port = cfg.port;
+  console.log(`Init chat userid: ${myUserId}, PORT:${port}, token: ${token}`);
   if (!token) {
     cfg.status.textContent = "\u274C Token not found. Please log in.";
     return;
   }
-  const host = `ws://${HOSTNAME}:${PORT}/ws`;
+  const host = `ws://${HOSTNAME2}:${port}/ws`;
   const url = host + "?token=" + token;
   const socket = new WebSocket(url);
   socket.onopen = () => cfg.status.textContent = "\u{1F7E2} Connected (" + host + ")";

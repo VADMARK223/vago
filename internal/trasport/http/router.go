@@ -74,7 +74,7 @@ func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine
 		auth.GET("/grpc-test", handler.Grpc)
 
 		auth.GET("/ws", handler.ServeSW(hub, ctx.Log, tokenProvider))
-		auth.GET("/chat", handler.ShowChat())
+		auth.GET("/chat", handler.ShowChat(ctx.Cfg.Port))
 	}
 
 	return r

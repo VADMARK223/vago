@@ -95,14 +95,13 @@ proto-js:
 
 bundle:
 	@echo "$(BLUE)📦 Bundling JavaScript client...$(RESET)"
-	npx esbuild web/static/js/main.js \
+	npx esbuild web/static/js/index.js \
 			--bundle \
 			--format=esm \
 			--outfile=web/static/js/bundle.js \
 			--platform=browser \
 			--target=es2020 \
-			--define:process.env.GRPC_WEB_PORT="'$(GRPC_WEB_PORT)'" \
-			--define:process.env.PORT="'$(PORT)'"
+			--define:process.env.GRPC_WEB_PORT="'$(GRPC_WEB_PORT)'"
 	@echo "$(GREEN)✅ Bundle created → web/static/js/bundle.js$(RESET)"
 
 proto-js-all: ## 🚀 Full pipeline: clean → generate → bundle

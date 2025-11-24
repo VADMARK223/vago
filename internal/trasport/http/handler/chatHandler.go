@@ -12,15 +12,16 @@ import (
 	"go.uber.org/zap"
 )
 
-func ShowChat() gin.HandlerFunc {
+func ShowChat(port string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		data := tplWithCapture(c, "Чат")
 
+		data[code.Port] = port
 		tokenStr, errTokenCookie := c.Cookie(code.VagoToken)
 		if errTokenCookie == nil && tokenStr != "" {
-			data["ws_token"] = tokenStr
+			data[code.WsToken] = tokenStr
 		} else {
-			data["ws_token"] = ""
+			data[code.WsToken] = ""
 		}
 
 		c.HTML(http.StatusOK, "chat.html", data)

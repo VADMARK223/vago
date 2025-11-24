@@ -4,9 +4,24 @@
     <div class="menu">
         <div>
             <a href="/" class="btn"><i class="fa-solid fa-house"></i></a>
-            <a href="/book" class="btn"><i class="fa-solid fa-book"></i>Книга</a>
-            <a href="/tasks" class="btn"><i class="fa-solid fa-list-check"></i>Задачи</a>
-            <a href="/chat" class="btn"><i class="fa-solid fa-comment"></i>Чат</a>
+            <a href="/book" class="btn">
+                <div class="icon-item">
+                    <i class="fa-solid fa-book"></i>
+                    <span>Книга</span>
+                </div>
+            </a>
+            <a href="/tasks" class="btn">
+                <div class="icon-item">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>Задачи</span>
+                </div>
+            </a>
+            <a href="/chat" class="btn">
+                <div class="icon-item">
+                    <i class="fa-solid fa-comment"></i>
+                    <span>Чат</span>
+                </div>
+            </a>
             {{if .user_id}}
             {{if .is_admin}}
             <a href="/users" class="btn"><i class="fa-solid fa-users"></i></a>
