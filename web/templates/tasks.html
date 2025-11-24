@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Tasks</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+{{ template "header" . }}
+
+<main>
+    <div class="container">
+        <form class="form-add" action="/tasks" method="POST">
+            <label>
+                <input type="text" name="name" placeholder="Task name" required>
+            </label>
+            <label>
+                <textarea name="description" placeholder="Description"></textarea>
+            </label>
+            <label>
+                <input type="checkbox" name="completed"> Completed
+            </label>
+            <br>
+            <div>
+                <button type="submit" class="btn"><i class="fa-solid fa-plus"></i></button>
+            </div>
+        </form>
+
+        <div>
+            <hr/>
+        </div>
+
+        <div class="scrollable-content">
+            <div class="list">
+                {{range .Tasks}}
+                <div class="item {{if .Completed}}completed{{end}}" id="task-{{.ID}}">
+                    <div class="item-info">
+                        <h3>{{.Name}}</h3>
+                        <p>{{.Description}}</p>
+                        <small>Created: {{.CreatedAt.Format "02.01.2006 15:04"}}</small>
+                    </div>
+
+                    <div>
+                        <label>
+                            <input type="checkbox"
+                                   name="completed"
+                                   {{if .Completed}}checked{{end}}
+                                   onchange="toggleCompleted('{{.ID}}', this.checked)"
+                            >
+                            Completed
+                        </label>
+
+                        <button class="btn-small btn-danger" onclick="deleteTask('{{.ID}}')"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+                {{else}}
+                <p class="empty">No tasks</p>
+                {{end}}
+            </div>
+        </div>
+    </div>
+</main>
+
+{{ template "footer" . }}
+<script>
+    async function deleteTask(id) {
+        if (!confirm('Delete task?')) return;
+
+        const res = await fetch(`/tasks/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+            document.getElementById(`task-${id}`).remove();
+        } else {
+            alert('Error deleting task');
+        }
+    }
+
+    async function toggleCompleted(id, completed) {
+        const res = await fetch(`/tasks/${id}`, {
+            method: 'PUT',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ completed })
+        });
+
+        if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            alert("Error task updating: " + (data.error || res.statusText));
+            return;
+        }
+
+        // Меняем стиль строки без обновления страницы
+        const li = document.getElementById(`task-${id}`);
+        if (completed) {
+            li.classList.add("completed");
+        } else {
+            li.classList.remove("completed");
+        }
+    }
+</script>
+</body>
+</html>

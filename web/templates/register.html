@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+{{ template "header" . }}
+
+<main>
+    <div class="container">
+        <form class="form-add" method="POST" action="/register">
+            <label><input name="login" placeholder="Login" required></label>
+            <label><input name="password" type="password" placeholder="Password" required></label>
+            <label><input name="username" placeholder="Username" required></label>
+            <label><input name="email" type="email" placeholder="E-mail" required></label>
+            <label><input value="user" disabled></label>
+            <input type="hidden" name="role" value="user">
+            <label><input name="color" placeholder="Color" value="#FF5733" readonly></label>
+
+            <div>
+                <button id="submitBtn" class="btn" type="submit">Create account</button>
+                {{if .error}}<span class="error-msg">{{.error}}</span>{{end}}
+            </div>
+
+            <span>
+                <a href="/login">Sign in</a>
+            </span>
+        </form>
+    </div>
+</main>
+
+{{ template "footer" . }}
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const loginInput = document.querySelector('input[name="login"]')
+        const passwordInput = document.querySelector('input[name="password"]')
+        const emailInput = document.querySelector('input[name="email"]')
+        const usernameInput = document.querySelector('input[name="username"]')
+        const submitBtn = document.getElementById("submitBtn")
+
+        loginInput.addEventListener("input", () => {
+            const v = loginInput.value.trim();
+
+            if (v) {
+                passwordInput.value = v;
+                emailInput.value = `${v}@${v}.ru`;
+                usernameInput.value = `User${v}`;
+            }
+
+            updateState()
+        })
+
+        passwordInput.addEventListener("input", updateState);
+        emailInput.addEventListener("input", updateState);
+        usernameInput.addEventListener("input", updateState);
+
+        function updateState() {
+            const login = loginInput.value.trim();
+            const password = passwordInput.value.trim();
+            const email = emailInput.value.trim();
+            const username = usernameInput.value.trim();
+            setDisabledSubmitBtn(login, password, email, username);
+        }
+
+        function setDisabledSubmitBtn(login, password, email, username) {
+            submitBtn.disabled = login === "" || password === "" || email === "" || username === "";
+        }
+
+        updateState();
+    })
+</script>
+</body>
+</html>

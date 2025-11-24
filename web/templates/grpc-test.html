@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>gRPC-Web Test</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+{{ template "header" . }}
+
+<main>
+    <div class="container">
+        <div>
+            <button id="sayHelloBtn" class="btn">SayHello</button>
+            <button id="pingHelloBtn" class="btn">PingHello</button>
+        </div>
+
+        <pre id="result"></pre>
+    </div>
+</main>
+
+{{ template "footer" . }}
+
+<script type="module">
+    import {sayHello, ping} from '/static/js/bundle.js';
+
+    const resultBox = document.getElementById('result');
+    const sayHelloBtn = document.getElementById('sayHelloBtn');
+    const pingBtn = document.getElementById('pingHelloBtn');
+    const token ="{{.vago_token}}"
+
+    function setStatus(message, isError = false) {
+        resultBox.textContent = (isError ? '❌ ' : '✅ ') + message + '\n';
+    }
+
+    sayHelloBtn.addEventListener('click', async () => {
+        sayHello("Вадим",token)
+            .then((resp) => {
+                setStatus("Response: " + resp.getMessage());
+            })
+            .catch((err) => {
+                setStatus("Error, " + err, true);
+            });
+    })
+
+    pingBtn.addEventListener('click', async () => {
+        ping()
+            .then((resp) => {
+                setStatus("Response: " + resp.getRun());
+            })
+            .catch((err) => {
+                setStatus("Error, " + err, true);
+            });
+    })
+</script>
+
+</body>
+</html>

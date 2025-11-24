@@ -1,0 +1,150 @@
+package grpc
+
+import (
+	"errors"
+	"fmt"
+	"net"
+	"net/http"
+	pbAuth "vago/api/pb/auth"
+	pbChat "vago/api/pb/chat"
+	pbHello "vago/api/pb/hello"
+	pbPing "vago/api/pb/ping"
+	"vago/internal/app"
+	"vago/internal/config/kafka/topic"
+	"vago/internal/domain/user"
+	"vago/internal/infra/kafka"
+	"vago/internal/infra/persistence/gorm"
+	"vago/internal/infra/token"
+
+	"github.com/improbable-eng/grpc-web/go/grpcweb"
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
+)
+
+type Server struct {
+	grpcServer *grpc.Server
+	listener   net.Listener
+	log        *zap.SugaredLogger
+}
+
+func NewServer(ctx *app.Context, grpcPort, grpcWebPort string, provider *token.JWTProvider) (*Server, error) {
+	lis, err := net.Listen("tcp", ":"+grpcPort)
+	if err != nil {
+		return nil, fmt.Errorf("failed to listen on port %s: %w", grpcPort, err)
+	}
+
+	//
+	s := &Server{
+		grpcServer: grpc.NewServer(
+			grpc.UnaryInterceptor(NewAuthInterceptor(ctx.Log, provider)),
+		),
+		listener: lis,
+		log:      ctx.Log,
+	}
+
+	userSvc := user.NewService(gorm.NewUserRepo(ctx), provider)
+
+	pbAuth.RegisterAuthServiceServer(s.grpcServer, NewAuthServer(userSvc, ctx.Cfg.JwtSecret))
+	pbHello.RegisterHelloServiceServer(s.grpcServer, NewHelloServer(ctx.Log))
+	pbPing.RegisterPingServiceServer(s.grpcServer, &PingServer{})
+	var producer *kafka.Producer
+	if ctx.Cfg.KafkaEnable {
+		producer = kafka.NewProducer(topic.ChatLog, ctx.Log, ctx)
+	}
+	pbChat.RegisterChatServiceServer(s.grpcServer, New(ctx.Log, producer))
+
+	wrappedGrpc := grpcweb.WrapServer(
+		s.grpcServer,
+		grpcweb.WithOriginFunc(func(origin string) bool {
+			ctx.Log.Debugw("origin", "origin", origin)
+			return true
+		}),
+		grpcweb.WithAllowedRequestHeaders([]string{
+			"x-grpc-web", "content-type", "x-user-agent", "authorization", "Authorization",
+		}),
+		grpcweb.WithWebsockets(true),
+		grpcweb.WithCorsForRegisteredEndpointsOnly(false),
+	)
+
+	httpServer := &http.Server{
+		Addr: ":" + grpcWebPort,
+		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			s.log.Infow("HTTP request", "method", r.Method, "path", r.URL.Path, "headers", r.Header)
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+			corsAllowedOrigins := ctx.Cfg.CorsAllowedOrigins()
+			origin := r.Header.Get("Origin")
+			ctx.Log.Infow("Check cors allowed origins.")
+			if corsAllowedOrigins[origin] {
+				w.Header().Set("Access-Control-Allow-Origin", origin)
+				w.Header().Set("Vary", "Origin")
+			} else {
+				ctx.Log.Infow("BAD")
+				ctx.Log.Infow("test", "origin", origin)
+				ctx.Log.Infow("test", "corsAllowedOrigins", corsAllowedOrigins)
+			}
+			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+			w.Header().Set("Access-Control-Allow-Headers",
+				"x-grpc-web, content-type, x-user-agent, authorization, Authorization, accept, x-requested-with")
+			w.Header().Set("Access-Control-Expose-Headers", "Grpc-Status, Grpc-Message, Grpc-Encoding, Grpc-Accept-Encoding")
+
+			if r.Method == http.MethodOptions {
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+
+			if r.URL.Path == "/health" {
+				w.WriteHeader(http.StatusOK)
+				_, _ = w.Write([]byte("gRPC-Web server is running"))
+				return
+			}
+
+			if wrappedGrpc.IsGrpcWebRequest(r) ||
+				wrappedGrpc.IsAcceptableGrpcCorsRequest(r) ||
+				wrappedGrpc.IsGrpcWebSocketRequest(r) {
+				s.log.Infow("gRPC-Web request", "content-type", r.Header.Get("content-type"))
+				wrappedGrpc.ServeHTTP(w, r)
+				return
+			}
+			http.NotFound(w, r)
+		}),
+	}
+
+	// Запускаем HTTP сервер в отдельной горутине
+	go func() {
+		s.log.Infow("gRPC-Web starting", "port", grpcWebPort)
+		if errServer := httpServer.ListenAndServe(); errServer != nil && !errors.Is(errServer, http.ErrServerClosed) {
+			s.log.Errorw("gRPC-Web stopped with error", "error", errServer)
+		}
+	}()
+
+	return s, nil
+}
+
+func (s *Server) Start() error {
+	s.log.Infow("gRPC ping starting", "address", s.listener.Addr().String())
+	return s.grpcServer.Serve(s.listener)
+}
+
+func (s *Server) GracefulStop() {
+	s.log.Infow("gRPC ping graceful stopping...")
+	s.grpcServer.GracefulStop()
+
+	/*if s.httpServer != nil {
+		s.log.Infow("gRPC-Web graceful stopping...")
+		if err := s.httpServer.Close(); err != nil {
+			s.log.Errorw("failed to close gRPC-Web server", "error", err)
+		}
+	}*/
+}
+
+func (s *Server) Stop() {
+	s.log.Infow("gRPC ping stopping...")
+	s.grpcServer.Stop()
+
+	/*if s.httpServer != nil {
+		s.log.Infow("gRPC-Web stopping...")
+		if err := s.httpServer.Close(); err != nil {
+			s.log.Errorw("failed to close gRPC-Web server", "error", err)
+		}
+	}*/
+}

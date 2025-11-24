@@ -1,0 +1,27 @@
+package code
+
+const (
+	RedirectTo           = "redirect_to"
+	UserId               = "user_id"
+	VagoToken            = "vago_token"
+	TokenStatus          = "token_status"
+	RefreshTokenStatus   = "refresh_token_status"
+	VagoRefreshToken     = "vago_refresh_token"
+	TemplateData         = "template_data"
+	Local                = "local"
+	Port                 = "port"
+	Error                = "error"
+	TokenExpireAt        = "token_expire_at"
+	RefreshTokenExpireAt = "refresh_token_expire_at"
+	Role                 = "role"
+	Color                = "color"
+	Email                = "email"
+	Password             = "password"
+	CurrentUser          = "current_user"
+	Login                = "login"
+	Username             = "username"
+	IsAdmin              = "is_admin"
+	Capture              = "capture"
+	Vago                 = "vago"
+	VagoSession          = "vago_session"
+)

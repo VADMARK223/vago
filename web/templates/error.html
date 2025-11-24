@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+{{ template "header" . }}
+
+<main>
+    {{if .Error}}
+    <div class="container">
+        <p class="error-msg">Error: {{.Error}}</p>
+    </div>
+    {{end}}
+</main>
+
+{{ template "footer" . }}
+</body>
+</html>

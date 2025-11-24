@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: vado-postgres
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U vadmark -d vadodb" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_USER: vadmark
+      POSTGRES_PASSWORD: 5125341
+      POSTGRES_DB: vadodb
+    volumes:
+      - vago_postgres_data:/var/lib/postgresql/data # постоянное хранилище
+      - ./db:/docker-entrypoint-initdb.d # SQL-скрипты при старте
+    networks:
+      - vago-net
+    command: >
+      postgres  -c shared_buffers=64MB 
+                -c work_mem=4MB 
+                -c maintenance_work_mem=16MB
+                -c max_connections=15
+                -c effective_cache_size=256MB
+
+  vago:
+    image: ghcr.io/vadmark223/vago:latest
+    container_name: vago
+    ports:
+      - "5555:5555" # Main port
+      - "50051:50051" # gRPC
+      - "8090:8090" # gRPC-web
+    restart: unless-stopped
+    env_file:
+      - .env.prod
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vago-net
+
+volumes:
+  vago_postgres_data:
+    name: vago_postgres_data
+
+networks:
+  vago-net:
