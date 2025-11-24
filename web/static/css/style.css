@@ -16,8 +16,7 @@
     --danger: #c94f4f;
 
     --layout-min-width: 320px;
-    /*--layout-min-width: 700px;*/
-    --layout-max-width: 840px;
+    --layout-max-width: 870px;
 
     --space-0: 0;
     --space-1: 4px;
@@ -195,6 +194,12 @@ a:not(.btn):not(.btn-small):not(.btn-danger):hover {
     color: white;
     padding: var(--space-2) var(--space-4);
     font-size: 14px;
+
+    transition:
+            background-color 0.3s ease,
+            color 0.3s ease,
+            opacity 0.3s ease,
+            transform 0.2s ease;
 }
 
 .btn:hover {
@@ -458,19 +463,12 @@ input[type="checkbox"]:checked::after {
 
 /* Компонент кнопки отправки сообщения */
 .chat-input-row .btn {
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    padding: var(--space-0);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+
 }
 
 .input-wrap {
     flex: 1;
     position: relative;
-    /*display: inline-block;*/
 }
 
 .clear-btn {
@@ -502,7 +500,7 @@ input[type="checkbox"]:checked::after {
     gap: var(--space-1);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 880px) {
     .greetings {
         display: none;
     }

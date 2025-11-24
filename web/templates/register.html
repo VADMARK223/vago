@@ -58,7 +58,7 @@
 
 {{ template "footer" . }}
 
-<script src="/static/js/ui.js"></script>
+<script type="module" src="/static/js/bundle.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         const loginInput = document.querySelector('input[name="login"]')
@@ -73,7 +73,7 @@
             if (v) {
                 passwordInput.value = v;
                 emailInput.value = `${v}@mail.ru`;
-                usernameInput.value = `User${v}`;
+                usernameInput.value = `User${v}`.slice(0, 30);
             }
 
             updateState()

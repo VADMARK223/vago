@@ -12,17 +12,16 @@
     <div class="container">
         <form class="form-add" action="/tasks" method="POST">
             <label>
-                <input type="text" name="name" placeholder="Task name" required>
+                <input type="text" name="name" placeholder="Наименование задачи" required>
             </label>
             <label>
-                <textarea name="description" placeholder="Description"></textarea>
+                <textarea name="description" placeholder="Описания задачи"></textarea>
             </label>
             <label>
-                <input type="checkbox" name="completed"> Completed
+                <input type="checkbox" name="completed">Выполнена
             </label>
-            <br>
             <div>
-                <button type="submit" class="btn"><i class="fa-solid fa-plus"></i></button>
+                <button type="submit" class="btn"><i class="fa-solid fa-plus"></i>Создать задачу</button>
             </div>
         </form>
 
@@ -37,7 +36,7 @@
                     <div class="item-info">
                         <h3>{{.Name}}</h3>
                         <p>{{.Description}}</p>
-                        <small>Created: {{.CreatedAt.Format "02.01.2006 15:04"}}</small>
+                        <small>Создана: {{.CreatedAt.Format "02.01.2006 15:04"}}</small>
                     </div>
 
                     <div>
@@ -46,8 +45,7 @@
                                    name="completed"
                                    {{if .Completed}}checked{{end}}
                                    onchange="toggleCompleted('{{.ID}}', this.checked)"
-                            >
-                            Completed
+                            >Выполнена
                         </label>
 
                         <button class="btn-small btn-danger" onclick="deleteTask('{{.ID}}')"><i class="fa-solid fa-trash"></i></button>
@@ -64,7 +62,7 @@
 {{ template "footer" . }}
 <script>
     async function deleteTask(id) {
-        if (!confirm('Delete task?')) return;
+        if (!confirm('Удалить задачу?')) return;
 
         const res = await fetch(`/tasks/${id}`, { method: 'DELETE' });
         if (res.ok) {

@@ -35,7 +35,7 @@
 {{ template "footer" . }}
 <script>
     async function deleteUser(id) {
-        if (!confirm('Delete user?')) return;
+        if (!confirm('Удалить пользователя?')) return;
 
         const res = await fetch(`/users/${id}`, { method: 'DELETE' });
         if (res.ok) {

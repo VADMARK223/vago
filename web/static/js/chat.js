@@ -3,8 +3,11 @@ const HOSTNAME = window.location.hostname;
 export function initChat(cfg) {
     const myUserId = cfg.userId;
     const token = cfg.token;
-    const port= cfg.port
+    const port = cfg.port
+
     console.log(`Init chat userid: ${myUserId}, PORT:${port}, token: ${token}`)
+    const msgInput = cfg.input
+    const sendBtn = cfg.sendBtn
 
     if (!token) {
         cfg.status.textContent = "❌ Token not found. Please log in.";
@@ -38,16 +41,22 @@ export function initChat(cfg) {
         }
     };
 
-    cfg.sendBtn.onclick = sendMessage;
-    cfg.input.addEventListener("keydown", (e) => {
+    sendBtn.onclick = sendMessage;
+    msgInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
             e.preventDefault();
             sendMessage();
         }
+
+        updateEnableSendBtn()
     });
 
+    msgInput.addEventListener("input", () => {
+        updateEnableSendBtn()
+    })
+
     function sendMessage() {
-        const text = cfg.input.value.trim();
+        const text = msgInput.value.trim();
         if (!text || socket.readyState !== WebSocket.OPEN) return;
 
         socket.send(
@@ -57,7 +66,8 @@ export function initChat(cfg) {
             })
         );
 
-        cfg.input.value = "";
+        msgInput.value = "";
+        updateEnableSendBtn()
     }
 
     function addMessage(text, isMine) {
@@ -71,4 +81,10 @@ export function initChat(cfg) {
         cfg.messages.appendChild(div);
         cfg.messages.scrollTop = cfg.messages.scrollHeight;
     }
+
+    function updateEnableSendBtn() {
+        sendBtn.disabled = msgInput.value === ""
+    }
+
+    updateEnableSendBtn()
 }

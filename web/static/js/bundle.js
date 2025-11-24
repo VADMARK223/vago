@@ -8244,6 +8244,8 @@ function initChat(cfg) {
   const token = cfg.token;
   const port = cfg.port;
   console.log(`Init chat userid: ${myUserId}, PORT:${port}, token: ${token}`);
+  const msgInput = cfg.input;
+  const sendBtn = cfg.sendBtn;
   if (!token) {
     cfg.status.textContent = "\u274C Token not found. Please log in.";
     return;
@@ -8266,15 +8268,19 @@ function initChat(cfg) {
       console.error("Bad JSON:", e2);
     }
   };
-  cfg.sendBtn.onclick = sendMessage;
-  cfg.input.addEventListener("keydown", (e2) => {
+  sendBtn.onclick = sendMessage;
+  msgInput.addEventListener("keydown", (e2) => {
     if (e2.key === "Enter") {
       e2.preventDefault();
       sendMessage();
     }
+    updateEnableSendBtn();
+  });
+  msgInput.addEventListener("input", () => {
+    updateEnableSendBtn();
   });
   function sendMessage() {
-    const text = cfg.input.value.trim();
+    const text = msgInput.value.trim();
     if (!text || socket.readyState !== WebSocket.OPEN) return;
     socket.send(
       JSON.stringify({
@@ -8282,7 +8288,8 @@ function initChat(cfg) {
         text
       })
     );
-    cfg.input.value = "";
+    msgInput.value = "";
+    updateEnableSendBtn();
   }
   function addMessage(text, isMine) {
     const div = document.createElement("div");
@@ -8293,7 +8300,25 @@ function initChat(cfg) {
     cfg.messages.appendChild(div);
     cfg.messages.scrollTop = cfg.messages.scrollHeight;
   }
+  function updateEnableSendBtn() {
+    sendBtn.disabled = msgInput.value === "";
+  }
+  updateEnableSendBtn();
 }
+
+// web/static/js/ui.js
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".clear-btn[data-clear]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const inp = btn.closest(".input-wrap").querySelector("input");
+      inp.value = "";
+      inp.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+  });
+  document.querySelectorAll("input[data-required='true']").forEach((input) => {
+    input.required = true;
+  });
+});
 export {
   initChat,
   ping,
