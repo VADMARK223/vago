@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"vago/internal/chat/chatApp"
 	"vago/internal/config/code"
 	"vago/internal/infra/token"
 
@@ -27,7 +28,7 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { return true },
 }
 
-func ServeSW(hub *ws.Hub, log *zap.SugaredLogger, provider *token.JWTProvider) gin.HandlerFunc {
+func ServeSW(hub *ws.Hub, log *zap.SugaredLogger, provider *token.JWTProvider, svc *chatApp.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenStr := c.Query("token")
 		// Если токена нет в query параметре, пробуем взять из кук
@@ -53,7 +54,7 @@ func ServeSW(hub *ws.Hub, log *zap.SugaredLogger, provider *token.JWTProvider) g
 			return
 		}
 
-		client := ws.NewClient(conn, hub, claims.UserID(), log)
+		client := ws.NewClient(conn, hub, claims.UserID(), log, svc)
 		hub.Register <- client
 
 		go client.OutgoingLoop()

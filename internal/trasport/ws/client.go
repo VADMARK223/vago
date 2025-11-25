@@ -1,20 +1,25 @@
 package ws
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"time"
+	"vago/internal/app"
+	"vago/internal/chat/chatApp"
+	"vago/internal/chat/domain"
 
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
 )
 
 type Client struct {
-	Conn   *websocket.Conn
-	Hub    *Hub
-	Send   chan []byte
-	log    *zap.SugaredLogger
-	UserID uint
+	Conn       *websocket.Conn
+	Hub        *Hub
+	Send       chan []byte
+	log        *zap.SugaredLogger
+	UserID     uint
+	messageSvc *chatApp.Service
 }
 
 type ClientPacket struct {
@@ -30,13 +35,14 @@ type ServerMessage struct {
 	Time     int64  `json:"time"`
 }
 
-func NewClient(conn *websocket.Conn, hub *Hub, userID uint, log *zap.SugaredLogger) *Client {
+func NewClient(conn *websocket.Conn, hub *Hub, userID uint, log *zap.SugaredLogger, svc *chatApp.Service) *Client {
 	client := &Client{
-		Conn:   conn,
-		Hub:    hub,
-		Send:   make(chan []byte, 256),
-		UserID: userID,
-		log:    log,
+		Conn:       conn,
+		Hub:        hub,
+		Send:       make(chan []byte, 256),
+		UserID:     userID,
+		log:        log,
+		messageSvc: svc,
 	}
 	return client
 }
@@ -69,6 +75,10 @@ func (c *Client) IncomingLoop() {
 		}
 
 		c.log.Infow("Received message", "packet", packet)
+		errSendMessage := c.messageSvc.SendMessage(context.Background(), domain.UserID(c.UserID), packet.Text)
+		if errSendMessage != nil {
+			app.Dump("Send message error", errSendMessage)
+		}
 
 		switch packet.Type {
 		case "message":

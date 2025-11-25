@@ -77,7 +77,7 @@ func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine
 		auth.DELETE("/users/:id", handler.DeleteUser(userSvc))
 		auth.GET("/grpc-test", handler.Grpc)
 
-		auth.GET("/ws", handler.ServeSW(hub, ctx.Log, tokenProvider))
+		auth.GET("/ws", handler.ServeSW(hub, ctx.Log, tokenProvider, messageSvc))
 		auth.GET("/chat", handler.ShowChat(ctx.Cfg.Port))
 
 		messagesHandler := handler.NewMessageHandler(messageSvc)
