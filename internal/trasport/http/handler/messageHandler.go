@@ -28,9 +28,19 @@ func (h *MessageHandler) ShowMessages() func(c *gin.Context) {
 func (h *MessageHandler) Delete() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		parseUint, parseUintErr := strconv.ParseUint(c.Param("id"), 10, 32)
+		if parseUintErr != nil {
+			ShowError(c, "Ошибка конвертации идентификатора", parseUintErr.Error())
+			return
+		}
 
 		app.Dump("ID", parseUint)
 		app.Dump("parseUintErr", parseUintErr)
+		errDelete := h.service.DeleteMessage(uint(parseUint))
+
+		if errDelete != nil {
+			ShowError(c, "Ошибка удаления сообщения", errDelete.Error())
+			return
+		}
 
 		renderMessagePage(c, h.service, "")
 	}

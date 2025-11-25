@@ -51,15 +51,6 @@ func (r *UserRepository) CreateUser(u user.User) error {
 			case ValueToLong:
 				return ErrValueToLong
 			}
-
-			/*if pgErr.Code == UniqueCode {
-				switch pgErr.ConstraintName {
-				case ConstraintLogin:
-					return ErrLoginExists
-				case ConstraintEmail:
-					return ErrEmailExists
-				}
-			}*/
 		}
 		return fmt.Errorf("failed to create user: %w", err)
 	}

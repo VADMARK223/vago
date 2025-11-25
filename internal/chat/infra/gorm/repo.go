@@ -2,6 +2,7 @@ package gorm
 
 import (
 	"context"
+	"fmt"
 	"vago/internal/chat/domain"
 
 	"gorm.io/gorm"
@@ -49,4 +50,12 @@ func (r *MessageRepo) ListAll(ctx context.Context) ([]*domain.Message, error) {
 	}
 
 	return result, nil
+}
+
+func (r *MessageRepo) DeleteMessage(id uint) error {
+	if err := r.db.Delete(&MessageEntity{}, id).Error; err != nil {
+		return fmt.Errorf("failed to delete message: %w", err)
+	}
+
+	return nil
 }

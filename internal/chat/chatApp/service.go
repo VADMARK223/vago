@@ -36,3 +36,7 @@ func (s *Service) SendMessage(ctx context.Context, author domain.UserID, body st
 func (s *Service) LastMessages(ctx context.Context) ([]*domain.Message, error) {
 	return s.repo.ListAll(ctx)
 }
+
+func (s *Service) DeleteMessage(id uint) error {
+	return s.repo.DeleteMessage(id)
+}
