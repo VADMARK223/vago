@@ -18,7 +18,7 @@ func ShowUsers(service *user.Service) func(c *gin.Context) {
 func renderUsersPage(c *gin.Context, service *user.Service, errorMsg string) {
 	users, err := service.GetAll()
 	if err != nil {
-		ShowError(c, "Failed to load users", err.Error())
+		ShowError(c, "Ошибка загрузки пользователя", err.Error())
 		return
 	}
 
@@ -71,7 +71,7 @@ func DeleteUser(service *user.Service) func(c *gin.Context) {
 
 		err := service.DeleteUser(uint(parseUint))
 		if err != nil {
-			ShowError(c, "Failed to delete user", err.Error())
+			ShowError(c, "Ошибка удаления пользователя", err.Error())
 			return
 		}
 

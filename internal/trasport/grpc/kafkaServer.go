@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 	"vago/api/pb/chat"
-	chatDomain "vago/internal/domain/chat"
 	"vago/internal/infra/kafka"
+	chatDomain "vago/internal/kafka/domain"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"

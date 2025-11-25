@@ -22,13 +22,7 @@
 
             {{if .user_id}}
             <div class="list">
-                <div class="item">
-                    <div>
-                        <h3>Токен</h3>
-                        <div>Статус: {{.token_status}}</div>
-                        <div>Истекает: {{.token_expire_at}}</div>
-                    </div>
-                </div>
+
 
                 <div class="item">
                     <div>
@@ -38,6 +32,15 @@
                         <div>E-mail: {{.email}}</div>
                     </div>
                 </div>
+
+                <div class="item">
+                    <div>
+                        <h3>Токен</h3>
+                        <div>Статус: {{.token_status}}</div>
+                        <div>Истекает: {{.token_expire_at}}</div>
+                    </div>
+                </div>
+
 
                 <div class="item">
                     <div>

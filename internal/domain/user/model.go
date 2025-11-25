@@ -13,8 +13,6 @@ type User struct {
 	Role      Role
 	Color     string
 	CreatedAt time.Time
-
-	TasksIDs []uint
 }
 
 func (u User) IsAdmin() bool {

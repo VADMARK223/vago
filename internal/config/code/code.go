@@ -25,4 +25,5 @@ const (
 	Vago                 = "vago"
 	VagoSession          = "vago_session"
 	TokenInfo            = "token_info"
+	Messages             = "messages"
 )

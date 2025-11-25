@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 	"vago/internal/app"
-	"vago/internal/domain/chat"
+	"vago/internal/kafka/domain"
 
 	"github.com/segmentio/kafka-go"
 	"go.uber.org/zap"
@@ -55,7 +55,7 @@ func (p *Producer) SendMessage(key, value []byte) error {
 	return nil
 }
 
-func (p *Producer) SendChatMessage(msg *chat.MessageLog) error {
+func (p *Producer) SendChatMessage(msg *domain.MessageLog) error {
 	data, err := json.Marshal(msg)
 	if err != nil {
 		p.log.Errorw("Failed to marshal message", "err", err)

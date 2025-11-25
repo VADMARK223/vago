@@ -59,7 +59,7 @@ func AddTask(appCtx *app.Context) gin.HandlerFunc {
 
 		if err := appCtx.DB.Create(&t).Error; err != nil {
 			appCtx.Log.Errorw("failed to create task", "error", err)
-			ShowError(c, "Error adding task", err.Error())
+			ShowError(c, "Ошибка создания задачи", err.Error())
 			return
 		}
 

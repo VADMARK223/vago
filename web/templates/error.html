@@ -2,16 +2,16 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Error</title>
+    <title>Ошибка</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
 {{ template "header" . }}
 
 <main>
-    {{if .Error}}
+    {{if .error}}
     <div class="container">
-        <p class="error-msg">Error: {{.Error}}</p>
+        <p class="error-msg">{{.error}}</p>
     </div>
     {{end}}
 </main>
