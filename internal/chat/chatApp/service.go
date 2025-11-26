@@ -40,3 +40,7 @@ func (s *Service) LastMessages(ctx context.Context) ([]*domain.Message, error) {
 func (s *Service) DeleteMessage(id uint) error {
 	return s.repo.DeleteMessage(id)
 }
+
+func (s *Service) DeleteAll() error {
+	return s.repo.DeleteAll()
+}

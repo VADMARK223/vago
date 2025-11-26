@@ -46,6 +46,16 @@ func (h *MessageHandler) Delete() func(c *gin.Context) {
 	}
 }
 
+func (h *MessageHandler) DeleteAll() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		err := h.service.DeleteAll()
+		if err != nil {
+			ShowError(c, "Ошибка удаления", err.Error())
+		}
+		renderMessagePage(c, h.service, "")
+	}
+}
+
 func renderMessagePage(c *gin.Context, service *chatApp.Service, _error string) {
 	all, err := service.LastMessages(context.Background())
 	if err != nil {
@@ -59,17 +69,17 @@ func renderMessagePage(c *gin.Context, service *chatApp.Service, _error string) 
 	c.HTML(http.StatusOK, "messages.html", data)
 }
 
-func AddMessage(_ *app.Context, svc *chatApp.Service) gin.HandlerFunc {
+func (h *MessageHandler) AddMessage() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		err := svc.SendMessage(context.Background(), 1, "Hello")
+		err := h.service.SendMessage(context.Background(), 1, "Hello")
 		if err != nil {
 			app.Dump("Error add message", err)
 			c.String(http.StatusInternalServerError, "Error add message")
 			return
 		}
 
-		c.Redirect(http.StatusFound, c.Request.Referer())
-
+		renderMessagePage(c, h.service, "")
+		//c.Redirect(http.StatusFound, c.Request.Referer())
 		// c.Redirect(http.StatusSeeOther, "/chat")
 	}
 }

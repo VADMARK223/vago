@@ -77,7 +77,9 @@ func (c *Client) IncomingLoop() {
 		c.log.Infow("Received message", "packet", packet)
 		errSendMessage := c.messageSvc.SendMessage(context.Background(), domain.UserID(c.UserID), packet.Text)
 		if errSendMessage != nil {
+			// TODO: доделать.
 			app.Dump("Send message error", errSendMessage)
+			return
 		}
 
 		switch packet.Type {

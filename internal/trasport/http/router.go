@@ -82,7 +82,8 @@ func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine
 
 		messagesHandler := handler.NewMessageHandler(messageSvc)
 		auth.GET("/messages", messagesHandler.ShowMessages())
-		auth.POST("/messages", handler.AddMessage(ctx, messageSvc))
+		auth.POST("/messages", messagesHandler.AddMessage())
+		auth.POST("/messagesDeleteAll", messagesHandler.DeleteAll())
 		auth.DELETE("/messages/:id", messagesHandler.Delete())
 	}
 
