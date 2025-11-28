@@ -73,24 +73,37 @@ export function parseAndAddMessage(messagesDiv, msg, myUserId) {
     console.log("Row message", msg)
     if (msg.type === "message") {
         const isMine = String(msg.author) === String(myUserId);
-        const text = isMine
-            ? msg.body
-            : `${msg.author}: ${msg.body}`;
-        addMessage(messagesDiv, text, isMine);
+        addMessage(messagesDiv, "Vadmark", msg.body, isMine, msg.sent_at, msg.author);
     } else {
         console.error(`Unknown message type:"${msg.type}"`)
     }
 }
 
-function addMessage(messagesDiv, text, isMine) {
-    console.log("Text", text, ", isMine", isMine)
-    const div = document.createElement("div");
-    div.textContent = text;
+function addMessage(messagesDiv, username, text, isMine, sentAt, author) {
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("chat-message");
 
     if (isMine) {
-        div.classList.add("chat-my-message");
+        wrapper.classList.add("chat-my-message");
+    }
+    
+    if (!isMine) {
+        const header = document.createElement("div");
+        header.classList.add("chat-message-header");
+        header.textContent = `${author}`;
+        wrapper.appendChild(header);
     }
 
-    messagesDiv.appendChild(div);
+    const body = document.createElement("div");
+    body.classList.add("chat-message-body");
+    body.textContent = text;
+    wrapper.appendChild(body);
+
+    const footer = document.createElement("div");
+    footer.classList.add("chat-message-footer");
+    footer.textContent = `${sentAt}`;
+    wrapper.appendChild(footer);
+
+    messagesDiv.appendChild(wrapper);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }

@@ -3,6 +3,7 @@ package domain
 import (
 	"errors"
 	"time"
+	"vago/pkg/timex"
 )
 
 type UserID uint
@@ -28,9 +29,20 @@ func (m *Message) Body() Body        { return m.body }
 func (m *Message) SentAt() time.Time { return m.sentAt }
 
 type MessageDTO struct {
-	Author UserID    `json:"author"`
-	Body   Body      `json:"body"`
-	SentAt time.Time `json:"sent_at"`
+	ID     uint   `json:"id"`
+	Author UserID `json:"author"`
+	Body   Body   `json:"body"`
+	SentAt string `json:"sent_at"`
 
 	Type string `json:"type"`
+}
+
+func (m *Message) ToDTO() MessageDTO {
+	return MessageDTO{
+		ID:     m.ID,
+		Author: m.Author(),
+		Body:   m.Body(),
+		SentAt: timex.Format(m.SentAt()),
+		Type:   "message", // TODO: пофиксякать
+	}
 }

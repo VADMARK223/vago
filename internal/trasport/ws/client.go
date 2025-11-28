@@ -8,6 +8,7 @@ import (
 	"vago/internal/app"
 	"vago/internal/chat/chatApp"
 	"vago/internal/chat/domain"
+	"vago/pkg/timex"
 
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
@@ -90,7 +91,7 @@ func (c *Client) IncomingLoop() {
 				//UserID:   c.UserID,
 				//Username: "test",
 				Body:   domain.Body(packet.Text),
-				SentAt: time.Now(),
+				SentAt: timex.Format(time.Now()),
 			}
 
 			serverMsgBytes, _ := json.Marshal(serverMsg)

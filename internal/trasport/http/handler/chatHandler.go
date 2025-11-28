@@ -29,13 +29,7 @@ func ShowChat(port string, service *chatApp.Service) gin.HandlerFunc {
 		data[code.Port] = port
 		dtos := make([]domain.MessageDTO, 0, len(all))
 		for _, m := range all {
-			dtos = append(dtos, domain.MessageDTO{
-				//ID:     m.ID,
-				Author: m.Author(),
-				Body:   m.Body(),
-				SentAt: m.SentAt(),
-				Type:   "message", // TODO: пофиксякать
-			})
+			dtos = append(dtos, m.ToDTO())
 		}
 		jsonBytes, _ := json.Marshal(dtos)
 		data["messages_json"] = string(jsonBytes)

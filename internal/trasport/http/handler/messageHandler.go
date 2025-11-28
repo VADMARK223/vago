@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"vago/internal/app"
 	"vago/internal/chat/chatApp"
+	"vago/internal/chat/domain"
 	"vago/internal/config/code"
 
 	"github.com/gin-gonic/gin"
@@ -62,8 +63,14 @@ func renderMessagePage(c *gin.Context, service *chatApp.Service, _error string) 
 	}
 
 	data := tplWithCapture(c, "Сообщения")
-	data[code.Messages] = all
-	data["messages_count"] = len(all)
+	messagesCount := len(all)
+	dtos := make([]domain.MessageDTO, 0, messagesCount)
+	for _, m := range all {
+		dtos = append(dtos, m.ToDTO())
+	}
+
+	data[code.Messages] = dtos
+	data["messages_count"] = messagesCount
 
 	c.HTML(http.StatusOK, "messages.html", data)
 }

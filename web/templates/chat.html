@@ -30,9 +30,9 @@
 {{ template "footer" . }}
 
 <script type="module">
-    import {parseAndAddMessage, initChat, getCookie} from "/static/js/bundle.js"
-    /*import {parseAndAddMessage, initChat} from "/static/js/chat.js"
-    import {getCookie} from "/static/js/common.js"*/
+    // import {parseAndAddMessage, initChat, getCookie} from "/static/js/bundle.js"
+    import {parseAndAddMessage, initChat} from "/static/js/chat.js"
+    import {getCookie} from "/static/js/common.js"
 
     const myUserId = "{{ .user_id }}";
     const token = getCookie("vago_token");

@@ -2,13 +2,18 @@ package gorm
 
 import (
 	"vago/internal/chat/domain"
+	"vago/pkg/timex"
 )
 
 func messageToEnty(dto domain.MessageDTO) *MessageEntity {
+	t, err := timex.Parse(dto.SentAt)
+	if err != nil {
+		panic(err)
+	}
 	return &MessageEntity{
 		UserID:    uint(dto.Author),
 		Content:   string(dto.Body),
-		CreatedAt: dto.SentAt,
+		CreatedAt: t,
 	}
 }
 

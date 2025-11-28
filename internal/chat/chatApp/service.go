@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 	"vago/internal/chat/domain"
+	"vago/pkg/timex"
 )
 
 type Service struct {
@@ -23,7 +24,7 @@ func (s *Service) SendMessage(ctx context.Context, author domain.UserID, body st
 	dto := domain.MessageDTO{
 		Author: author,
 		Body:   b,
-		SentAt: time.Now(),
+		SentAt: timex.Format(time.Now()),
 	}
 
 	if err := s.repo.Save(ctx, dto); err != nil {

@@ -403,24 +403,33 @@ input[type="checkbox"]:checked::after {
 }
 
 /* Стили для всех сообщений */
-.chat-messages > div {
+.chat-messages > .chat-message {
+    display: flex;
+    flex-direction: column;
     max-width: 70%;
     padding: var(--space-3) var(--space-4);
     border-radius: var(--radius-lg);
     word-wrap: break-word;
-    position: relative;
     animation: fadeIn 0.3s ease-in;
+    gap: 4px;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* Заголовок (ник) */
+.chat-message-header {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+/* Текст */
+.chat-message-body {
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+/* Подвал (время) */
+.chat-message-footer {
+    font-size: 0.8rem;
+    opacity: 0.7;
 }
 
 /* Сообщения других пользователей (слева) */
@@ -439,6 +448,17 @@ input[type="checkbox"]:checked::after {
     align-self: flex-end;
     text-align: left;
     border-bottom-right-radius: var(--radius-sm);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .chat-messages > div:hover {

@@ -18,6 +18,7 @@ import (
 	"vago/internal/infra/token"
 	"vago/internal/trasport/grpc"
 	"vago/internal/trasport/http"
+	"vago/pkg/timex"
 
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
@@ -32,7 +33,7 @@ func main() {
 	defer func() { _ = zapLogger.Sync() }()
 
 	appCtx := ctx.NewAppContext(zapLogger)
-	appCtx.Log.Infow("Start vago-ping.", "time", time.Now().Format("2006-01-02 15:04:05"))
+	appCtx.Log.Infow("Start vago-ping.", "time", timex.Format(time.Now()))
 
 	//------------------------------------------------------------
 	// Подключение к базе данных
