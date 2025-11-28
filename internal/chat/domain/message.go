@@ -29,20 +29,22 @@ func (m *Message) Body() Body        { return m.body }
 func (m *Message) SentAt() time.Time { return m.sentAt }
 
 type MessageDTO struct {
-	ID     uint   `json:"id"`
-	Author UserID `json:"author"`
-	Body   Body   `json:"body"`
-	SentAt string `json:"sent_at"`
+	ID       uint   `json:"id"`
+	AuthorID UserID `json:"author"`
+	Username string `json:"username"`
+	Body     Body   `json:"body"`
+	SentAt   string `json:"sent_at"`
 
 	Type string `json:"type"`
 }
 
-func (m *Message) ToDTO() MessageDTO {
+func (m *Message) ToDTO(username string) MessageDTO {
 	return MessageDTO{
-		ID:     m.ID,
-		Author: m.Author(),
-		Body:   m.Body(),
-		SentAt: timex.Format(m.SentAt()),
-		Type:   "message", // TODO: пофиксякать
+		ID:       m.ID,
+		AuthorID: m.Author(),
+		Username: username,
+		Body:     m.Body(),
+		SentAt:   timex.Format(m.SentAt()),
+		Type:     "message", // TODO: пофиксякать
 	}
 }

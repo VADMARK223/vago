@@ -11,7 +11,7 @@ func messageToEnty(dto domain.MessageDTO) *MessageEntity {
 		panic(err)
 	}
 	return &MessageEntity{
-		UserID:    uint(dto.Author),
+		UserID:    uint(dto.AuthorID),
 		Content:   string(dto.Body),
 		CreatedAt: t,
 	}

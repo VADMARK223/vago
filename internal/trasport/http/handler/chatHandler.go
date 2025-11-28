@@ -8,6 +8,7 @@ import (
 	"vago/internal/chat/chatApp"
 	"vago/internal/chat/domain"
 	"vago/internal/config/code"
+	"vago/internal/domain/user"
 	"vago/internal/infra/token"
 
 	"vago/internal/trasport/ws"
@@ -17,9 +18,9 @@ import (
 	"go.uber.org/zap"
 )
 
-func ShowChat(port string, service *chatApp.Service) gin.HandlerFunc {
+func ShowChat(port string, chatSvc *chatApp.Service, userSvc *user.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		all, err := service.LastMessages(context.Background())
+		all, err := chatSvc.Messages(context.Background())
 		if err != nil {
 			ShowError(c, "Ошибка получения списка сообщений", err.Error())
 			return
@@ -27,9 +28,17 @@ func ShowChat(port string, service *chatApp.Service) gin.HandlerFunc {
 
 		data := tplWithCapture(c, "Чат")
 		data[code.Port] = port
+
 		dtos := make([]domain.MessageDTO, 0, len(all))
 		for _, m := range all {
-			dtos = append(dtos, m.ToDTO())
+			u, errUser := userSvc.GetByID(uint(m.Author()))
+			var username string
+			if errUser != nil {
+				username = "Неизвестно"
+			} else {
+				username = u.Username
+			}
+			dtos = append(dtos, m.ToDTO(username))
 		}
 		jsonBytes, _ := json.Marshal(dtos)
 		data["messages_json"] = string(jsonBytes)

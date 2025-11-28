@@ -22,9 +22,10 @@ func (s *Service) SendMessage(ctx context.Context, author domain.UserID, body st
 	}
 
 	dto := domain.MessageDTO{
-		Author: author,
-		Body:   b,
-		SentAt: timex.Format(time.Now()),
+		AuthorID: author,
+		Username: "admin",
+		Body:     b,
+		SentAt:   timex.Format(time.Now()),
 	}
 
 	if err := s.repo.Save(ctx, dto); err != nil {
@@ -34,7 +35,7 @@ func (s *Service) SendMessage(ctx context.Context, author domain.UserID, body st
 	return nil
 }
 
-func (s *Service) LastMessages(ctx context.Context) ([]*domain.Message, error) {
+func (s *Service) Messages(ctx context.Context) ([]*domain.Message, error) {
 	return s.repo.ListAll(ctx)
 }
 

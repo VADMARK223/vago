@@ -73,7 +73,7 @@ export function parseAndAddMessage(messagesDiv, msg, myUserId) {
     console.log("Row message", msg)
     if (msg.type === "message") {
         const isMine = String(msg.author) === String(myUserId);
-        addMessage(messagesDiv, "Vadmark", msg.body, isMine, msg.sent_at, msg.author);
+        addMessage(messagesDiv, msg.username, msg.body, isMine, msg.sent_at, msg.author);
     } else {
         console.error(`Unknown message type:"${msg.type}"`)
     }
@@ -86,13 +86,13 @@ function addMessage(messagesDiv, username, text, isMine, sentAt, author) {
     if (isMine) {
         wrapper.classList.add("chat-my-message");
     }
-    
-    if (!isMine) {
+
+    // if (!isMine) {
         const header = document.createElement("div");
         header.classList.add("chat-message-header");
-        header.textContent = `${author}`;
+        header.textContent = `${author} • ${username}`;
         wrapper.appendChild(header);
-    }
+    // }
 
     const body = document.createElement("div");
     body.classList.add("chat-message-body");

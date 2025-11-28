@@ -86,12 +86,11 @@ func (c *Client) IncomingLoop() {
 		switch packet.Type {
 		case "message":
 			serverMsg := domain.MessageDTO{
-				Author: domain.UserID(c.UserID),
-				Type:   "message",
-				//UserID:   c.UserID,
-				//Username: "test",
-				Body:   domain.Body(packet.Text),
-				SentAt: timex.Format(time.Now()),
+				AuthorID: domain.UserID(c.UserID),
+				Type:     "message",
+				Username: "client",
+				Body:     domain.Body(packet.Text),
+				SentAt:   timex.Format(time.Now()),
 			}
 
 			serverMsgBytes, _ := json.Marshal(serverMsg)
