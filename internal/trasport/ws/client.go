@@ -27,13 +27,13 @@ type ClientPacket struct {
 	Text string `json:"text"`
 }
 
-type ServerMessage struct {
+/*type ServerMessage struct {
 	Type     string `json:"type"` // "message"
 	UserID   uint   `json:"userId"`
 	Username string `json:"username"`
 	Text     string `json:"text"`
 	Time     int64  `json:"time"`
-}
+}*/
 
 func NewClient(conn *websocket.Conn, hub *Hub, userID uint, log *zap.SugaredLogger, svc *chatApp.Service) *Client {
 	client := &Client{
@@ -84,12 +84,13 @@ func (c *Client) IncomingLoop() {
 
 		switch packet.Type {
 		case "message":
-			serverMsg := ServerMessage{
-				Type:     "message",
-				UserID:   c.UserID,
-				Username: "test",
-				Text:     packet.Text,
-				Time:     time.Now().Unix(),
+			serverMsg := domain.MessageDTO{
+				Author: domain.UserID(c.UserID),
+				Type:   "message",
+				//UserID:   c.UserID,
+				//Username: "test",
+				Body:   domain.Body(packet.Text),
+				SentAt: time.Now(),
 			}
 
 			serverMsgBytes, _ := json.Marshal(serverMsg)

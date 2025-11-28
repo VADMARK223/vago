@@ -33,8 +33,6 @@ func (h *MessageHandler) Delete() func(c *gin.Context) {
 			return
 		}
 
-		app.Dump("ID", parseUint)
-		app.Dump("parseUintErr", parseUintErr)
 		errDelete := h.service.DeleteMessage(uint(parseUint))
 
 		if errDelete != nil {
@@ -50,9 +48,9 @@ func (h *MessageHandler) DeleteAll() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		err := h.service.DeleteAll()
 		if err != nil {
-			ShowError(c, "Ошибка удаления", err.Error())
+			ShowError(c, "Ошибка удаления всех", err.Error())
 		}
-		renderMessagePage(c, h.service, "")
+		c.Redirect(http.StatusSeeOther, "/messages")
 	}
 }
 
@@ -65,6 +63,7 @@ func renderMessagePage(c *gin.Context, service *chatApp.Service, _error string) 
 
 	data := tplWithCapture(c, "Сообщения")
 	data[code.Messages] = all
+	data["messages_count"] = len(all)
 
 	c.HTML(http.StatusOK, "messages.html", data)
 }
@@ -78,8 +77,7 @@ func (h *MessageHandler) AddMessage() gin.HandlerFunc {
 			return
 		}
 
-		renderMessagePage(c, h.service, "")
 		//c.Redirect(http.StatusFound, c.Request.Referer())
-		// c.Redirect(http.StatusSeeOther, "/chat")
+		c.Redirect(http.StatusSeeOther, "/messages")
 	}
 }

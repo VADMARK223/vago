@@ -12,16 +12,19 @@
     <div class="container">
         <div class="list">
             <div class="item">
-                <form class="form-add" action="/messages" method="POST">
-                    <div>
-                        <button type="submit" class="btn"><i class="fa-solid fa-plus"></i>Создать сообщение</button>
-                    </div>
-                </form>
-                <form class="form-add" action="/messagesDeleteAll" method="POST">
-                    <div>
-                        <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i>Удалить все сообщения</button>
-                    </div>
-                </form>
+                <div class="messages-control">
+                    <form class="form-add" action="/messages" method="POST">
+                        <div>
+                            <button type="submit" class="btn"><i class="fa-solid fa-plus"></i>Создать сообщение</button>
+                        </div>
+                    </form>
+                    <form class="form-add" action="/messagesDeleteAll" method="POST">
+                        <div>
+                            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i>Удалить все сообщения</button>
+                        </div>
+                    </form>
+                    <span>Сообщений: {{.messages_count}}</span>
+                </div>
             </div>
         </div>
         <hr>

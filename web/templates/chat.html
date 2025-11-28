@@ -12,7 +12,7 @@
     <div class="container">
         <div class="chat">
             <div id="status"></div>
-            <div id="messages" class="chat-messages"></div>
+            <div id="messagesDiv" class="chat-messages"></div>
 
             <div class="chat-input-row">
                 {{ template "component.inputWithClear" dict
@@ -30,25 +30,35 @@
 {{ template "footer" . }}
 
 <script type="module">
-    import {initChat, getCookie} from "/static/js/bundle.js"
+    import {parseAndAddMessage, initChat, getCookie} from "/static/js/bundle.js"
+    /*import {parseAndAddMessage, initChat} from "/static/js/chat.js"
+    import {getCookie} from "/static/js/common.js"*/
 
     const myUserId = "{{ .user_id }}";
     const token = getCookie("vago_token");
 
     const port = "{{ .port }}";
     const msgInput = document.getElementById("msgInput");
+    const messagesData = JSON.parse(`{{.messages_json}}`)
+    console.log("messagesData", messagesData)
+
+    const messagesDiv = document.getElementById("messagesDiv")
 
     initChat({
         userId: myUserId,
         token: token,
         port: port,
         status: document.getElementById("status"),
-        messages: document.getElementById("messages"),
+        messages: messagesDiv,
         input: msgInput,
         sendBtn: document.getElementById("sendBtn")
     });
 
     msgInput.focus();
+
+    messagesData.forEach((item) => {
+        parseAndAddMessage(messagesDiv, item, myUserId)
+    })
 </script>
 
 </body>

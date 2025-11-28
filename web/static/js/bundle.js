@@ -8266,11 +8266,7 @@ function initChat(cfg) {
   socket.onmessage = (event) => {
     try {
       const msg = JSON.parse(event.data);
-      if (msg.type === "message") {
-        const isMine = String(msg.userId) === String(myUserId);
-        const text = isMine ? msg.text : `${msg.userId}: ${msg.text}`;
-        addMessage(text, isMine);
-      }
+      parseAndAddMessage(messagesDiv, msg, myUserId);
     } catch (e2) {
       console.error("Bad JSON:", e2);
     }
@@ -8298,19 +8294,30 @@ function initChat(cfg) {
     msgInput.value = "";
     updateEnableSendBtn();
   }
-  function addMessage(text, isMine) {
-    const div = document.createElement("div");
-    div.textContent = text;
-    if (isMine) {
-      div.classList.add("chat-my-message");
-    }
-    cfg.messages.appendChild(div);
-    cfg.messages.scrollTop = cfg.messages.scrollHeight;
-  }
   function updateEnableSendBtn() {
     sendBtn.disabled = msgInput.value === "";
   }
   updateEnableSendBtn();
+}
+function parseAndAddMessage(messagesDiv2, msg, myUserId) {
+  console.log("Row message", msg);
+  if (msg.type === "message") {
+    const isMine = String(msg.author) === String(myUserId);
+    const text = isMine ? msg.body : `${msg.author}: ${msg.body}`;
+    addMessage(messagesDiv2, text, isMine);
+  } else {
+    console.error(`Unknown message type:"${msg.type}"`);
+  }
+}
+function addMessage(messagesDiv2, text, isMine) {
+  console.log("Text", text, ", isMine", isMine);
+  const div = document.createElement("div");
+  div.textContent = text;
+  if (isMine) {
+    div.classList.add("chat-my-message");
+  }
+  messagesDiv2.appendChild(div);
+  messagesDiv2.scrollTop = messagesDiv2.scrollHeight;
 }
 
 // web/static/js/ui.js
@@ -8329,6 +8336,7 @@ document.addEventListener("DOMContentLoaded", () => {
 export {
   getCookie,
   initChat,
+  parseAndAddMessage,
   ping,
   sayHello
 };

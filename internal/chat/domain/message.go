@@ -28,7 +28,9 @@ func (m *Message) Body() Body        { return m.body }
 func (m *Message) SentAt() time.Time { return m.sentAt }
 
 type MessageDTO struct {
-	Author UserID
-	Body   Body
-	SentAt time.Time
+	Author UserID    `json:"author"`
+	Body   Body      `json:"body"`
+	SentAt time.Time `json:"sent_at"`
+
+	Type string `json:"type"`
 }

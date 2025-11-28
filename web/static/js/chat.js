@@ -27,15 +27,7 @@ export function initChat(cfg) {
     socket.onmessage = (event) => {
         try {
             const msg = JSON.parse(event.data);
-
-            if (msg.type === "message") {
-                const isMine =
-                    String(msg.userId) === String(myUserId);
-                const text = isMine
-                    ? msg.text
-                    : `${msg.userId}: ${msg.text}`;
-                addMessage(text, isMine);
-            }
+            parseAndAddMessage(messagesDiv, msg, myUserId)
         } catch (e) {
             console.error("Bad JSON:", e);
         }
@@ -70,21 +62,35 @@ export function initChat(cfg) {
         updateEnableSendBtn()
     }
 
-    function addMessage(text, isMine) {
-        const div = document.createElement("div");
-        div.textContent = text;
-
-        if (isMine) {
-            div.classList.add("chat-my-message");
-        }
-
-        cfg.messages.appendChild(div);
-        cfg.messages.scrollTop = cfg.messages.scrollHeight;
-    }
-
     function updateEnableSendBtn() {
         sendBtn.disabled = msgInput.value === ""
     }
 
     updateEnableSendBtn()
+}
+
+export function parseAndAddMessage(messagesDiv, msg, myUserId) {
+    console.log("Row message", msg)
+    if (msg.type === "message") {
+        const isMine = String(msg.author) === String(myUserId);
+        const text = isMine
+            ? msg.body
+            : `${msg.author}: ${msg.body}`;
+        addMessage(messagesDiv, text, isMine);
+    } else {
+        console.error(`Unknown message type:"${msg.type}"`)
+    }
+}
+
+function addMessage(messagesDiv, text, isMine) {
+    console.log("Text", text, ", isMine", isMine)
+    const div = document.createElement("div");
+    div.textContent = text;
+
+    if (isMine) {
+        div.classList.add("chat-my-message");
+    }
+
+    messagesDiv.appendChild(div);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }

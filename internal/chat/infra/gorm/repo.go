@@ -3,7 +3,6 @@ package gorm
 import (
 	"context"
 	"fmt"
-	"vago/internal/app"
 	"vago/internal/chat/domain"
 
 	"gorm.io/gorm"
@@ -62,6 +61,5 @@ func (r *MessageRepo) DeleteMessage(id uint) error {
 }
 
 func (r *MessageRepo) DeleteAll() error {
-	app.Dump("Dele all", nil)
 	return r.db.Exec("TRUNCATE TABLE messages RESTART IDENTITY").Error
 }
