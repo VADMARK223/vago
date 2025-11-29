@@ -5,14 +5,15 @@ import (
 	"net/http"
 	"strconv"
 	"vago/internal/app"
+	task2 "vago/internal/application/task"
 	"vago/internal/config/code"
-	"vago/internal/domain/task"
+	"vago/internal/domain"
 	"vago/internal/infra/persistence/gorm"
 
 	"github.com/gin-gonic/gin"
 )
 
-func Tasks(service *task.Service) gin.HandlerFunc {
+func Tasks(service *task2.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		data := tplWithCapture(c, "User tasks")
 
@@ -71,7 +72,7 @@ func DeleteTask(appCtx *app.Context) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 
-		if err := appCtx.DB.Delete(&task.Task{}, id).Error; err != nil {
+		if err := appCtx.DB.Delete(&domain.Task{}, id).Error; err != nil {
 			appCtx.Log.Errorw("failed to delete task", "error", err)
 			c.String(http.StatusInternalServerError, "Error deleting task")
 			return
@@ -81,7 +82,7 @@ func DeleteTask(appCtx *app.Context) gin.HandlerFunc {
 	}
 }
 
-func UpdateTask(appCtx *app.Context, service *task.Service) gin.HandlerFunc {
+func UpdateTask(appCtx *app.Context, service *task2.Service) gin.HandlerFunc {
 	type reqBody struct {
 		Completed bool `json:"completed"`
 	}

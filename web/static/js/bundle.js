@@ -8301,9 +8301,9 @@ function initChat(cfg) {
 }
 function parseAndAddMessage(messagesDiv2, msg, myUserId) {
   console.log("Row message", msg);
-  if (msg.type === "message") {
-    const isMine = String(msg.author) === String(myUserId);
-    addMessage(messagesDiv2, msg.username, msg.body, isMine, msg.sent_at, msg.author);
+  if (msg.type === "text") {
+    const isMine = String(msg.author_id) === String(myUserId);
+    addMessage(messagesDiv2, msg.username, msg.body, isMine, msg.sent_at, msg.author_id);
   } else {
     console.error(`Unknown message type:"${msg.type}"`);
   }

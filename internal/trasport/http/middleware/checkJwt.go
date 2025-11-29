@@ -3,7 +3,7 @@ package middleware
 import (
 	"time"
 	"vago/internal/config/code"
-	"vago/internal/domain/auth"
+	"vago/internal/domain"
 	"vago/internal/infra/token"
 
 	"github.com/gin-gonic/gin"
@@ -47,7 +47,7 @@ func tryRefresh(c *gin.Context, refreshTTL int, provider *token.JWTProvider) boo
 	}
 
 	claims, _ := provider.ParseToken(newAccess)
-	auth.SetCookie(c, code.VagoToken, newAccess, refreshTTL, false)
+	domain.SetCookie(c, code.VagoToken, newAccess, refreshTTL, false)
 
 	setAuth(c, refreshClaims.UserID(), refreshClaims.Role, claims.ExpiresAt.Time, true)
 	return true
@@ -57,7 +57,7 @@ func setAuth(c *gin.Context, id uint, role string, exp time.Time, refreshed bool
 	c.Set(code.UserId, id)
 	c.Set(code.Role, role)
 
-	c.Set(code.TokenInfo, auth.TokenInfo{
+	c.Set(code.TokenInfo, domain.TokenInfo{
 		UserID:      id,
 		Role:        role,
 		Exp:         exp,
@@ -66,12 +66,12 @@ func setAuth(c *gin.Context, id uint, role string, exp time.Time, refreshed bool
 	})
 }
 
-func TokenInfo(c *gin.Context) (auth.TokenInfo, bool) {
+func TokenInfo(c *gin.Context) (domain.TokenInfo, bool) {
 	v, ok := c.Get(code.TokenInfo)
 	if !ok {
-		return auth.TokenInfo{}, false
+		return domain.TokenInfo{}, false
 	}
 
-	info, ok := v.(auth.TokenInfo)
+	info, ok := v.(domain.TokenInfo)
 	return info, ok
 }

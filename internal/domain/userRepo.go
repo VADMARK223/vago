@@ -1,9 +1,10 @@
-package user
+package domain
 
-type Repository interface {
+type UserRepository interface {
 	CreateUser(user User) error
 	DeleteUser(id uint) error
 	GetByLogin(login string) (User, error)
 	GetByID(id uint) (User, error)
+	GetByIDs(ids []uint) ([]User, error)
 	GetAll() ([]User, error)
 }

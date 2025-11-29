@@ -2,12 +2,12 @@ package handler
 
 import (
 	"net/http"
-	"vago/internal/domain/auth"
+	"vago/internal/domain"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Logout(c *gin.Context) {
-	auth.ClearTokenCookies(c)
+	domain.ClearTokenCookies(c)
 	c.Redirect(http.StatusFound, "/")
 }

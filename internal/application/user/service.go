@@ -3,7 +3,7 @@ package user
 import (
 	"errors"
 	"fmt"
-	"vago/internal/domain/auth"
+	"vago/internal/domain"
 
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
@@ -11,20 +11,20 @@ import (
 )
 
 type Service struct {
-	repo   Repository
-	tokens auth.TokenProvider
+	repo   domain.UserRepository
+	tokens domain.TokenProvider
 }
 
-func NewService(repo Repository, tokens auth.TokenProvider) *Service {
+func NewService(repo domain.UserRepository, tokens domain.TokenProvider) *Service {
 	return &Service{
 		repo:   repo,
 		tokens: tokens,
 	}
 }
 
-func (s *Service) CreateUser(dto DTO) error {
+func (s *Service) CreateUser(dto domain.DTO) error {
 	hash, _ := bcrypt.GenerateFromPassword([]byte(dto.Password), bcrypt.DefaultCost)
-	user := New(dto.Login, string(hash), dto.Email, dto.Username, dto.Color, dto.Role)
+	user := domain.New(dto.Login, string(hash), dto.Email, dto.Username, dto.Color, dto.Role)
 	return s.repo.CreateUser(user)
 }
 
@@ -32,15 +32,15 @@ func (s *Service) DeleteUser(id uint) error {
 	return s.repo.DeleteUser(id)
 }
 
-func (s *Service) GetByID(id uint) (User, error) {
+func (s *Service) GetByID(id uint) (domain.User, error) {
 	return s.repo.GetByID(id)
 }
 
-func (s *Service) Login(login, password string) (User, *auth.TokenPair, error) {
+func (s *Service) Login(login, password string) (domain.User, *domain.TokenPair, error) {
 	u, errGetUser := s.repo.GetByLogin(login)
 
 	if errGetUser != nil {
-		return User{}, nil, errors.New("пользователь не найден")
+		return domain.User{}, nil, errors.New("пользователь не найден")
 	}
 
 	if bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)) != nil {
@@ -49,30 +49,30 @@ func (s *Service) Login(login, password string) (User, *auth.TokenPair, error) {
 
 	tokens, err := s.tokens.CreateTokenPair(u.ID, string(u.Role))
 	if err != nil {
-		return User{}, nil, fmt.Errorf("error creating tokens: %s", err.Error())
+		return domain.User{}, nil, fmt.Errorf("error creating tokens: %s", err.Error())
 	}
 
 	return u, tokens, nil
 }
 
-func (s *Service) Refresh(token string) (User, string, error) {
+func (s *Service) Refresh(token string) (domain.User, string, error) {
 	claims, errParseToken := s.tokens.ParseToken(token)
 	if errParseToken != nil {
-		return User{}, "", status.Error(codes.Unauthenticated, "token read error")
+		return domain.User{}, "", status.Error(codes.Unauthenticated, "token read error")
 	}
 	u, errGetUser := s.repo.GetByID(claims.UserID())
 	if errGetUser != nil {
-		return User{}, "", errors.New("пользователь не найден")
+		return domain.User{}, "", errors.New("пользователь не найден")
 	}
 
 	newToken, errToken := s.tokens.CreateToken(u.ID, string(u.Role), true)
 	if errToken != nil {
-		return User{}, "", status.Error(codes.Unauthenticated, fmt.Sprintf("Error creating new token: %s", errToken.Error()))
+		return domain.User{}, "", status.Error(codes.Unauthenticated, fmt.Sprintf("Error creating new token: %s", errToken.Error()))
 	}
 
 	return u, newToken, nil
 }
 
-func (s *Service) GetAll() ([]User, error) {
+func (s *Service) GetAll() ([]domain.User, error) {
 	return s.repo.GetAll()
 }

@@ -7,11 +7,10 @@ import (
 	"path/filepath"
 	"strings"
 	"vago/internal/app"
-	"vago/internal/chat/chatApp"
-	gorm2 "vago/internal/chat/infra/gorm"
+	"vago/internal/application/chat"
+	"vago/internal/application/task"
+	"vago/internal/application/user"
 	"vago/internal/config/route"
-	"vago/internal/domain/task"
-	"vago/internal/domain/user"
 	"vago/internal/infra/persistence/gorm"
 	"vago/internal/infra/token"
 	"vago/internal/trasport/http/handler"
@@ -27,10 +26,11 @@ func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine
 	go hub.Run()
 	// Сервисы
 	taskSvc := task.NewService(gorm.NewTaskRepo(ctx.DB))
-	messageRepo := gorm2.NewMessageRepo(ctx.DB)
-	messageSvc := chatApp.NewMessageSvc(messageRepo)
+	messageRepo := gorm.NewMessageRepo(ctx.DB)
+	userRepo := gorm.NewUserRepo(ctx)
+	chatSvc := chat.NewService(messageRepo, userRepo)
 
-	userSvc := user.NewService(gorm.NewUserRepo(ctx), tokenProvider)
+	userSvc := user.NewService(userRepo, tokenProvider)
 	localCache := app.NewLocalCache()
 
 	// Хендлеры
@@ -77,10 +77,10 @@ func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine
 		auth.DELETE("/users/:id", handler.DeleteUser(userSvc))
 		auth.GET("/grpc-test", handler.Grpc)
 
-		auth.GET("/ws", handler.ServeSW(hub, ctx.Log, tokenProvider, messageSvc))
-		auth.GET("/chat", handler.ShowChat(ctx.Cfg.Port, messageSvc, userSvc))
+		auth.GET("/ws", handler.ServeSW(hub, ctx.Log, tokenProvider, chatSvc))
+		auth.GET("/chat", handler.ShowChat(ctx.Cfg.Port, chatSvc, userSvc))
 
-		messagesHandler := handler.NewMessageHandler(messageSvc, userSvc)
+		messagesHandler := handler.NewMessageHandler(chatSvc, userSvc)
 		auth.GET("/messages", messagesHandler.ShowMessages())
 		auth.POST("/messages", messagesHandler.AddMessage())
 		auth.POST("/messagesDeleteAll", messagesHandler.DeleteAll())

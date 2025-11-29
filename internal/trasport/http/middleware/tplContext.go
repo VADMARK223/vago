@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"vago/internal/config/code"
-	"vago/internal/domain/user"
+	"vago/internal/domain"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,7 +13,7 @@ func TemplateContext(c *gin.Context) {
 	}
 
 	if contextUser, ok := c.Get(code.CurrentUser); ok {
-		u := contextUser.(user.User)
+		u := contextUser.(domain.User)
 
 		result[code.UserId] = u.ID
 		result[code.Login] = u.Login

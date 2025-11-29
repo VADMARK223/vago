@@ -7,7 +7,7 @@ import (
 	"time"
 	"vago/internal/config/code"
 	"vago/internal/config/config"
-	"vago/internal/domain/auth"
+	"vago/internal/domain"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -22,7 +22,7 @@ func NewJWTProvider(cfg *config.Config) *JWTProvider {
 	return &JWTProvider{secret: cfg.JwtSecret, accessTTL: cfg.AccessTTLDuration(), refreshTTL: cfg.RefreshTTLDuration()}
 }
 
-func (j *JWTProvider) CreateTokenPair(userID uint, role string) (*auth.TokenPair, error) {
+func (j *JWTProvider) CreateTokenPair(userID uint, role string) (*domain.TokenPair, error) {
 	access, err := j.CreateToken(userID, role, true)
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func (j *JWTProvider) CreateTokenPair(userID uint, role string) (*auth.TokenPair
 		return nil, err
 	}
 
-	return &auth.TokenPair{
+	return &domain.TokenPair{
 		AccessToken:  access,
 		RefreshToken: refresh,
 	}, nil
@@ -49,7 +49,7 @@ func (j *JWTProvider) CreateToken(userID uint, role string, accessToken bool) (s
 		duration = j.refreshTTL
 	}
 
-	claims := auth.CustomClaims{
+	claims := domain.CustomClaims{
 		Role: role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   strconv.Itoa(int(userID)),
@@ -64,12 +64,12 @@ func (j *JWTProvider) CreateToken(userID uint, role string, accessToken bool) (s
 	return token.SignedString([]byte(j.secret))
 }
 
-func (j *JWTProvider) ParseToken(tokenStr string) (*auth.CustomClaims, error) {
+func (j *JWTProvider) ParseToken(tokenStr string) (*domain.CustomClaims, error) {
 	if tokenStr == "" {
 		return nil, errors.New("token is empty")
 	}
 
-	token, err := jwt.ParseWithClaims(tokenStr, &auth.CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenStr, &domain.CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, jwt.ErrSignatureInvalid
 		}
@@ -79,7 +79,7 @@ func (j *JWTProvider) ParseToken(tokenStr string) (*auth.CustomClaims, error) {
 		return nil, fmt.Errorf("parse error: %w", err)
 	}
 
-	claims, ok := token.Claims.(*auth.CustomClaims)
+	claims, ok := token.Claims.(*domain.CustomClaims)
 	if !ok || !token.Valid {
 		return nil, errors.New("invalid token claims")
 	}

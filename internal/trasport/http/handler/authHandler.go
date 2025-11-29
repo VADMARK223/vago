@@ -2,10 +2,10 @@ package handler
 
 import (
 	"net/http"
+	user2 "vago/internal/application/user"
 	"vago/internal/config/code"
 	"vago/internal/config/route"
-	"vago/internal/domain/auth"
-	"vago/internal/domain/user"
+	"vago/internal/domain"
 	"vago/pkg/strx"
 
 	"github.com/gin-contrib/sessions"
@@ -14,13 +14,13 @@ import (
 )
 
 type AuthHandler struct {
-	service    *user.Service
+	service    *user2.Service
 	secret     string
 	refreshTTL int
 	log        *zap.SugaredLogger
 }
 
-func NewAuthHandler(service *user.Service, secret string, refreshTTL int, log *zap.SugaredLogger) *AuthHandler {
+func NewAuthHandler(service *user2.Service, secret string, refreshTTL int, log *zap.SugaredLogger) *AuthHandler {
 	return &AuthHandler{
 		service:    service,
 		secret:     secret,
@@ -40,7 +40,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	auth.SetTokenCookies(c, tokens, h.refreshTTL)
+	domain.SetTokenCookies(c, tokens, h.refreshTTL)
 
 	session := sessions.Default(c)
 
@@ -56,7 +56,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	c.Redirect(http.StatusFound, redirectTo.(string))
 }
 
-func PerformRegister(service *user.Service) gin.HandlerFunc {
+func PerformRegister(service *user2.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		login := c.PostForm(code.Login)
 		email := c.PostForm(code.Email)
@@ -65,7 +65,7 @@ func PerformRegister(service *user.Service) gin.HandlerFunc {
 		color := c.PostForm(code.Color)
 		username := c.PostForm(code.Username)
 
-		err := service.CreateUser(user.DTO{Login: login, Email: email, Password: password, Role: user.Role(role), Color: color, Username: username})
+		err := service.CreateUser(domain.DTO{Login: login, Email: email, Password: password, Role: domain.Role(role), Color: color, Username: username})
 
 		if err != nil {
 			c.Set(code.Error, strx.Capitalize(err.Error()))

@@ -6,9 +6,7 @@ import (
 	"log"
 	"time"
 	"vago/internal/app"
-	"vago/internal/chat/chatApp"
-	"vago/internal/chat/domain"
-	"vago/pkg/timex"
+	"vago/internal/application/chat"
 
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
@@ -20,7 +18,7 @@ type Client struct {
 	Send       chan []byte
 	log        *zap.SugaredLogger
 	UserID     uint
-	messageSvc *chatApp.Service
+	messageSvc *chat.Service
 }
 
 type ClientPacket struct {
@@ -28,15 +26,7 @@ type ClientPacket struct {
 	Text string `json:"text"`
 }
 
-/*type ServerMessage struct {
-	Type     string `json:"type"` // "message"
-	UserID   uint   `json:"userId"`
-	Username string `json:"username"`
-	Text     string `json:"text"`
-	Time     int64  `json:"time"`
-}*/
-
-func NewClient(conn *websocket.Conn, hub *Hub, userID uint, log *zap.SugaredLogger, svc *chatApp.Service) *Client {
+func NewClient(conn *websocket.Conn, hub *Hub, userID uint, log *zap.SugaredLogger, svc *chat.Service) *Client {
 	client := &Client{
 		Conn:       conn,
 		Hub:        hub,
@@ -76,7 +66,8 @@ func (c *Client) IncomingLoop() {
 		}
 
 		c.log.Infow("Received message", "packet", packet)
-		errSendMessage := c.messageSvc.SendMessage(context.Background(), domain.UserID(c.UserID), packet.Text)
+		createDTO := chat.MessageCreateDTO{AuthorID: c.UserID, Body: packet.Text, MessageType: "text"}
+		dto, errSendMessage := c.messageSvc.CreateMessage(context.Background(), createDTO)
 		if errSendMessage != nil {
 			// TODO: доделать.
 			app.Dump("Send message error", errSendMessage)
@@ -85,16 +76,7 @@ func (c *Client) IncomingLoop() {
 
 		switch packet.Type {
 		case "message":
-			serverMsg := domain.MessageDTO{
-				AuthorID: domain.UserID(c.UserID),
-				Type:     "message",
-				Username: "client",
-				Body:     domain.Body(packet.Text),
-				SentAt:   timex.Format(time.Now()),
-			}
-
-			serverMsgBytes, _ := json.Marshal(serverMsg)
-
+			serverMsgBytes, _ := json.Marshal(dto)
 			c.Hub.Broadcast <- serverMsgBytes
 		default:
 			c.log.Warnw("Unknown message type", "type", packet.Type)

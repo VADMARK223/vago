@@ -1,6 +1,8 @@
-package auth
+package domain
 
-import "time"
+import (
+	"time"
+)
 
 type TokenInfo struct {
 	Exp         time.Time     `json:"exp"`

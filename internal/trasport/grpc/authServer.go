@@ -3,7 +3,7 @@ package grpc
 import (
 	"context"
 	pb "vago/api/pb/auth"
-	"vago/internal/domain/user"
+	"vago/internal/application/user"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

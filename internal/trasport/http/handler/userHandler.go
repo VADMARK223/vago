@@ -3,8 +3,8 @@ package handler
 import (
 	"net/http"
 	"strconv"
+	"vago/internal/application/user"
 	"vago/internal/config/code"
-	"vago/internal/domain/user"
 
 	"github.com/gin-gonic/gin"
 )

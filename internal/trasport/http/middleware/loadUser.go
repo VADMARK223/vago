@@ -4,13 +4,14 @@ import (
 	"net/http"
 	"time"
 	"vago/internal/app"
+	user2 "vago/internal/application/user"
 	"vago/internal/config/code"
-	"vago/internal/domain/user"
+	"vago/internal/domain"
 
 	"github.com/gin-gonic/gin"
 )
 
-func LoadUserContext(svc *user.Service, cache *app.LocalCache) gin.HandlerFunc {
+func LoadUserContext(svc *user2.Service, cache *app.LocalCache) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		uidVal, exists := c.Get(code.UserId)
 		if !exists {
@@ -26,7 +27,7 @@ func LoadUserContext(svc *user.Service, cache *app.LocalCache) gin.HandlerFunc {
 		userID := uidVal.(uint)
 
 		if cached, ok := cache.Get(userID); ok {
-			c.Set(code.CurrentUser, cached.(user.User))
+			c.Set(code.CurrentUser, cached.(domain.User))
 			c.Next()
 			return
 		}

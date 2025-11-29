@@ -3,7 +3,8 @@ package gorm
 import (
 	"context"
 	"fmt"
-	"vago/internal/chat/domain"
+	"time"
+	"vago/internal/domain"
 
 	"gorm.io/gorm"
 )
@@ -16,14 +17,19 @@ func NewMessageRepo(db *gorm.DB) *MessageRepo {
 	return &MessageRepo{db: db}
 }
 
-func (r *MessageRepo) Save(ctx context.Context, dto domain.MessageDTO) error {
-	entity := messageToEnty(dto)
+func (r *MessageRepo) Save(ctx context.Context, m *domain.Message) (uint, error) {
+	entity := MessageEntity{
+		UserID:    uint(m.Author()),
+		Content:   string(m.Body()),
+		Type:      m.MessageType,
+		CreatedAt: time.Now(),
+	}
 
-	err := r.db.WithContext(ctx).Create(entity).Error
+	if err := r.db.WithContext(ctx).Create(&entity).Error; err != nil {
+		return 0, err
+	}
 
-	//domain, errDomain := messageToDomain(entity)
-
-	return err
+	return entity.ID, nil
 }
 
 func (r *MessageRepo) ListAll(ctx context.Context) ([]*domain.Message, error) {
@@ -42,10 +48,10 @@ func (r *MessageRepo) ListAll(ctx context.Context) ([]*domain.Message, error) {
 
 	result := make([]*domain.Message, 0, len(entities))
 	for _, entity := range entities {
-		m, errMapping := messageToDomain(&entity)
-		if errMapping != nil {
-			return nil, errMapping
-		}
+		m := domain.NewMessage(domain.UserID(entity.UserID), domain.Body(entity.Content), entity.Type)
+		m.ID = entity.ID
+		m.MessageType = entity.Type
+		m.SetSentAt(entity.CreatedAt)
 		result = append(result, m)
 	}
 
