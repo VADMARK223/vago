@@ -28,4 +28,6 @@ const (
 	Messages             = "messages"
 	MessagesJson         = "messages_json"
 	MessagesCount        = "messages_count"
+	QuestionsCount       = "questions_count"
+	Questions            = "questions"
 )

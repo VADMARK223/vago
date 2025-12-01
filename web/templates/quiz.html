@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Админка викторины</title>
+    <link rel="stylesheet" href="/static/css/index.css">
+</head>
+<body>
+{{ template "header" . }}
+
+<main>
+    <div class="container">
+        <div class="list">
+            <div class="item">
+                <div class="messages-control">
+                    <form class="form-add" action="/messages" method="POST">
+                        <div>
+                            <button type="submit" class="btn"><i class="fa-solid fa-plus"></i>Создать сообщение</button>
+                        </div>
+                    </form>
+                    <form class="form-add" action="/messagesDeleteAll" method="POST">
+                        <div>
+                            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i>Удалить все сообщения</button>
+                        </div>
+                    </form>
+                    <span>Сообщений: {{.questions_count}}</span>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="scrollable-content">
+            <div class="list">
+                {{range .questions}}
+                <div class="item" id="message-{{.ID}}">
+                    <div class="item-info">
+                        <p>Идентификатор вопроса: {{.ID}}</p>
+                        <p>Текст: {{.Text}}</p>
+                    </div>
+                    <div>
+                        <button class="btn-small btn-danger" onclick="deleteMessage('{{.ID}}')"><i
+                                class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+                {{else}}
+                <p class="empty">Сообщений нет</p>
+                {{end}}
+            </div>
+        </div>
+    </div>
+</main>
+
+{{ template "footer" . }}
+<script>
+    async function deleteMessage(id) {
+        if (!confirm('Удалить сообщение?')) return;
+
+        const res = await fetch(`/messages/${id}`, {method: 'DELETE'});
+        if (res.ok) {
+            document.getElementById(`message-${id}`).remove();
+        } else {
+            const data = await res.json();
+            alert(data.error || 'Error deleting message');
+        }
+    }
+</script>
+</body>
+</html>

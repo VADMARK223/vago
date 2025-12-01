@@ -8,6 +8,7 @@ import (
 	"strings"
 	"vago/internal/app"
 	"vago/internal/application/chat"
+	"vago/internal/application/quiz"
 	"vago/internal/application/task"
 	"vago/internal/application/user"
 	"vago/internal/config/route"
@@ -85,6 +86,11 @@ func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine
 		auth.POST("/messages", messagesHandler.AddMessage())
 		auth.POST("/messagesDeleteAll", messagesHandler.DeleteAll())
 		auth.DELETE("/messages/:id", messagesHandler.Delete())
+
+		questionRepo := gorm.NewQuestionRepo(ctx.DB)
+		questionSvc := quiz.NewService(questionRepo)
+		quizHandler := handler.NewQuizHandler(questionSvc)
+		auth.GET("/quiz", quizHandler.ShowQuizAdmin())
 	}
 
 	r.NoRoute(handler.NotFoundHandler)
