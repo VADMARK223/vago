@@ -111,6 +111,12 @@ proto-js-all: ## 🚀 Full pipeline: clean → generate → bundle
 	@$(MAKE) bundle || { echo "$(ORANGE)❌ Stage failed: bundle$(RESET)"; exit 1; }
 	@echo "$(GREEN)✅ All stages completed successfully!$(RESET)"
 
+gen-questions:
+	@echo "Run convert Json in SQL"
+	go run ./cmd/genQuestions
+	@echo "==> Выполнение SQL..."
+	psql "postgresql://localhost:5432/vadodb" -f db/04_questions.sql
+
 kafka-up:
 	$(COMPOSE) $(KAFKA_YML) up -d
 
@@ -142,4 +148,7 @@ help:
 	@echo "$(CYAN)Others:$(RESET)"
 	@echo "  $(GREEN)make kafka-up$(RESET)   - start kafka and kafka UI containers"
 	@echo "  $(GREEN)make kafka-down$(RESET) - stop kafka and kafka UI containers"
+	@echo ""
+	@echo "$(CYAN)Qiuz:$(RESET)"
+	@echo "  $(GREEN)make gen-questions$(RESET)   - generate questions from JSON"
 .DEFAULT_GOAL := help

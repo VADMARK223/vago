@@ -1,5 +1,71 @@
 [
   {
+    "topic_id": 9,
+    "text": "Какой тип передается в канал chan int?",
+    "answers": [
+      {
+        "text": "Только указатели на int",
+        "correct": false
+      },
+      {
+        "text": "Только значения типа int",
+        "correct": true
+      },
+      {
+        "text": "Любые числа",
+        "correct": false
+      },
+      {
+        "text": "Любые типы",
+        "correct": false
+      }
+    ]
+  },
+  {
+    "topic_id": 9,
+    "text": "Что произойдёт при записи в закрытый канал?",
+    "answers": [
+      {
+        "text": "Ничего — значение игнорируется",
+        "correct": false
+      },
+      {
+        "text": "Запись блокируется",
+        "correct": false
+      },
+      {
+        "text": "Происходит panic",
+        "correct": true
+      },
+      {
+        "text": "Возвращается zero-value",
+        "correct": false
+      }
+    ]
+  },
+  {
+    "topic_id": 13,
+    "text": "Когда происходит escape в heap?",
+    "answers": [
+      {
+        "text": "Когда переменная слишком большая",
+        "correct": false
+      },
+      {
+        "text": "Когда значение нужно вернуть наружу и оно \"живет\" после выхода функции",
+        "correct": true
+      },
+      {
+        "text": "Когда в функции много переменных",
+        "correct": false
+      },
+      {
+        "text": "Когда программа вызывает panic",
+        "correct": false
+      }
+    ]
+  },
+  {
     "topic_id": 7,
     "text": "Что такое goroutine?",
     "answers": [

@@ -14,3 +14,4 @@ insert into topics (id, name) values (9, 'Каналы');
 insert into topics (id, name) values (10, 'Синхронизация');
 insert into topics (id, name) values (11, 'Ошибки');
 insert into topics (id, name) values (12, 'Defer');
+insert into topics (id, name) values (13, 'Куча (Heap)');
