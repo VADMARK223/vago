@@ -1,0 +1,68 @@
+[
+  {
+    "topic_id": 7,
+    "text": "Что такое goroutine?",
+    "answers": [
+      {
+        "text": "Отдельный процесс ОС",
+        "correct": false
+      },
+      {
+        "text": "Лёгкая потокоподобная сущность, управляемая рантаймом Go",
+        "correct": true
+      },
+      {
+        "text": "Поток ОС",
+        "correct": false
+      },
+      {
+        "text": "Операция ввода-вывода",
+        "correct": false
+      }
+    ]
+  },
+  {
+    "topic_id": 12,
+    "text": "Что делает ключевое слово defer?",
+    "answers": [
+      {
+        "text": "Выполняет функцию асинхронно",
+        "correct": false
+      },
+      {
+        "text": "Выполняет функцию после выхода из текущей функции",
+        "correct": true
+      },
+      {
+        "text": "Отменяет выполнение функции",
+        "correct": false
+      },
+      {
+        "text": "Экспортирует функцию",
+        "correct": false
+      }
+    ]
+  },
+  {
+    "topic_id": 5,
+    "text": "Какой размер у пустой структуры struct{}?",
+    "answers": [
+      {
+        "text": "1 байт",
+        "correct": false
+      },
+      {
+        "text": "0 байт",
+        "correct": true
+      },
+      {
+        "text": "4 байта",
+        "correct": false
+      },
+      {
+        "text": "Зависит от архитектуры",
+        "correct": false
+      }
+    ]
+  }
+]
