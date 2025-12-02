@@ -22,3 +22,7 @@ func (s *Service) AllQuestions() ([]*domain.Question, error) {
 
 	return questions, nil
 }
+
+func (s *Service) DeleteAll() error {
+	return s.repo.DeleteAll()
+}

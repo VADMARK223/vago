@@ -15,15 +15,15 @@
                 <div class="messages-control">
                     <form class="form-add" action="/messages" method="POST">
                         <div>
-                            <button type="submit" class="btn"><i class="fa-solid fa-plus"></i>Создать сообщение</button>
+                            <button type="submit" class="btn" disabled><i class="fa-solid fa-plus"></i>Создать вопрос</button>
                         </div>
                     </form>
-                    <form class="form-add" action="/messagesDeleteAll" method="POST">
+                    <form class="form-add" action="/questionsDeleteAll" method="POST">
                         <div>
-                            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i>Удалить все сообщения</button>
+                            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i>Удалить все вопросы</button>
                         </div>
                     </form>
-                    <span>Сообщений: {{.questions_count}}</span>
+                    <span>Вопросов: {{.questions_count}}</span>
                 </div>
             </div>
         </div>
@@ -33,16 +33,29 @@
                 {{range .questions}}
                 <div class="item" id="message-{{.ID}}">
                     <div class="item-info">
-                        <p>Идентификатор вопроса: {{.ID}}</p>
-                        <p>Текст: {{.Text}}</p>
+                        <p>{{.ID}}: <b>{{.Text}}</b></p>
+
+                        <div class="answers">
+                            {{range .Answers}}
+                            <div class="answer">
+                                <span>{{.ID}}) {{.Text}}</span>
+                                {{if .IsCorrect}}
+                                <span class="correct">✔</span>
+                                {{end}}
+                            </div>
+                            {{else}}
+                            <div class="empty">Ответов пока нет</div>
+                            {{end}}
+                        </div>
                     </div>
+
                     <div>
                         <button class="btn-small btn-danger" onclick="deleteMessage('{{.ID}}')"><i
                                 class="fa-solid fa-trash"></i></button>
                     </div>
                 </div>
                 {{else}}
-                <p class="empty">Сообщений нет</p>
+                <p class="empty">Вопросов нет</p>
                 {{end}}
             </div>
         </div>

@@ -1,6 +1,7 @@
 package domain
 
 type Question struct {
-	ID   uint
-	Text string
+	ID      uint
+	Text    string
+	Answers []Answer
 }

@@ -91,6 +91,7 @@ func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine
 		questionSvc := quiz.NewService(questionRepo)
 		quizHandler := handler.NewQuizHandler(questionSvc)
 		auth.GET("/quiz", quizHandler.ShowQuizAdmin())
+		auth.POST("/questionsDeleteAll", quizHandler.DeleteAllQuestions())
 	}
 
 	r.NoRoute(handler.NotFoundHandler)

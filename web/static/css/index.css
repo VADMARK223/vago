@@ -1,6 +1,7 @@
 @import url("/static/css/fontawesome-7_1_0.min.css");
 @import url("/static/css/base/variables.css");
 @import url("/static/css/ui/scroll.css");
+@import url("/static/css/components/quiz.css");
 
 *, *::before, *::after {
     box-sizing: border-box;

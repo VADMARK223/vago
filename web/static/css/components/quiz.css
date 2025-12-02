@@ -1,0 +1,15 @@
+.answers {
+    margin-left: 16px;
+    margin-top: 6px;
+}
+
+.answer {
+    padding: 4px 0;
+    color: #a9b7c6;
+}
+
+.correct {
+    color: #4CAF50;
+    font-weight: bold;
+    margin-left: 6px;
+}
