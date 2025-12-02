@@ -2,25 +2,33 @@ package handler
 
 import (
 	"net/http"
+	"vago/internal/app"
 	"vago/internal/application/quiz"
+	"vago/internal/application/topic"
 	"vago/internal/config/code"
 
 	"github.com/gin-gonic/gin"
 )
 
 type QuizHandler struct {
-	quizSvc *quiz.Service
+	quizSvc  *quiz.Service
+	topicSvc *topic.Service
 }
 
-func NewQuizHandler(quizSvc *quiz.Service) *QuizHandler {
-	return &QuizHandler{quizSvc: quizSvc}
+func NewQuizHandler(quizSvc *quiz.Service, topicSvc *topic.Service) *QuizHandler {
+	return &QuizHandler{quizSvc: quizSvc, topicSvc: topicSvc}
 }
 
 func (h *QuizHandler) ShowQuizAdmin() func(c *gin.Context) {
 	return func(c *gin.Context) {
+		topics, _ := h.topicSvc.All()
+
+		app.Dump("Topics", topics)
+
 		questions, _ := h.quizSvc.AllQuestions()
 
 		data := tplWithCapture(c, "Админка викторины")
+		data[code.Topics] = topics
 		data[code.Questions] = questions
 		data[code.QuestionsCount] = len(questions)
 

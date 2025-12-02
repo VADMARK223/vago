@@ -15,12 +15,15 @@
                 <div class="messages-control">
                     <form class="form-add" action="/messages" method="POST">
                         <div>
-                            <button type="submit" class="btn" disabled><i class="fa-solid fa-plus"></i>Создать вопрос</button>
+                            <button type="submit" class="btn" disabled><i class="fa-solid fa-plus"></i>Создать вопрос
+                            </button>
                         </div>
                     </form>
                     <form class="form-add" action="/questionsDeleteAll" method="POST">
                         <div>
-                            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i>Удалить все вопросы</button>
+                            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i>Удалить все
+                                вопросы
+                            </button>
                         </div>
                     </form>
                     <span>Вопросов: {{.questions_count}}</span>
@@ -30,9 +33,13 @@
         <hr>
         <div class="scrollable-content">
             <div class="list">
+                {{ range .topics }}
+                <span>{{.ID}}: {{.Name}}</span>
+                {{end}}
+
                 {{range .questions}}
                 <div class="item" id="message-{{.ID}}">
-                    <div class="item-info">
+                    <div>
                         <p>{{.ID}}: <b>{{.Text}}</b></p>
 
                         <div class="answers">

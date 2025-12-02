@@ -30,4 +30,5 @@ const (
 	MessagesCount        = "messages_count"
 	QuestionsCount       = "questions_count"
 	Questions            = "questions"
+	Topics               = "topics"
 )

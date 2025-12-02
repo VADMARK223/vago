@@ -10,6 +10,7 @@ import (
 	"vago/internal/application/chat"
 	"vago/internal/application/quiz"
 	"vago/internal/application/task"
+	"vago/internal/application/topic"
 	"vago/internal/application/user"
 	"vago/internal/config/route"
 	"vago/internal/infra/persistence/gorm"
@@ -87,9 +88,9 @@ func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine
 		auth.POST("/messagesDeleteAll", messagesHandler.DeleteAll())
 		auth.DELETE("/messages/:id", messagesHandler.Delete())
 
-		questionRepo := gorm.NewQuestionRepo(ctx.DB)
-		questionSvc := quiz.NewService(questionRepo)
-		quizHandler := handler.NewQuizHandler(questionSvc)
+		questionSvc := quiz.NewService(gorm.NewQuestionRepo(ctx.DB))
+		topicSvc := topic.NewService(gorm.NewTopicRepo(ctx.DB))
+		quizHandler := handler.NewQuizHandler(questionSvc, topicSvc)
 		auth.GET("/quiz", quizHandler.ShowQuizAdmin())
 		auth.POST("/questionsDeleteAll", quizHandler.DeleteAllQuestions())
 	}
