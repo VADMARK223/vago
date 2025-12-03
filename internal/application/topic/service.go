@@ -14,11 +14,15 @@ func NewService(repo *gorm.TopicRepo) *Service {
 }
 
 func (s *Service) All() ([]*domain.Topic, error) {
-	questions, err := s.repo.All()
+	topics, err := s.repo.All()
 
 	if err != nil {
 		return nil, err
 	}
 
-	return questions, nil
+	return topics, nil
+}
+
+func (s *Service) AllWithCount() ([]domain.TopicWithCount, error) {
+	return s.repo.AllWithCount()
 }

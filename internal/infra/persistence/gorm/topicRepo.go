@@ -35,3 +35,17 @@ func (r TopicRepo) All() ([]*domain.Topic, error) {
 
 	return result, nil
 }
+
+func (r TopicRepo) AllWithCount() ([]domain.TopicWithCount, error) {
+	var topics []domain.TopicWithCount
+
+	err := r.db.
+		Table("topics t").
+		Select("t.id, t.name, COUNT(q.id) AS questions_count").
+		Joins("LEFT JOIN questions q ON q.topic_id = t.id").
+		Group("t.id").
+		Order("t.id").
+		Scan(&topics).Error
+
+	return topics, err
+}

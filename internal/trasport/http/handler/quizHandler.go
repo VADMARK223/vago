@@ -21,7 +21,9 @@ func NewQuizHandler(quizSvc *quiz.Service, topicSvc *topic.Service) *QuizHandler
 
 func (h *QuizHandler) ShowQuizAdmin() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		topics, _ := h.topicSvc.All()
+		//topics, _ := h.topicSvc.All()
+
+		topics, _ := h.topicSvc.AllWithCount()
 
 		app.Dump("Topics", topics)
 

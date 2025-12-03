@@ -34,7 +34,7 @@
         <div class="scrollable-content">
             <div class="list">
                 {{ range .topics }}
-                <span>{{.ID}}: {{.Name}}</span>
+                <span>{{.ID}}: {{.Name}} ({{.QuestionsCount}})</span>
                 {{end}}
 
                 {{range .questions}}
