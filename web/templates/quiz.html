@@ -28,10 +28,9 @@
         </div>
 
         <p id="result" class="hidden"></p>
-
-        {{if .question.Explanation}}
-        Объяснение: {{.question.Explanation}}
-        {{end}}
+        <div id="continueBtn" class="btn" style="visibility: hidden;">
+            Продолжить
+        </div>
     </div>
 </main>
 
@@ -41,6 +40,10 @@
     const questionID = "{{.question.ID}}";
     const buttons = document.querySelectorAll(".answer");
     const result = document.getElementById("result");
+    const continueBtn = document.getElementById("continueBtn")
+    continueBtn.addEventListener("click", ()=>{
+        window.location.reload();
+    })
 
     buttons.forEach(btn => {
         btn.addEventListener("click", async () => {
@@ -62,15 +65,22 @@
             const data = await resp.json();
 
             result.classList.remove("hidden");
+
             if (data.correct) {
                 btn.classList.add("correct");
-                result.innerText = "Правильно!";
+
                 result.classList.remove("bad");
                 result.classList.add("ok");
 
-                setTimeout(() => {
-                    window.location.reload();
-                }, 700);
+                if(data.explanation) {
+                    result.innerText = "Правильно! " + data.explanation;
+                    continueBtn.style.visibility = "visible";
+                } else {
+                    result.innerText = "Правильно!";
+                    setTimeout(() => {
+                         window.location.reload();
+                    }, 700);
+                }
             } else {
                 btn.classList.add("wrong");
                 result.innerText = "Неправильно 😞";

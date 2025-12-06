@@ -52,13 +52,13 @@ func (s *Service) ToPublic(q *domain.Question) QuestionPublic {
 	return res
 }
 
-func (s *Service) CheckAnswer(qID, aID uint) bool {
+func (s *Service) CheckAnswer(qID, aID uint) (bool, string) {
 	q, _ := s.repo.GetByID(qID)
 
 	for _, a := range q.Answers {
 		if a.ID == aID {
-			return a.IsCorrect
+			return a.IsCorrect, q.Explanation
 		}
 	}
-	return false
+	return false, q.Explanation
 }

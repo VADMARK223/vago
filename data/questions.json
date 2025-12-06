@@ -1,6 +1,27 @@
 [
   {
     "topic_id": 4,
+    "text": "Что произойдёт при исполнении?",
+    "code": "ch := make(chan int)\ngo func() {\n    ch <- 10\n}()\nfmt.Println(<-ch)\n",
+    "explanation": "Обычная синхронная передача данных.",
+    "answers": [
+      {
+        "text": "Deadlock"
+      },
+      {
+        "text": "10",
+        "correct": true
+      },
+      {
+        "text": "Panic: closed channel"
+      },
+      {
+        "text": "Неопределенное поведение"
+      }
+    ]
+  },
+  {
+    "topic_id": 4,
     "text": "Что выведет код?",
     "code": "m := make(map[string]int)\nm[\"a\"] = 1\nfor k := range m {\n    delete(m, k)\n}\nfmt.Println(len(m))\n",
     "explanation": "Go допускает удаление элементов из map во время итерации.",

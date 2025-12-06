@@ -2,7 +2,6 @@ package handler
 
 import (
 	"net/http"
-	"vago/internal/app"
 	"vago/internal/application/quiz"
 	"vago/internal/application/topic"
 	"vago/internal/config/code"
@@ -21,7 +20,8 @@ type CheckRequest struct {
 }
 
 type CheckResponse struct {
-	Correct bool `json:"correct"`
+	Correct     bool   `json:"correct"`
+	Explanation string `json:"explanation"`
 }
 
 func NewQuizHandler(quizSvc *quiz.Service, topicSvc *topic.Service) *QuizHandler {
@@ -30,11 +30,10 @@ func NewQuizHandler(quizSvc *quiz.Service, topicSvc *topic.Service) *QuizHandler
 
 func (h *QuizHandler) ShowQuiz() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		id := uint(1)
-		q, _ := h.quizSvc.RandomQuestion(&id)
+		//id := uint(1)
+		//q, _ := h.quizSvc.RandomQuestion(&id)
+		q, _ := h.quizSvc.RandomQuestion(nil)
 		public := h.quizSvc.ToPublic(q)
-
-		app.Dump("public", public)
 
 		data := tplWithCapture(c, "Викторина")
 		data[code.Question] = public
@@ -51,8 +50,8 @@ func (h *QuizHandler) Check() func(c *gin.Context) {
 			return
 		}
 
-		correct := h.quizSvc.CheckAnswer(req.QuestionID, req.AnswerID)
-		c.JSON(200, CheckResponse{Correct: correct})
+		correct, explanation := h.quizSvc.CheckAnswer(req.QuestionID, req.AnswerID)
+		c.JSON(200, CheckResponse{Correct: correct, Explanation: explanation})
 	}
 }
 
