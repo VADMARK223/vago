@@ -3,6 +3,7 @@ package gorm
 import (
 	"math/rand"
 	"time"
+	"vago/internal/app"
 	"vago/internal/domain"
 
 	"gorm.io/gorm"
@@ -63,11 +64,7 @@ func (q QuestionRepo) Random() (*domain.Question, error) {
 		return nil, err
 	}
 
-	// Маппинг в доменную модель
-	res := &domain.Question{
-		ID:   entity.ID,
-		Text: entity.Text,
-	}
+	res := questionToDomain(entity)
 
 	for _, a := range entity.Answers {
 		res.Answers = append(res.Answers, domain.Answer{
@@ -82,15 +79,6 @@ func (q QuestionRepo) Random() (*domain.Question, error) {
 	return res, nil
 }
 
-func shuffleAnswers(a []domain.Answer) {
-	rand.Seed(time.Now().UnixNano()) // однократная инициализация
-	n := len(a)
-	for i := n - 1; i > 0; i-- {
-		j := rand.Intn(i + 1)
-		a[i], a[j] = a[j], a[i]
-	}
-}
-
 func (q QuestionRepo) GetByID(id uint) (*domain.Question, error) {
 	var entity QuestionEntity
 
@@ -101,10 +89,8 @@ func (q QuestionRepo) GetByID(id uint) (*domain.Question, error) {
 		return nil, err
 	}
 
-	result := &domain.Question{
-		ID:   entity.ID,
-		Text: entity.Text,
-	}
+	result := questionToDomain(entity)
+	app.Dump("rezzz", result)
 
 	for _, a := range entity.Answers {
 		result.Answers = append(result.Answers, domain.Answer{
@@ -114,5 +100,25 @@ func (q QuestionRepo) GetByID(id uint) (*domain.Question, error) {
 		})
 	}
 
+	shuffleAnswers(result.Answers)
+
 	return result, nil
+}
+
+func shuffleAnswers(a []domain.Answer) {
+	rand.Seed(time.Now().UnixNano()) // однократная инициализация
+	n := len(a)
+	for i := n - 1; i > 0; i-- {
+		j := rand.Intn(i + 1)
+		a[i], a[j] = a[j], a[i]
+	}
+}
+
+func questionToDomain(e QuestionEntity) *domain.Question {
+	return &domain.Question{
+		ID:          e.ID,
+		Text:        e.Text,
+		Code:        e.Code,
+		Explanation: e.Explanation,
+	}
 }

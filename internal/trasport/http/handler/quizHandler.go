@@ -30,8 +30,11 @@ func NewQuizHandler(quizSvc *quiz.Service, topicSvc *topic.Service) *QuizHandler
 
 func (h *QuizHandler) ShowQuiz() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		q, _ := h.quizSvc.RandomQuestion()
+		id := uint(1)
+		q, _ := h.quizSvc.RandomQuestion(&id)
 		public := h.quizSvc.ToPublic(q)
+
+		app.Dump("public", public)
 
 		data := tplWithCapture(c, "Викторина")
 		data[code.Question] = public
@@ -43,7 +46,6 @@ func (h *QuizHandler) ShowQuiz() func(c *gin.Context) {
 func (h *QuizHandler) Check() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var req CheckRequest
-		app.Dump("asd", req)
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(400, gin.H{"error": "invalid"})
 			return
@@ -57,8 +59,6 @@ func (h *QuizHandler) Check() func(c *gin.Context) {
 func (h *QuizHandler) ShowQuizAdmin() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		topics, _ := h.topicSvc.AllWithCount()
-
-		app.Dump("Topics", topics)
 
 		questions, _ := h.quizSvc.AllQuestions()
 

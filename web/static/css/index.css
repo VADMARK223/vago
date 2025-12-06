@@ -7,6 +7,22 @@
     box-sizing: border-box;
 }
 
+pre {
+    background: #2b2d30;
+    padding: 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+    color: #a9b7c6;
+    font-size: 14px;
+    line-height: 1.4;
+    border: 1px solid #4b4e50;
+    margin: 10px 0;
+}
+
+code {
+    font-family: "JetBrains Mono", monospace;
+}
+
 .menu,
 .container {
     background: var(--bg-panel);

@@ -27,14 +27,20 @@ func (s *Service) DeleteAll() error {
 	return s.repo.DeleteAll()
 }
 
-func (s *Service) RandomQuestion() (*domain.Question, error) {
-	return s.repo.Random()
+func (s *Service) RandomQuestion(id *uint) (*domain.Question, error) {
+	if id == nil {
+		return s.repo.Random()
+	}
+
+	return s.repo.GetByID(*id)
 }
 
 func (s *Service) ToPublic(q *domain.Question) QuestionPublic {
 	res := QuestionPublic{
-		ID:   q.ID,
-		Text: q.Text,
+		ID:          q.ID,
+		Text:        q.Text,
+		Code:        q.Code,
+		Explanation: q.Explanation,
 	}
 
 	for _, a := range q.Answers {

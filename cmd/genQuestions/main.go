@@ -14,9 +14,11 @@ type Answer struct {
 }
 
 type Question struct {
-	TopicID int      `json:"topic_id"`
-	Text    string   `json:"text"`
-	Answers []Answer `json:"answers"`
+	TopicID     int      `json:"topic_id"`
+	Text        string   `json:"text"`
+	Code        string   `json:"code"`
+	Explanation string   `json:"explanation"`
+	Answers     []Answer `json:"answers"`
 }
 
 const (
@@ -52,7 +54,7 @@ func main() {
 
 	questionID := 1
 	for _, q := range questions {
-		_, _ = fmt.Fprintf(out, "INSERT INTO questions (id, topic_id, text) VALUES (%d, %d, '%s');\n", questionID, q.TopicID, escape(q.Text))
+		_, _ = fmt.Fprintf(out, "INSERT INTO questions (id, topic_id, text, code, explanation) VALUES (%d, %d, '%s', '%s', '%s');\n", questionID, q.TopicID, escape(q.Text), escape(q.Code), q.Explanation)
 
 		for _, ans := range q.Answers {
 			correct := "false"

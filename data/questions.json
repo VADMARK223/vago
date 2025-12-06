@@ -1,5 +1,26 @@
 [
   {
+    "topic_id": 4,
+    "text": "Что выведет код?",
+    "code": "m := make(map[string]int)\nm[\"a\"] = 1\nfor k := range m {\n    delete(m, k)\n}\nfmt.Println(len(m))\n",
+    "explanation": "Go допускает удаление элементов из map во время итерации.",
+    "answers": [
+      {
+        "text": "1"
+      },
+      {
+        "text": "0",
+        "correct": true
+      },
+      {
+        "text": "panic"
+      },
+      {
+        "text": "Неопределенное поведение"
+      }
+    ]
+  },
+  {
     "topic_id": 11,
     "text": "Для чего нужен интерфейс error?",
     "answers": [

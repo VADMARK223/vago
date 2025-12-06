@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Quiz</title>
     <link rel="stylesheet" href="/static/css/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 </head>
 <body>
 {{ template "header" . }}
@@ -11,6 +13,11 @@
 <main>
     <div class="container">
         <h2>{{.question.Text}}</h2>
+
+        {{if .question.Code}}
+        <script>hljs.highlightAll();</script>
+        <pre><code class="go">{{.question.Code}}</code></pre>
+        {{end}}
 
         <div class="answers" id="answers">
             {{range .question.Answers}}
@@ -22,6 +29,9 @@
 
         <p id="result" class="hidden"></p>
 
+        {{if .question.Explanation}}
+        Объяснение: {{.question.Explanation}}
+        {{end}}
     </div>
 </main>
 
