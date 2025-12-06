@@ -4,6 +4,14 @@
     <div class="menu">
         <div>
             <a href="/" class="btn"><i class="fa-solid fa-house"></i></a>
+
+            <a href="/quiz" class="btn">
+                <div class="icon-item">
+                    <i class="fa-solid fa-check-double"></i>
+                    <span>Quiz</span>
+                </div>
+            </a>
+
             <a href="/book" class="btn">
                 <div class="icon-item">
                     <i class="fa-solid fa-book"></i>
@@ -24,10 +32,16 @@
             </a>
             {{if .user_id}}
             {{if .is_admin}}
-            <a href="/quiz" class="btn"><i class="fa-solid fa-check-double"></i></a>
+            <a href="/questions" class="btn"><i class="fa-solid fa-check-double"></i></a>
             <a href="/messages" class="btn"><i class="fa-solid fa-comment"></i></a>
             <a href="/users" class="btn"><i class="fa-solid fa-users"></i></a>
             <a href="/grpc-test" class="btn"><i class="fa-solid fa-j"></i></a>
+            <a href="/moex" class="btn">
+                <div class="icon-item">
+                    <i class="fa-solid fa-book"></i>
+                    <span>Мос биржа</span>
+                </div>
+            </a>
             {{end}}
             {{end}}
         </div>

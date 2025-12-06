@@ -47,3 +47,59 @@ func (q QuestionRepo) All() ([]*domain.Question, error) {
 
 	return result, nil
 }
+
+func (q QuestionRepo) Random() (*domain.Question, error) {
+	var entity QuestionEntity
+
+	err := q.db.
+		Preload("Answers").
+		Order("RANDOM()").
+		Limit(1).
+		First(&entity).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Маппинг в доменную модель
+	res := &domain.Question{
+		ID:   entity.ID,
+		Text: entity.Text,
+	}
+
+	for _, a := range entity.Answers {
+		res.Answers = append(res.Answers, domain.Answer{
+			ID:        a.ID,
+			Text:      a.Text,
+			IsCorrect: a.IsCorrect,
+		})
+	}
+
+	return res, nil
+}
+
+func (q QuestionRepo) GetByID(id uint) (*domain.Question, error) {
+	var entity QuestionEntity
+
+	err := q.db.Preload("Answers").
+		First(&entity, id).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	result := &domain.Question{
+		ID:   entity.ID,
+		Text: entity.Text,
+	}
+
+	for _, a := range entity.Answers {
+		result.Answers = append(result.Answers, domain.Answer{
+			ID:        a.ID,
+			Text:      a.Text,
+			IsCorrect: a.IsCorrect,
+		})
+	}
+
+	return result, nil
+}

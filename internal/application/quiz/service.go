@@ -26,3 +26,33 @@ func (s *Service) AllQuestions() ([]*domain.Question, error) {
 func (s *Service) DeleteAll() error {
 	return s.repo.DeleteAll()
 }
+
+func (s *Service) RandomQuestion() (*domain.Question, error) {
+	return s.repo.Random()
+}
+
+func (s *Service) ToPublic(q *domain.Question) QuestionPublic {
+	res := QuestionPublic{
+		ID:   q.ID,
+		Text: q.Text,
+	}
+
+	for _, a := range q.Answers {
+		res.Answers = append(res.Answers, AnswerPublic{
+			ID:   a.ID,
+			Text: a.Text,
+		})
+	}
+	return res
+}
+
+func (s *Service) CheckAnswer(qID, aID uint) bool {
+	q, _ := s.repo.GetByID(qID)
+
+	for _, a := range q.Answers {
+		if a.ID == aID {
+			return a.IsCorrect
+		}
+	}
+	return false
+}

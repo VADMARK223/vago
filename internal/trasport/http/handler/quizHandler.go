@@ -15,8 +15,45 @@ type QuizHandler struct {
 	topicSvc *topic.Service
 }
 
+type CheckRequest struct {
+	QuestionID uint `json:"question_id"`
+	AnswerID   uint `json:"answer_id"`
+}
+
+type CheckResponse struct {
+	Correct bool `json:"correct"`
+}
+
 func NewQuizHandler(quizSvc *quiz.Service, topicSvc *topic.Service) *QuizHandler {
 	return &QuizHandler{quizSvc: quizSvc, topicSvc: topicSvc}
+}
+
+func (h *QuizHandler) ShowQuiz() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		q, _ := h.quizSvc.RandomQuestion()
+		public := h.quizSvc.ToPublic(q)
+
+		app.Dump("Вопрос", public)
+
+		data := tplWithCapture(c, "Викторина")
+		data[code.Question] = public
+
+		c.HTML(http.StatusOK, "quiz.html", data)
+	}
+}
+
+func (h *QuizHandler) Check() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var req CheckRequest
+		app.Dump("asd", req)
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(400, gin.H{"error": "invalid"})
+			return
+		}
+
+		correct := h.quizSvc.CheckAnswer(req.QuestionID, req.AnswerID)
+		c.JSON(200, CheckResponse{Correct: correct})
+	}
 }
 
 func (h *QuizHandler) ShowQuizAdmin() func(c *gin.Context) {
@@ -34,7 +71,7 @@ func (h *QuizHandler) ShowQuizAdmin() func(c *gin.Context) {
 		data[code.Questions] = questions
 		data[code.QuestionsCount] = len(questions)
 
-		c.HTML(http.StatusOK, "quiz.html", data)
+		c.HTML(http.StatusOK, "questions.html", data)
 	}
 }
 

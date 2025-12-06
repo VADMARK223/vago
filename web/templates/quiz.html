@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Админка викторины</title>
+    <title>Quiz</title>
     <link rel="stylesheet" href="/static/css/index.css">
 </head>
 <body>
@@ -10,60 +10,57 @@
 
 <main>
     <div class="container">
-        <div class="list">
-            <div class="item">
-                <div class="messages-control">
-                    <form class="form-add" action="/messages" method="POST">
-                        <div>
-                            <button type="submit" class="btn" disabled><i class="fa-solid fa-plus"></i>Создать вопрос
-                            </button>
-                        </div>
-                    </form>
-                    <form class="form-add" action="/questionsDeleteAll" method="POST">
-                        <div>
-                            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i>Удалить все
-                                вопросы
-                            </button>
-                        </div>
-                    </form>
-                    <span>Вопросов: {{.questions_count}}</span>
-                </div>
-            </div>
-        </div>
-        <hr>
-        <div class="scrollable-content">
-            <div class="list">
-                {{ range .topics }}
-                <span>{{.ID}}: {{.Name}} ({{.QuestionsCount}})</span>
-                {{end}}
+        <h2>{{.question.Text}}</h2>
 
-                {{range .questions}}
-                <div class="item" id="message-{{.ID}}">
-                    <div>
-                        <p>{{.ID}}: <b>{{.Text}}</b></p>
-
-                        <div class="answers">
-                            {{range .Answers}}
-                            <div class="answer">
-                                <span>{{.ID}}) {{.Text}}</span>
-                                {{if .IsCorrect}}
-                                <span class="correct">✔</span>
-                                {{end}}
-                            </div>
-                            {{else}}
-                            <div class="empty">Ответов пока нет</div>
-                            {{end}}
-                        </div>
-                    </div>
-                </div>
-                {{else}}
-                <p class="empty">Вопросов нет</p>
-                {{end}}
-            </div>
+        <div class="answers" id="answers">
+            {{range .question.Answers}}
+            <button class="answer" data-id="{{.ID}}">
+                {{.Text}}
+            </button>
+            {{end}}
         </div>
+
+        <p id="result" class="hidden"></p>
+
     </div>
 </main>
 
 {{ template "footer" . }}
+
+<script>
+    const questionID = "{{.question.ID}}";
+    console.log("Question ID", questionID)
+    const buttons = document.querySelectorAll(".answer");
+    const result = document.getElementById("result");
+
+    buttons.forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const answerID = Number(btn.dataset.id);
+
+            const resp = await fetch("/quiz/check", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    question_id: Number(questionID),
+                    answer_id: answerID
+                })
+            });
+            const data = await resp.json();
+
+            if (data.correct) {
+                btn.classList.add("correct");
+                result.innerText = "Правильно!";
+                result.classList.remove("hidden");
+                result.classList.add("ok");
+            } else {
+                btn.classList.add("wrong");
+                result.innerText = "Неправильно 😞";
+                result.classList.remove("hidden");
+                result.classList.add("bad");
+            }
+        });
+    });
+</script>
+
 </body>
 </html>
