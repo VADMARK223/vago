@@ -29,13 +29,17 @@
 
 <script>
     const questionID = "{{.question.ID}}";
-    console.log("Question ID", questionID)
     const buttons = document.querySelectorAll(".answer");
     const result = document.getElementById("result");
 
     buttons.forEach(btn => {
         btn.addEventListener("click", async () => {
             const answerID = Number(btn.dataset.id);
+
+            // Очищаем предыдущие подсветки
+            buttons.forEach(b => {
+                b.classList.remove("correct", "wrong");
+            });
 
             const resp = await fetch("/quiz/check", {
                 method: "POST",
@@ -47,15 +51,20 @@
             });
             const data = await resp.json();
 
+            result.classList.remove("hidden");
             if (data.correct) {
                 btn.classList.add("correct");
                 result.innerText = "Правильно!";
-                result.classList.remove("hidden");
+                result.classList.remove("bad");
                 result.classList.add("ok");
+
+                setTimeout(() => {
+                    window.location.reload();
+                }, 700);
             } else {
                 btn.classList.add("wrong");
                 result.innerText = "Неправильно 😞";
-                result.classList.remove("hidden");
+                result.classList.remove("ok");
                 result.classList.add("bad");
             }
         });

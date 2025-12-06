@@ -1,6 +1,8 @@
 package gorm
 
 import (
+	"math/rand"
+	"time"
 	"vago/internal/domain"
 
 	"gorm.io/gorm"
@@ -75,7 +77,18 @@ func (q QuestionRepo) Random() (*domain.Question, error) {
 		})
 	}
 
+	shuffleAnswers(res.Answers)
+
 	return res, nil
+}
+
+func shuffleAnswers(a []domain.Answer) {
+	rand.Seed(time.Now().UnixNano()) // однократная инициализация
+	n := len(a)
+	for i := n - 1; i > 0; i-- {
+		j := rand.Intn(i + 1)
+		a[i], a[j] = a[j], a[i]
+	}
 }
 
 func (q QuestionRepo) GetByID(id uint) (*domain.Question, error) {

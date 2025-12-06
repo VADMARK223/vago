@@ -33,8 +33,6 @@ func (h *QuizHandler) ShowQuiz() func(c *gin.Context) {
 		q, _ := h.quizSvc.RandomQuestion()
 		public := h.quizSvc.ToPublic(q)
 
-		app.Dump("Вопрос", public)
-
 		data := tplWithCapture(c, "Викторина")
 		data[code.Question] = public
 
@@ -58,8 +56,6 @@ func (h *QuizHandler) Check() func(c *gin.Context) {
 
 func (h *QuizHandler) ShowQuizAdmin() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		//topics, _ := h.topicSvc.All()
-
 		topics, _ := h.topicSvc.AllWithCount()
 
 		app.Dump("Topics", topics)
