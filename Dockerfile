@@ -15,10 +15,6 @@ COPY "cmd" "./cmd"
 COPY internal ./internal
 COPY pkg ./pkg
 COPY web ./web
-COPY migrations ./migrations
-
-# Ставим goose как бинарник
-RUN go install github.com/pressly/goose/v3/cmd/goose@latest
 
 # Сборка бинарника (статическая, без CGO)
 # CGO_ENABLED=0 компилято выключает исользование С, и Go собирает чистый статический бинарник. Если чистое CLI, для GUI может все сломать
@@ -29,21 +25,12 @@ RUN CGO_ENABLED=0 go build -ldflags="-s -w" -trimpath -o vago ./cmd/vago
 # Этап 2: рантайм (минимальный финальный образ)
 FROM debian:bookworm-slim AS runtime
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    postgresql-client \
-  && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /app
 
 # Копируем бинарник из builder-этапа
 COPY --from=builder /app/vago .
-# Копируем миграции
-COPY --from=builder /app/migrations ./migrations
 # Копируем шаблоны и статику
 COPY --from=builder /app/web ./web
-
-# Копируем goose бинарник
-COPY --from=builder /go/bin/goose /usr/local/bin/goose
 
 # Порт для gRPC и HTTP
 EXPOSE 50051 5555 8090

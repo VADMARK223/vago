@@ -14,7 +14,7 @@ services:
       POSTGRES_DB: vagodb
     volumes:
       - vago_postgres_data:/var/lib/postgresql/data # постоянное хранилище
-#      - ./db:/docker-entrypoint-initdb.d # SQL-скрипты при старте
+      - ./db:/docker-entrypoint-initdb.d # SQL-скрипты при старте
     networks:
       - vago-net
     command: >
@@ -23,30 +23,6 @@ services:
                 -c maintenance_work_mem=16MB
                 -c max_connections=15
                 -c effective_cache_size=256MB
-
-  migrations:
-    image: ghcr.io/vadmark223/vago:latest
-    container_name: vago-migrations
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      GOOSE_DRIVER: postgres
-      GOOSE_DBSTRING: postgres://vadmark:5125341@postgres:5432/vagodb?sslmode=disable
-    entrypoint: >
-      sh -c "
-        echo 'Waiting for Postgres...';
-        until pg_isready -h postgres -U vadmark -d vagodb; do
-          echo 'Postgres is unavailable - sleeping';
-          sleep 1;
-        done;
-        echo 'Running Goose migrations...';
-        goose -dir /app/migrations up;
-        echo 'Migrations completed successfully.';
-      "
-    restart: "no"
-    networks:
-      - vago-net
 
   vago:
     image: ghcr.io/vadmark223/vago:latest
@@ -59,8 +35,8 @@ services:
     env_file:
       - .env.prod
     depends_on:
-      migrations:
-        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
     networks:
       - vago-net
 
