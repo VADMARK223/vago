@@ -32,11 +32,14 @@ func (h *QuizHandler) ShowQuiz() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		//id := uint(1)
 		//q, _ := h.quizSvc.RandomQuestion(&id)
-		q, _ := h.quizSvc.RandomQuestion(nil)
-		public := h.quizSvc.ToPublic(q)
+		q, err := h.quizSvc.RandomQuestion(nil)
 
 		data := tplWithCapture(c, "Викторина")
-		data[code.Question] = public
+		if err != nil {
+			data[code.Question] = quiz.QuestionPublic{}
+		} else {
+			data[code.Question] = h.quizSvc.ToPublic(q)
+		}
 
 		c.HTML(http.StatusOK, "quiz.html", data)
 	}

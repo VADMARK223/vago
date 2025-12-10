@@ -23,13 +23,13 @@ sudo kill -9 PID
 
 Зайти в контейнер
 ```shell
-docker exec -it vado_postgres bash
+docker exec -it vago_postgres bash
 ```
 
 ## psql
 Зайти в `psql`
 ```shell
-psql -U vadmark -d vadodb
+psql -U vadmark -d vagodb
 ```
 Список таблиц
 ```shell
@@ -41,14 +41,14 @@ psql -U vadmark -d vadodb
 ```
 Удаление volume, чтобы база создалась заново
 ```shell
-docker volume rm vado-server_postgres-data
+docker volume rm vago-server_postgres-data
 ```
 
 # Golang
 
 Инициализация проекта
 ```shell
-go mod init vado_server
+go mod init vago_server
 ```
 Чистит зависимости (добавляет/удаляет лишние)
 ```shell
@@ -85,7 +85,7 @@ go run ./cmd/ping/main.go
 
 Активация
 ```shell
-sudo ln -s /etc/nginx/sites-available/vado.local /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/vago.local /etc/nginx/sites-enabled/
 sudo nginx -t   # проверка синтаксиса
 sudo systemctl reload nginx
 ```

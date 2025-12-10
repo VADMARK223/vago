@@ -1,17 +1,17 @@
 services:
   postgres:
     image: postgres:15
-    container_name: vado-postgres
+    container_name: vago-postgres
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U vadmark -d vadodb" ]
+      test: [ "CMD-SHELL", "pg_isready -U vadmark -d vagodb" ]
       interval: 5s
       timeout: 5s
       retries: 5
     environment:
       POSTGRES_USER: vadmark
       POSTGRES_PASSWORD: 5125341
-      POSTGRES_DB: vadodb
+      POSTGRES_DB: vagodb
     volumes:
       - vago_postgres_data:/var/lib/postgresql/data # постоянное хранилище
       - ./db:/docker-entrypoint-initdb.d # SQL-скрипты при старте
@@ -23,6 +23,21 @@ services:
                 -c maintenance_work_mem=16MB
                 -c max_connections=15
                 -c effective_cache_size=256MB
+
+  migrations:
+    image: golang:1.22
+    working_dir: /migrations
+    depends_on:
+      - postgres
+    volumes:
+      - ./migrations:/migrations
+    entrypoint: [
+      "go", "run", "github.com/pressly/goose/v3/cmd/goose",
+      "-dir", "/migrations",
+      "postgres",
+      "postgres://vadmark:5125341@localhost:5432/vagodb?sslmode=disable",
+      "up"
+    ]
 
   vago:
     image: ghcr.io/vadmark223/vago:latest

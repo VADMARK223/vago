@@ -6,6 +6,7 @@ import (
 	"vago/internal/app"
 	user2 "vago/internal/application/user"
 	"vago/internal/config/code"
+	"vago/internal/config/route"
 	"vago/internal/domain"
 
 	"github.com/gin-gonic/gin"
@@ -34,8 +35,11 @@ func LoadUserContext(svc *user2.Service, cache *app.LocalCache) gin.HandlerFunc 
 
 		u, err := svc.GetByID(userID)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"Error": err.Error()})
-			return
+			// TODO: чет надо сделать, если базу почистили
+			//c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"Error": err.Error()})
+			//return
+			c.Redirect(http.StatusFound, route.Login)
+			c.Abort()
 		}
 
 		cache.Set(userID, u, time.Minute*5)

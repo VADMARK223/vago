@@ -58,7 +58,7 @@ logs-f:
 	docker compose -p $(PROJECT_NAME) logs -f --tail=20 vago
 
 psql:
-	docker exec -it vado-postgres psql -U vadmark -d vadodb
+	docker exec -it vago-postgres psql -U vadmark -d vagodb
 
 clean-all:
 	docker system prune -af --volumes
@@ -115,7 +115,18 @@ gen-questions:
 	@echo "Run convert Json in SQL"
 	go run ./cmd/genQuestions
 	@echo "==> Выполнение SQL..."
-	psql "postgresql://localhost:5432/vadodb" -f db/04_questions.sql
+	psql "postgresql://localhost:5432/vagodb" -f db/04_questions.sql
+
+GOOSE = goose -dir ./migrations postgres "postgres://vadmark:5125341@localhost:5432/vagodb?sslmode=disable"
+
+goose-up:
+	$(GOOSE) up
+
+goose-down:
+	$(GOOSE) down
+
+goose-status:
+	$(GOOSE) status
 
 kafka-up:
 	$(COMPOSE) $(KAFKA_YML) up -d
@@ -151,4 +162,8 @@ help:
 	@echo ""
 	@echo "$(CYAN)Qiuz:$(RESET)"
 	@echo "  $(GREEN)make gen-questions$(RESET)   - generate questions from JSON"
+	@echo "$(CYAN)Goose:$(RESET)"
+	@echo "  $(GREEN)make goose-up$(RESET)   - Goose up"
+	@echo "  $(GREEN)make goose-down$(RESET)   - Goose down"
+	@echo "  $(GREEN)make goose-status$(RESET)   - Goose status"
 .DEFAULT_GOAL := help
