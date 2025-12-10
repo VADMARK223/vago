@@ -14,7 +14,7 @@ services:
       POSTGRES_DB: vagodb
     volumes:
       - vago_postgres_data:/var/lib/postgresql/data # постоянное хранилище
-      - ./db:/docker-entrypoint-initdb.d # SQL-скрипты при старте
+#      - ./db:/docker-entrypoint-initdb.d # SQL-скрипты при старте
     networks:
       - vago-net
     command: >
@@ -25,15 +25,13 @@ services:
                 -c effective_cache_size=256MB
 
   migrations:
-    image: golang:1.22
-    working_dir: /migrations
+    image: ghcr.io/vadmark223/vago:latest
+    container_name: vago-migrations
     depends_on:
       - postgres
-    volumes:
-      - ./migrations:/migrations
-    entrypoint: [
-      "go", "run", "github.com/pressly/goose/v3/cmd/goose",
-      "-dir", "/migrations",
+    command: [
+      "goose",
+      "-dir", "/app/migrations",
       "postgres",
       "postgres://vadmark:5125341@localhost:5432/vagodb?sslmode=disable",
       "up"

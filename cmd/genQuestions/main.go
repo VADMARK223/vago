@@ -23,7 +23,7 @@ type Question struct {
 
 const (
 	input  = "data/questions.json"
-	output = "db/04_questions.sql"
+	output = "db/05_questions.sql"
 )
 
 func main() {
