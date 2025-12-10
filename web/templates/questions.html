@@ -19,11 +19,14 @@
                             </button>
                         </div>
                     </form>
+                    <form class="form-add" action="/runSeed" method="POST">
+                        <div>
+                            <button type="submit" class="btn">Run</button>
+                        </div>
+                    </form>
                     <form class="form-add" action="/questionsDeleteAll" method="POST">
                         <div>
-                            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i>Удалить все
-                                вопросы
-                            </button>
+                            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </form>
                     <span>Вопросов: {{.questions_count}}</span>

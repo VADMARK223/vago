@@ -12,7 +12,8 @@
 
 <main>
     <div class="container">
-        <h2>{{.question.Text}}</h2>
+        <h3>{{.question.ID}}. {{.question.Text}}</h3>
+        <span>Тема: {{.question.TopicName}}</span>
 
         {{if .question.Code}}
         <script>hljs.highlightAll();</script>
@@ -28,7 +29,8 @@
         </div>
 
         <p id="result" class="hidden"></p>
-        <div id="continueBtn" class="btn" style="visibility: hidden;">
+        <p id="explanation" class="explanation hidden"></p>
+        <div id="continueBtn" class="btn" style="visibility: hidden; text-align: center">
             Продолжить
         </div>
     </div>
@@ -40,8 +42,10 @@
     const questionID = "{{.question.ID}}";
     const buttons = document.querySelectorAll(".answer");
     const result = document.getElementById("result");
+    const explanation = document.getElementById("explanation");
+
     const continueBtn = document.getElementById("continueBtn")
-    continueBtn.addEventListener("click", ()=>{
+    continueBtn.addEventListener("click", () => {
         window.location.reload();
     })
 
@@ -72,13 +76,15 @@
                 result.classList.remove("bad");
                 result.classList.add("ok");
 
-                if(data.explanation) {
-                    result.innerText = "Правильно! " + data.explanation;
+                if (data.explanation) {
+                    explanation.classList.remove("hidden");
+                    result.innerText = "Правильно!";
+                    explanation.innerText = data.explanation;
                     continueBtn.style.visibility = "visible";
                 } else {
                     result.innerText = "Правильно!";
                     setTimeout(() => {
-                         window.location.reload();
+                        window.location.reload();
                     }, 700);
                 }
             } else {

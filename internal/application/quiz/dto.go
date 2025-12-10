@@ -5,6 +5,7 @@ type QuestionPublic struct {
 	Text        string
 	Code        string
 	Explanation string
+	TopicName   string
 	Answers     []AnswerPublic
 }
 

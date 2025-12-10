@@ -49,3 +49,15 @@ func (r TopicRepo) AllWithCount() ([]domain.TopicWithCount, error) {
 
 	return topics, err
 }
+
+func (r TopicRepo) GetByID(id uint) (*domain.Topic, error) {
+	var entity TopicEntity
+	if err := r.db.First(&entity, id).First(&entity).Error; err != nil {
+		return &domain.Topic{}, err
+	}
+
+	return &domain.Topic{
+		ID:   entity.ID,
+		Name: entity.Name,
+	}, nil
+}

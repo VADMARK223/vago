@@ -36,3 +36,14 @@
 .hidden {
     display: none;
 }
+
+.explanation {
+    /*display: flex;*/
+    /*flex-direction: row;*/
+    /*align-items: center;*/
+    background: var(--bg-item);
+    border: var(--border-1);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    /*transition: background 0.2s;*/
+}

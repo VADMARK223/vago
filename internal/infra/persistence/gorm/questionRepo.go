@@ -3,7 +3,6 @@ package gorm
 import (
 	"math/rand"
 	"time"
-	"vago/internal/app"
 	"vago/internal/domain"
 
 	"gorm.io/gorm"
@@ -90,7 +89,6 @@ func (q QuestionRepo) GetByID(id uint) (*domain.Question, error) {
 	}
 
 	result := questionToDomain(entity)
-	app.Dump("rezzz", result)
 
 	for _, a := range entity.Answers {
 		result.Answers = append(result.Answers, domain.Answer{
@@ -120,5 +118,6 @@ func questionToDomain(e QuestionEntity) *domain.Question {
 		Text:        e.Text,
 		Code:        e.Code,
 		Explanation: e.Explanation,
+		TopicID:     e.TopicID,
 	}
 }

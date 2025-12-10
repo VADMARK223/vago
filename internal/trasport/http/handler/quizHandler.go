@@ -5,6 +5,7 @@ import (
 	"vago/internal/application/quiz"
 	"vago/internal/application/topic"
 	"vago/internal/config/code"
+	"vago/internal/seed"
 
 	"github.com/gin-gonic/gin"
 )
@@ -30,16 +31,12 @@ func NewQuizHandler(quizSvc *quiz.Service, topicSvc *topic.Service) *QuizHandler
 
 func (h *QuizHandler) ShowQuiz() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		//id := uint(1)
-		//q, _ := h.quizSvc.RandomQuestion(&id)
-		q, err := h.quizSvc.RandomQuestion(nil)
+		id := uint(1)
+		q := h.quizSvc.RandomPublicQuestion(&id)
+		//q, err := h.quizSvc.RandomQuestion(nil)
 
 		data := tplWithCapture(c, "Викторина")
-		if err != nil {
-			data[code.Question] = quiz.QuestionPublic{}
-		} else {
-			data[code.Question] = h.quizSvc.ToPublic(q)
-		}
+		data[code.Question] = q
 
 		c.HTML(http.StatusOK, "quiz.html", data)
 	}
@@ -80,5 +77,16 @@ func (h *QuizHandler) DeleteAllQuestions() func(c *gin.Context) {
 			ShowError(c, "Ошибка удаления всех вопросов", err.Error())
 		}
 		c.Redirect(http.StatusSeeOther, "/quiz")
+	}
+}
+
+func (h *QuizHandler) RunSeed() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		err := seed.Run()
+		if err != nil {
+			ShowError(c, "Ошибка сидирования", err.Error())
+			return
+		}
+		c.Redirect(http.StatusSeeOther, "/questions")
 	}
 }

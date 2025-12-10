@@ -1,6 +1,90 @@
 [
   {
-    "topic_id": 4,
+    "topic_id": 2,
+    "text": "Что напечатает код?",
+    "code": "s := []int{1, 2, 3}\ns2 := s[:1]       // len=1, cap=3\ns3 := append(s2, 9)\nfmt.Println(s, s3)\n",
+    "explanation": "append пишет в общую память: срез s тоже меняется.",
+    "answers": [
+      {
+        "text": "[1 2 3] [1 9]"
+      },
+      {
+        "text": "[1 9 3] [1 9]",
+        "correct": true
+      },
+      {
+        "text": "[1 9 3] [1 9 3]"
+      },
+      {
+        "text": "[1 2 3] [1 2 3 9]"
+      }
+    ]
+  },
+  {
+    "topic_id": 2,
+    "text": "Что напечатает код?",
+    "code": "s := make([]int, 2, 5)\ns2 := append(s, 7)\ns2[0] = 99\nfmt.Println(s[0])\n",
+    "explanation": "Общий массив, так как при append вместимости хватает (5)",
+    "answers": [
+      {
+        "text": "99",
+        "correct": true
+      },
+      {
+        "text": "0"
+      },
+      {
+        "text": "7"
+      },
+      {
+        "text": "Panic"
+      }
+    ]
+  },
+  {
+    "topic_id": 2,
+    "text": "Что напечатает код?",
+    "code": "s := []int{10, 20, 30}\ns2 := s[:2]\ns2[1] = 99\nfmt.Println(s[1])\n",
+    "explanation": "Подзрезка тоже же базового массива.\nПосле подрезки в s2 [10 20], len=2, cap=3",
+    "answers": [
+      {
+        "text": "99",
+        "correct": true
+      },
+      {
+        "text": "20"
+      },
+      {
+        "text": "30"
+      },
+      {
+        "text": "Panic"
+      }
+    ]
+  },
+  {
+    "topic_id": 2,
+    "text": "Что напечатает код?",
+    "code": "s := []int{1, 2, 3}\ns2 := append(s, 4)\ns2[0] = 99\nfmt.Println(s[0])\n",
+    "explanation": "В начале len=3 cap=3, под срезом лежит массив [1 2 3]\nПосле добавления 4, нет свободного места создается НОВЫЙ базовый массив с cap=6, изменения идут уже у нового массива",
+    "answers": [
+      {
+        "text": "1",
+        "correct": true
+      },
+      {
+        "text": "99"
+      },
+      {
+        "text": "Runtime panic"
+      },
+      {
+        "text": "Зависит от версии Go"
+      }
+    ]
+  },
+  {
+    "topic_id": 9,
     "text": "Что произойдёт при исполнении?",
     "code": "ch := make(chan int)\ngo func() {\n    ch <- 10\n}()\nfmt.Println(<-ch)\n",
     "explanation": "Обычная синхронная передача данных.",

@@ -66,7 +66,6 @@ func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine
 	r.GET(route.Register, handler.ShowSignup)
 	r.POST(route.Register, handler.PerformRegister(userSvc))
 	r.POST(route.Logout, handler.Logout)
-	r.GET("/moex", handler.ShowMoex)
 
 	// Защищенные маршруты
 	auth := r.Group("/")
@@ -89,13 +88,16 @@ func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine
 		auth.POST("/messagesDeleteAll", messagesHandler.DeleteAll())
 		auth.DELETE("/messages/:id", messagesHandler.Delete())
 
-		questionSvc := quiz.NewService(gorm.NewQuestionRepo(ctx.DB))
-		topicSvc := topic.NewService(gorm.NewTopicRepo(ctx.DB))
+		topicRepo := gorm.NewTopicRepo(ctx.DB)
+		questionSvc := quiz.NewService(gorm.NewQuestionRepo(ctx.DB), topicRepo)
+		topicSvc := topic.NewService(topicRepo)
+
 		quizHandler := handler.NewQuizHandler(questionSvc, topicSvc)
 		auth.GET("/questions", quizHandler.ShowQuizAdmin())
 		auth.GET("/quiz", quizHandler.ShowQuiz())
 		auth.POST("/quiz/check", quizHandler.Check())
 		auth.POST("/questionsDeleteAll", quizHandler.DeleteAllQuestions())
+		auth.POST("/runSeed", quizHandler.RunSeed())
 	}
 
 	r.NoRoute(handler.NotFoundHandler)
