@@ -29,6 +29,10 @@ RUN CGO_ENABLED=0 go build -ldflags="-s -w" -trimpath -o vago ./cmd/vago
 # Этап 2: рантайм (минимальный финальный образ)
 FROM debian:bookworm-slim AS runtime
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    postgresql-client \
+  && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Копируем бинарник из builder-этапа
