@@ -20,18 +20,18 @@
         <pre><code class="go">{{.question.Code}}</code></pre>
         {{end}}
 
-        <div class="answers" id="answers">
-            {{range .question.Answers}}
-            <button class="answer" data-id="{{.ID}}">
-                {{.Text}}
-            </button>
-            {{end}}
-        </div>
+        {{range .question.Answers}}
+        <button class="answer" data-id="{{.ID}}">
+            {{.Text}}
+        </button>
+        {{end}}
 
-        <p id="result" class="hidden"></p>
-        <p id="explanation" class="explanation hidden"></p>
-        <div id="continueBtn" class="btn" style="visibility: hidden; text-align: center">
-            Продолжить
+        <div class="stack">
+            <p id="result" class="hidden"></p>
+            <p id="explanation" class="panel hidden"></p>
+            <div id="continueBtn" class="btn" style="visibility: hidden; text-align: center">
+                Продолжить
+            </div>
         </div>
     </div>
 </main>
@@ -92,6 +92,8 @@
                 result.innerText = "Неправильно 😞";
                 result.classList.remove("ok");
                 result.classList.add("bad");
+                explanation.classList.add("hidden");
+                continueBtn.style.visibility = "hidden";
             }
         });
     });

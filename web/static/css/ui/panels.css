@@ -1,1 +1,16 @@
-/*.menu, .container, .panel, .card*/
+/*.menu, .container, .card*/
+
+/*Самая универсальная панель*/
+.panel {
+    background: var(--bg-item);
+    border: var(--border-1);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+}
+
+/*Вертикальная панель с отступом*/
+.stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}

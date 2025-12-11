@@ -2,6 +2,7 @@
 @import url("/static/css/base/variables.css");
 @import url("/static/css/base/reset.css");
 @import url("/static/css/base/globals.css");
+@import url("/static/css/ui/panels.css");
 @import url("/static/css/ui/forms.css");
 @import url("/static/css/ui/scroll.css");
 @import url("/static/css/components/quiz.css");
@@ -33,8 +34,6 @@ code {
     padding: var(--space-2);
     width: 100%;
 }
-
-
 
 h1 {
     margin: 0 0 var(--space-4);

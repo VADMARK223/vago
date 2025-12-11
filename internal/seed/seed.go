@@ -24,8 +24,6 @@ type Question struct {
 
 const dataFile = "data/questions.json"
 
-//const dataFileTest = "data/questions_test.json"
-
 func AddQuestion(question Question) error {
 	data, err := os.ReadFile(dataFile)
 	if err != nil {

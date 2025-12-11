@@ -32,7 +32,7 @@ func NewQuizHandler(quizSvc *quiz.Service, topicSvc *topic.Service) *QuizHandler
 
 func (h *QuizHandler) ShowQuiz() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		id := uint(1)
+		id := uint(22)
 		q := h.quizSvc.RandomPublicQuestion(&id)
 		//q, err := h.quizSvc.RandomQuestion(nil)
 
@@ -97,13 +97,18 @@ func (h *QuizHandler) AddQuestion() func(c *gin.Context) {
 			answers[correctIdx].Correct = true
 		}
 
-		_ = seed.AddQuestion(seed.Question{
+		err := seed.AddQuestion(seed.Question{
 			TopicID:     topicId,
 			Text:        text,
 			Code:        codeStr,
 			Explanation: explanation,
 			Answers:     answers,
 		})
+
+		if err != nil {
+			ShowError(c, "Ошибка добавления вопроса", err.Error())
+			return
+		}
 
 		c.Redirect(http.StatusSeeOther, "/questions")
 	}
