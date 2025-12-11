@@ -28,6 +28,10 @@ func (s *Service) DeleteAll() error {
 	return s.questionRepo.DeleteAll()
 }
 
+func (s *Service) RandomID() (uint, error) {
+	return s.questionRepo.RandomID()
+}
+
 func (s *Service) RandomPublicQuestion(id *uint) QuestionPublic {
 	question, err := s.randomQuestion(id)
 	if err != nil {

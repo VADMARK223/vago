@@ -15,6 +15,7 @@ COPY "cmd" "./cmd"
 COPY internal ./internal
 COPY pkg ./pkg
 COPY web ./web
+COPY data ./data
 
 # Сборка бинарника (статическая, без CGO)
 # CGO_ENABLED=0 компилято выключает исользование С, и Go собирает чистый статический бинарник. Если чистое CLI, для GUI может все сломать

@@ -1,6 +1,7 @@
 package gorm
 
 import (
+	"errors"
 	"math/rand"
 	"time"
 	"vago/internal/domain"
@@ -48,6 +49,25 @@ func (q QuestionRepo) All() ([]*domain.Question, error) {
 	}
 
 	return result, nil
+}
+
+func (q QuestionRepo) RandomID() (uint, error) {
+	var count int64
+	if err := q.db.Model(&QuestionEntity{}).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	if count == 0 {
+		return 0, errors.New("no questions")
+	}
+
+	offset := rand.Intn(int(count))
+
+	var entity QuestionEntity
+	if err := q.db.Select("id").Offset(offset).Limit(1).Find(&entity).Error; err != nil {
+		return 0, err
+	}
+
+	return entity.ID, nil
 }
 
 func (q QuestionRepo) Random() (*domain.Question, error) {

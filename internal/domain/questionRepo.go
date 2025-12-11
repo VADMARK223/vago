@@ -5,4 +5,5 @@ type QuestionRepository interface {
 	DeleteAll() error
 	Random() (*Question, error)
 	GetByID(id uint) (*Question, error)
+	RandomID() (uint, error)
 }

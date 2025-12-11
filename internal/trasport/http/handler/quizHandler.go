@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"vago/internal/application/quiz"
@@ -30,17 +31,37 @@ func NewQuizHandler(quizSvc *quiz.Service, topicSvc *topic.Service) *QuizHandler
 	return &QuizHandler{quizSvc: quizSvc, topicSvc: topicSvc}
 }
 
-func (h *QuizHandler) ShowQuiz() func(c *gin.Context) {
+func (h *QuizHandler) ShowQuizRandom() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		id := uint(22)
-		q := h.quizSvc.RandomPublicQuestion(&id)
-		//q, err := h.quizSvc.RandomQuestion(nil)
-
-		data := tplWithCapture(c, "Викторина")
-		data[code.Question] = q
-
-		c.HTML(http.StatusOK, "quiz.html", data)
+		id, err := h.quizSvc.RandomID()
+		if err != nil {
+			ShowError(c, "Ошибка генерации случайного вопроса", err.Error())
+			return
+		}
+		c.Redirect(http.StatusFound, fmt.Sprintf("/quiz/%d", id))
 	}
+}
+
+func (h *QuizHandler) ShowQuizByID() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		idStr := c.Param("id")
+		id64, err := strconv.ParseUint(idStr, 10, 64)
+		if err != nil {
+			c.String(400, "invalid id")
+			return
+		}
+		temp := uint(id64)
+		q := h.quizSvc.RandomPublicQuestion(&temp)
+
+		renderQuiz(c, q)
+	}
+}
+
+func renderQuiz(c *gin.Context, q quiz.QuestionPublic) {
+	data := tplWithCapture(c, "Викторина")
+	data[code.Question] = q
+
+	c.HTML(http.StatusOK, "quiz.html", data)
 }
 
 func (h *QuizHandler) Check() func(c *gin.Context) {
