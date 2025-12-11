@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"vago/internal/app"
 	"vago/internal/application/quiz"
 	"vago/internal/application/topic"
 	"vago/internal/config/code"
@@ -67,6 +68,14 @@ func (h *QuizHandler) ShowQuizAdmin() func(c *gin.Context) {
 		data[code.QuestionsCount] = len(questions)
 
 		c.HTML(http.StatusOK, "questions.html", data)
+	}
+}
+
+func (h *QuizHandler) AddQuestion() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		text := c.PostForm("text")
+		app.Dump("Add text", text)
+		c.Redirect(http.StatusSeeOther, "/questions")
 	}
 }
 

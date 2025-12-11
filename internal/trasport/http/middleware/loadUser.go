@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 	"vago/internal/app"
-	user2 "vago/internal/application/user"
+	"vago/internal/application/user"
 	"vago/internal/config/code"
 	"vago/internal/config/route"
 	"vago/internal/domain"
@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func LoadUserContext(svc *user2.Service, cache *app.LocalCache) gin.HandlerFunc {
+func LoadUserContext(svc *user.Service, cache *app.LocalCache) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		uidVal, exists := c.Get(code.UserId)
 		if !exists {
@@ -35,9 +35,7 @@ func LoadUserContext(svc *user2.Service, cache *app.LocalCache) gin.HandlerFunc 
 
 		u, err := svc.GetByID(userID)
 		if err != nil {
-			// TODO: чет надо сделать, если базу почистили
-			//c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"Error": err.Error()})
-			//return
+			domain.ClearTokenCookies(c)
 			c.Redirect(http.StatusFound, route.Login)
 			c.Abort()
 		}

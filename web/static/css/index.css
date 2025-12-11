@@ -162,10 +162,12 @@ a:not(.btn):not(.btn-small):not(.btn-danger):hover {
     background: #599fdb;
 }
 
-.btn:disabled {
+.btn:disabled,
+.btn[aria-disabled="true"] {
     background: #888;
     cursor: not-allowed;
     opacity: 0.6;
+    pointer-events: none;
 }
 
 .btn:disabled:hover {

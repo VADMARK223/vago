@@ -3,33 +3,38 @@
     <h2>{{.capture}}</h2>
     <div class="menu">
         <div>
-            <a href="/" class="btn"><i class="fa-solid fa-house"></i></a>
+            {{ template "component.href_btn" dict
+            "Href" "/"
+            "Icon" "fa-solid fa-house"
+            }}
 
-            <a href="/quiz" class="btn">
-                <div class="icon-item">
-                    <i class="fa-solid fa-check-double"></i>
-                    <span>Quiz</span>
-                </div>
-            </a>
+            {{ template "component.href_btn" dict
+            "Href" "/book"
+            "Name" "Книга"
+            "Icon" "fa-solid fa-book"
+            }}
 
-            <a href="/book" class="btn">
-                <div class="icon-item">
-                    <i class="fa-solid fa-book"></i>
-                    <span>Книга</span>
-                </div>
-            </a>
-            <a href="/tasks" class="btn">
-                <div class="icon-item">
-                    <i class="fa-solid fa-list-check"></i>
-                    <span>Задачи</span>
-                </div>
-            </a>
-            <a href="/chat" class="btn">
-                <div class="icon-item">
-                    <i class="fa-solid fa-comment"></i>
-                    <span>Чат</span>
-                </div>
-            </a>
+            {{ template "component.href_btn" dict
+            "Href" "/quiz"
+            "Name" "Quiz"
+            "Icon" "fa-solid fa-check-double"
+            "Disabled" (not .user_id)
+            }}
+
+            {{ template "component.href_btn" dict
+            "Href" "/tasks"
+            "Name" "Задачи"
+            "Icon" "fa-solid fa-list-check"
+            "Disabled" (not .user_id)
+            }}
+
+            {{ template "component.href_btn" dict
+            "Href" "/chat"
+            "Name" "Чат"
+            "Icon" "fa-solid fa-comment"
+            "Disabled" (not .user_id)
+            }}
+
             {{if .user_id}}
             {{if .is_admin}}
             <a href="/questions" class="btn"><i class="fa-solid fa-check-double"></i></a>

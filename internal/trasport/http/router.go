@@ -94,6 +94,7 @@ func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine
 
 		quizHandler := handler.NewQuizHandler(questionSvc, topicSvc)
 		auth.GET("/questions", quizHandler.ShowQuizAdmin())
+		auth.POST("/questions", quizHandler.AddQuestion())
 		auth.GET("/quiz", quizHandler.ShowQuiz())
 		auth.POST("/quiz/check", quizHandler.Check())
 		auth.POST("/questionsDeleteAll", quizHandler.DeleteAllQuestions())

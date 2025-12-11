@@ -7,5 +7,5 @@ import (
 )
 
 func ShowBook(c *gin.Context) {
-	c.HTML(http.StatusOK, "book.html", tplWithCapture(c, "Golang book"))
+	c.HTML(http.StatusOK, "book.html", tplWithCapture(c, "Книга по Golang"))
 }
