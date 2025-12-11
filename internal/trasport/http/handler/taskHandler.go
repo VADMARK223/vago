@@ -15,7 +15,7 @@ import (
 
 func Tasks(service *task2.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		data := tplWithCapture(c, "User tasks")
+		data := tplWithCapture(c, "Задачи пользователя")
 
 		tasks, err := service.GetAllByUser(data[code.UserId].(uint))
 		if err != nil {

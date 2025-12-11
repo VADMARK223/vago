@@ -2,6 +2,27 @@
   {
     "topic_id": 2,
     "text": "Что напечатает код?",
+    "code": "s := []int{5, 6, 7}\ns2 := append(append(s, 8), 9)\nfmt.Println(len(s), cap(s))\n",
+    "explanation": "append(s, 8) уже создало новый массив, но переменная s осталась нетронутой.",
+    "answers": [
+      {
+        "text": "3 3",
+        "correct": true
+      },
+      {
+        "text": "3 4"
+      },
+      {
+        "text": "3 6"
+      },
+      {
+        "text": "3 8"
+      }
+    ]
+  },
+  {
+    "topic_id": 2,
+    "text": "Что напечатает код?",
     "code": "s := []int{1, 2, 3}\ns2 := s[:1]       // len=1, cap=3\ns3 := append(s2, 9)\nfmt.Println(s, s3)\n",
     "explanation": "append пишет в общую память: срез s тоже меняется.",
     "answers": [

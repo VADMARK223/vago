@@ -2,7 +2,7 @@ package handler
 
 import (
 	"net/http"
-	"vago/internal/app"
+	"strconv"
 	"vago/internal/application/quiz"
 	"vago/internal/application/topic"
 	"vago/internal/config/code"
@@ -74,7 +74,37 @@ func (h *QuizHandler) ShowQuizAdmin() func(c *gin.Context) {
 func (h *QuizHandler) AddQuestion() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		text := c.PostForm("text")
-		app.Dump("Add text", text)
+		codeStr := c.PostForm("code")
+		answer1 := c.PostForm("answer1")
+		answer2 := c.PostForm("answer2")
+		answer3 := c.PostForm("answer3")
+		answer4 := c.PostForm("answer4")
+		correctAnswerIdxStr := c.PostForm("correct_answer_index")
+		topicIdStr := c.PostForm("topic_id")
+		explanation := c.PostForm("explanation")
+
+		topicId, _ := strconv.Atoi(topicIdStr)
+		correctIdx, _ := strconv.Atoi(correctAnswerIdxStr)
+
+		answers := []seed.Answer{
+			{Text: answer1},
+			{Text: answer2},
+			{Text: answer3},
+			{Text: answer4},
+		}
+
+		if correctIdx >= 0 && correctIdx < len(answers) {
+			answers[correctIdx].Correct = true
+		}
+
+		_ = seed.AddQuestion(seed.Question{
+			TopicID:     topicId,
+			Text:        text,
+			Code:        codeStr,
+			Explanation: explanation,
+			Answers:     answers,
+		})
+
 		c.Redirect(http.StatusSeeOther, "/questions")
 	}
 }
@@ -89,9 +119,9 @@ func (h *QuizHandler) DeleteAllQuestions() func(c *gin.Context) {
 	}
 }
 
-func (h *QuizHandler) RunSeed() func(c *gin.Context) {
+func (h *QuizHandler) RunSeed(dsn string) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		err := seed.Run()
+		err := seed.Run(dsn)
 		if err != nil {
 			ShowError(c, "Ошибка сидирования", err.Error())
 			return

@@ -1,0 +1,101 @@
+input, textarea {
+    width: 100%;
+    background: var(--bg-entry);
+    color: var(--text);
+    border: 1px solid var(--bg-border);
+    transition: border-color .2s, box-shadow .2s;
+    border-radius: var(--radius-sm);
+    padding: var(--space-2);
+    font-family: inherit;
+}
+
+input:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--accent-strong);
+    box-shadow: 0 0 0 1px var(--accent-strong);
+}
+
+input:disabled,
+textarea:disabled {
+    background: #2c2d30; /* чуть светлее, чем обычный bg-entry */
+    color: #777; /* приглушённый текст */
+    border-color: #555; /* более тусклая рамка */
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+input[readonly],
+textarea[readonly] {
+    background: #26272a;
+    color: #999;
+    border-color: #555;
+    cursor: default;
+}
+
+input[type="checkbox"] {
+    appearance: none; /* убираем стандартный стиль */
+    -webkit-appearance: none;
+    background-color: var(--bg-main);
+    border: var(--border-1);
+    width: 18px;
+    height: 18px;
+    border-radius: var(--radius-sm);
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+input[type="checkbox"]:hover {
+    border-color: var(--accent);
+}
+
+input[type="checkbox"]:checked {
+    background-color: var(--accent-strong);
+    border-color: var(--accent-strong);
+}
+
+input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 5px;
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+select {
+    width: 100%;
+    background: var(--bg-entry);
+    color: var(--text);
+    border: 1px solid var(--bg-border);
+    transition: border-color .2s, box-shadow .2s;
+    border-radius: var(--radius-sm);
+    padding: var(--space-2);
+    font-family: inherit;
+    cursor: pointer;
+    appearance: none; /* скрываем браузерную стрелку */
+}
+
+select {
+    background-image: url("data:image/svg+xml;utf8,<svg fill='%23a9b7c6' height='16' viewBox='0 0 24 24' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right var(--space-2) center;
+    padding-right: calc(var(--space-2) * 4); /* место под стрелку */
+}
+
+select:hover {
+    border-color: var(--accent);
+}
+
+select:focus {
+    outline: none;
+    border-color: var(--accent-strong);
+    box-shadow: 0 0 0 2px rgba(78, 148, 206, .25);
+}

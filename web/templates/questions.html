@@ -35,7 +35,70 @@
                             "Placeholder" "Введите вопрос"
                             "MaxLength" "30"
                             "Required" "true"
+                            "Value" "Вопрос"
                             }}
+
+                            <label>
+                                <textarea name="code" placeholder="Пример кода"></textarea>
+                            </label>
+
+                            {{ template "component.inputWithClear" dict
+                            "ID" "answer1Input"
+                            "Name" "answer1"
+                            "Placeholder" "Ответ 1"
+                            "Value" "Ответ 1"
+                            "Required" "true"
+                            }}
+
+                            {{ template "component.inputWithClear" dict
+                            "ID" "answer2Input"
+                            "Name" "answer2"
+                            "Placeholder" "Ответ 2"
+                            "Value" "Ответ 2"
+                            "Required" "true"
+                            }}
+
+                            {{ template "component.inputWithClear" dict
+                            "ID" "answer3Input"
+                            "Name" "answer3"
+                            "Placeholder" "Ответ 3"
+                            "Value" "Ответ 3"
+                            "Required" "true"
+                            }}
+
+                            {{ template "component.inputWithClear" dict
+                            "ID" "answer4Input"
+                            "Name" "answer4"
+                            "Placeholder" "Ответ 4"
+                            "Value" "Ответ 4"
+                            "Required" "true"
+                            }}
+
+                            <div style="display: flex; align-items: center; justify-content: start; gap: 4px; width: 100%;">
+                                <span>Правильный:</span>
+                                <label>
+                                    <select id="correctAnswer" name="correct_answer_index" required>
+                                        <option value="0">Ответ 1</option>
+                                        <option value="1">Ответ 2</option>
+                                        <option value="2">Ответ 3</option>
+                                        <option value="3">Ответ 4</option>
+                                    </select>
+                                </label>
+
+                                <span>Тема:</span>
+                                <label>
+                                    <select id="topic" name="topic_id" required>
+                                        {{ range .topics }}
+                                        <option value="{{ .ID }}">{{ .Name }}</option>
+                                        {{ end }}
+                                    </select>
+                                </label>
+                            </div>
+
+
+                            <label>
+                                <textarea name="explanation" placeholder="Объяснение решения"></textarea>
+                            </label>
 
                             <div>
                                 <button type="submit" class="btn"><i class="fa-solid fa-plus"></i>Создать вопрос

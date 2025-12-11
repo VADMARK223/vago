@@ -11,30 +11,56 @@ import (
 
 type Answer struct {
 	Text    string `json:"text"`
-	Correct bool   `json:"correct"`
+	Correct bool   `json:"correct,omitempty"`
 }
 
 type Question struct {
 	TopicID     int      `json:"topic_id"`
 	Text        string   `json:"text"`
-	Code        string   `json:"code"`
-	Explanation string   `json:"explanation"`
+	Code        string   `json:"code,omitempty"`
+	Explanation string   `json:"explanation,omitempty"`
 	Answers     []Answer `json:"answers"`
 }
 
-const (
-	input = "data/questions.json"
-)
+const dataFile = "data/questions.json"
 
-func Run() error {
-	log.Println("Start generation.")
-	dsn := "postgres://vadmark:5125341@localhost:5432/vagodb?sslmode=disable"
+//const dataFileTest = "data/questions_test.json"
+
+func AddQuestion(question Question) error {
+	data, err := os.ReadFile(dataFile)
+	if err != nil {
+		return err
+	}
+
+	var questions []Question
+	if err := json.Unmarshal(data, &questions); err != nil {
+		return err
+	}
+
+	questions = append(questions, question)
+
+	out, err := json.MarshalIndent(questions, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	if err := os.WriteFile(dataFile, out, 0644); err != nil {
+		return err
+	}
+
+	log.Println("Question added.")
+
+	return nil
+}
+
+func Run(dsn string) error {
+	log.Println("Start generation: ", dsn)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return err
 	}
 
-	data, err := os.ReadFile(input)
+	data, err := os.ReadFile(dataFile)
 	if err != nil {
 		return err
 	}

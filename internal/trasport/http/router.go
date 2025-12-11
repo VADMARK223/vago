@@ -98,7 +98,7 @@ func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine
 		auth.GET("/quiz", quizHandler.ShowQuiz())
 		auth.POST("/quiz/check", quizHandler.Check())
 		auth.POST("/questionsDeleteAll", quizHandler.DeleteAllQuestions())
-		auth.POST("/runSeed", quizHandler.RunSeed())
+		auth.POST("/runSeed", quizHandler.RunSeed(ctx.Cfg.PostgresDsn))
 	}
 
 	r.NoRoute(handler.NotFoundHandler)
