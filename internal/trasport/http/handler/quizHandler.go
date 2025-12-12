@@ -159,7 +159,7 @@ func (h *QuizHandler) RunQuestionsSeed() func(c *gin.Context) {
 
 func (h *QuizHandler) RunTopicsSeed() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		err := seed.SyncTopics(h.dsn)
+		err := seed.Topics(h.dsn)
 		if err != nil {
 			ShowError(c, "Ошибка сидирования", err.Error())
 			return

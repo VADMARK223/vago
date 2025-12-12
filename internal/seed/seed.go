@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -59,7 +60,37 @@ func AddQuestion(question Question) error {
 	return nil
 }
 
+func Topics(dsn string) error {
+	start := time.Now()
+	log.Println("Start topics: ", dsn)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return err
+	}
+
+	data, err := os.ReadFile(dataFileTopics)
+	if err != nil {
+		return err
+	}
+
+	var topics []Topic
+	if err := json.Unmarshal(data, &topics); err != nil {
+		return err
+	}
+
+	db.Exec("TRUNCATE TABLE topics RESTART IDENTITY CASCADE")
+
+	if err := db.Create(&topics).Error; err != nil {
+		return err
+	}
+
+	elapsed := time.Since(start)
+	log.Println("Topics seeding complete: ", elapsed)
+	return nil
+}
+
 func SyncQuestions(dsn string) error {
+	start := time.Now()
 	log.Println("Start questions: ", dsn)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -98,34 +129,7 @@ func SyncQuestions(dsn string) error {
 			)
 		}
 	}
-
-	log.Println("Questions seeding complete.")
-	return nil
-}
-
-func SyncTopics(dsn string) error {
-	log.Println("Start topics: ", dsn)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		return err
-	}
-
-	data, err := os.ReadFile(dataFileTopics)
-	if err != nil {
-		return err
-	}
-
-	var topics []Topic
-	if err := json.Unmarshal(data, &topics); err != nil {
-		return err
-	}
-
-	db.Exec("TRUNCATE TABLE topics RESTART IDENTITY CASCADE")
-
-	if err := db.Create(&topics).Error; err != nil {
-		return err
-	}
-
-	log.Println("Topics seeding complete.")
+	elapsed := time.Since(start)
+	log.Println("Questions seeding complete:", elapsed)
 	return nil
 }
