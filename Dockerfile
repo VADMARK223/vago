@@ -15,7 +15,6 @@ COPY "cmd" "./cmd"
 COPY internal ./internal
 COPY pkg ./pkg
 COPY web ./web
-COPY data ./data
 
 # Сборка бинарника (статическая, без CGO)
 # CGO_ENABLED=0 компилято выключает исользование С, и Go собирает чистый статический бинарник. Если чистое CLI, для GUI может все сломать
@@ -32,6 +31,8 @@ WORKDIR /app
 COPY --from=builder /app/vago .
 # Копируем шаблоны и статику
 COPY --from=builder /app/web ./web
+# Вопросы викторины
+COPY data ./data
 
 # Порт для gRPC и HTTP
 EXPOSE 50051 5555 8090

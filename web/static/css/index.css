@@ -3,6 +3,7 @@
 @import url("/static/css/base/reset.css");
 @import url("/static/css/base/globals.css");
 @import url("/static/css/ui/panels.css");
+@import url("/static/css/ui/buttons.css");
 @import url("/static/css/ui/forms.css");
 @import url("/static/css/ui/scroll.css");
 @import url("/static/css/components/quiz.css");
@@ -97,73 +98,6 @@ a:not(.btn):not(.btn-small):not(.btn-danger):hover {
     overflow: hidden;
 }
 
-.btn, .btn-small, .btn-danger {
-    font-family: "JetBrains Mono", monospace;
-    border: none;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: background 0.2s ease, color 0.2s ease;
-}
-
-.btn {
-    background: var(--accent-strong);
-    color: white;
-    padding: var(--space-2) var(--space-4);
-    font-size: 14px;
-
-    transition:
-            background-color 0.3s ease,
-            color 0.3s ease,
-            opacity 0.3s ease,
-            transform 0.2s ease;
-}
-
-.btn:hover {
-    background: #599fdb;
-}
-
-.btn:disabled,
-.btn[aria-disabled="true"] {
-    background: #888;
-    cursor: not-allowed;
-    opacity: 0.6;
-    pointer-events: none;
-}
-
-.btn:disabled:hover {
-    background: #888;
-}
-
-.btn-small {
-    background: var(--accent-strong);
-    color: white;
-    padding: var(--space-2) var(--space-3);
-    font-size: 12px;
-}
-
-.btn-small:hover {
-    background: var(--accent);
-}
-
-.btn-danger {
-    background: var(--danger);
-}
-
-.btn-danger:hover {
-    background: #b54747;
-}
-
-.btn-outline {
-    background: transparent;
-    color: var(--accent);
-    border: 2px solid var(--accent);
-}
-
-.btn-outline:hover {
-    background: var(--accent);
-    color: white;
-}
-
 .form-add {
     display: flex;
     flex-direction: column;
@@ -185,12 +119,6 @@ a:not(.btn):not(.btn-small):not(.btn-danger):hover {
     padding: var(--space-4);
     border-radius: var(--radius-md);
     transition: background 0.2s;
-}
-
-.item.index-card {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-2);
 }
 
 .item h3,
