@@ -2,27 +2,12 @@
 @import url("/static/css/base/variables.css");
 @import url("/static/css/base/reset.css");
 @import url("/static/css/base/globals.css");
+@import url("/static/css/base/typography.css");
 @import url("/static/css/ui/panels.css");
 @import url("/static/css/ui/buttons.css");
 @import url("/static/css/ui/forms.css");
 @import url("/static/css/ui/scroll.css");
 @import url("/static/css/components/quiz.css");
-
-pre {
-    background: #2b2d30;
-    padding: 12px;
-    border-radius: 6px;
-    overflow-x: auto;
-    color: #a9b7c6;
-    font-size: 14px;
-    line-height: 1.4;
-    border: 1px solid #4b4e50;
-    margin: 10px 0;
-}
-
-code {
-    font-family: "JetBrains Mono", monospace;
-}
 
 .menu,
 .container {

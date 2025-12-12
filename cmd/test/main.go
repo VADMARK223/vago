@@ -3,9 +3,12 @@ package main
 import "fmt"
 
 func main() {
-	x := 5
+	fmt.Println(f())
+}
 
-	defer fmt.Println(x)
-
-	x = 10
+func f() (x int) {
+	defer func() {
+		x++
+	}()
+	return 1
 }

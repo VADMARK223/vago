@@ -18,9 +18,14 @@
             <div class="item">
                 <div style="display: flex; flex-direction: column; align-items: start; gap: 4px; width: 100%;">
                     <div style="display: flex; align-items: center; justify-content: start; gap: 4px; width: 100%;">
-                        <form class="form-add" action="/runSeed" method="POST">
+                        <form class="form-add" action="/runQuestionsSeed" method="POST">
                             <div>
-                                <button type="submit" class="btn">Run</button>
+                                <button type="submit" class="btn">Question seed</button>
+                            </div>
+                        </form>
+                        <form class="form-add" action="/runTopicsSeed" method="POST">
+                            <div>
+                                <button type="submit" class="btn">Topics seed</button>
                             </div>
                         </form>
                         <form class="form-add" action="/questionsDeleteAll" method="POST">

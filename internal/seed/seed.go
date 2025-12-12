@@ -22,10 +22,18 @@ type Question struct {
 	Answers     []Answer `json:"answers"`
 }
 
-const dataFile = "data/questions.json"
+type Topic struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+const (
+	dataFileQuestions = "data/questions.json"
+	dataFileTopics    = "data/topics.json"
+)
 
 func AddQuestion(question Question) error {
-	data, err := os.ReadFile(dataFile)
+	data, err := os.ReadFile(dataFileQuestions)
 	if err != nil {
 		return err
 	}
@@ -42,7 +50,7 @@ func AddQuestion(question Question) error {
 		return err
 	}
 
-	if err := os.WriteFile(dataFile, out, 0644); err != nil {
+	if err := os.WriteFile(dataFileQuestions, out, 0644); err != nil {
 		return err
 	}
 
@@ -51,14 +59,14 @@ func AddQuestion(question Question) error {
 	return nil
 }
 
-func Run(dsn string) error {
-	log.Println("Start generation: ", dsn)
+func SyncQuestions(dsn string) error {
+	log.Println("Start questions: ", dsn)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return err
 	}
 
-	data, err := os.ReadFile(dataFile)
+	data, err := os.ReadFile(dataFileQuestions)
 	if err != nil {
 		return err
 	}
@@ -91,6 +99,33 @@ func Run(dsn string) error {
 		}
 	}
 
-	log.Println("Seeding complete.")
+	log.Println("Questions seeding complete.")
+	return nil
+}
+
+func SyncTopics(dsn string) error {
+	log.Println("Start topics: ", dsn)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return err
+	}
+
+	data, err := os.ReadFile(dataFileTopics)
+	if err != nil {
+		return err
+	}
+
+	var topics []Topic
+	if err := json.Unmarshal(data, &topics); err != nil {
+		return err
+	}
+
+	db.Exec("TRUNCATE TABLE topics RESTART IDENTITY CASCADE")
+
+	if err := db.Create(&topics).Error; err != nil {
+		return err
+	}
+
+	log.Println("Topics seeding complete.")
 	return nil
 }

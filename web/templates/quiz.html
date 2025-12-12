@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <title>Quiz</title>
     <link rel="stylesheet" href="/static/css/index.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/static/css/github-dark.min.css">
+    <script src="/static/js/highlight.min.js"></script>
 </head>
 <body>
 {{ template "header" . }}
@@ -16,8 +16,7 @@
         <span>Тема: {{.question.TopicName}}</span>
 
         {{if .question.Code}}
-        <script>hljs.highlightAll();</script>
-        <pre><code class="go">{{.question.Code}}</code></pre>
+            <pre><code class="language-go">{{.question.Code}}</code></pre>
         {{end}}
 
         {{range .question.Answers}}
@@ -85,7 +84,7 @@
                 } else {
                     result.innerText = "Правильно!";
                     setTimeout(() => {
-                        window.location.reload();
+                        window.location.href = "/quiz";
                     }, 700);
                 }
             } else {
@@ -99,6 +98,6 @@
         });
     });
 </script>
-
+<script>hljs.highlightAll();</script>
 </body>
 </html>

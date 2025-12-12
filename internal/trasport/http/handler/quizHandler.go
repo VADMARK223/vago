@@ -15,6 +15,7 @@ import (
 type QuizHandler struct {
 	quizSvc  *quiz.Service
 	topicSvc *topic.Service
+	dsn      string
 }
 
 type CheckRequest struct {
@@ -27,8 +28,8 @@ type CheckResponse struct {
 	Explanation string `json:"explanation"`
 }
 
-func NewQuizHandler(quizSvc *quiz.Service, topicSvc *topic.Service) *QuizHandler {
-	return &QuizHandler{quizSvc: quizSvc, topicSvc: topicSvc}
+func NewQuizHandler(quizSvc *quiz.Service, topicSvc *topic.Service, dsn string) *QuizHandler {
+	return &QuizHandler{quizSvc: quizSvc, topicSvc: topicSvc, dsn: dsn}
 }
 
 func (h *QuizHandler) ShowQuizRandom() func(c *gin.Context) {
@@ -145,9 +146,20 @@ func (h *QuizHandler) DeleteAllQuestions() func(c *gin.Context) {
 	}
 }
 
-func (h *QuizHandler) RunSeed(dsn string) func(c *gin.Context) {
+func (h *QuizHandler) RunQuestionsSeed() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		err := seed.Run(dsn)
+		err := seed.SyncQuestions(h.dsn)
+		if err != nil {
+			ShowError(c, "Ошибка сидирования", err.Error())
+			return
+		}
+		c.Redirect(http.StatusSeeOther, "/questions")
+	}
+}
+
+func (h *QuizHandler) RunTopicsSeed() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		err := seed.SyncTopics(h.dsn)
 		if err != nil {
 			ShowError(c, "Ошибка сидирования", err.Error())
 			return

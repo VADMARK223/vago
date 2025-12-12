@@ -57,7 +57,7 @@ func (q QuestionRepo) RandomID() (uint, error) {
 		return 0, err
 	}
 	if count == 0 {
-		return 0, errors.New("no questions")
+		return 0, errors.New("вопросов нет")
 	}
 
 	offset := rand.Intn(int(count))

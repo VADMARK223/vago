@@ -92,14 +92,15 @@ func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine
 		questionSvc := quiz.NewService(gorm.NewQuestionRepo(ctx.DB), topicRepo)
 		topicSvc := topic.NewService(topicRepo)
 
-		quizHandler := handler.NewQuizHandler(questionSvc, topicSvc)
+		quizHandler := handler.NewQuizHandler(questionSvc, topicSvc, ctx.Cfg.PostgresDsn)
 		auth.GET("/questions", quizHandler.ShowQuizAdmin())
 		auth.POST("/questions", quizHandler.AddQuestion())
 		auth.GET("/quiz", quizHandler.ShowQuizRandom())
 		auth.GET("/quiz/:id", quizHandler.ShowQuizByID())
 		auth.POST("/quiz/check", quizHandler.Check())
 		auth.POST("/questionsDeleteAll", quizHandler.DeleteAllQuestions())
-		auth.POST("/runSeed", quizHandler.RunSeed(ctx.Cfg.PostgresDsn))
+		auth.POST("/runQuestionsSeed", quizHandler.RunQuestionsSeed())
+		auth.POST("/runTopicsSeed", quizHandler.RunTopicsSeed())
 	}
 
 	r.NoRoute(handler.NotFoundHandler)

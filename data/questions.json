@@ -604,5 +604,294 @@
         "text": "Прерывает выполнение функции без вызова defer"
       }
     ]
+  },
+  {
+    "topic_id": 12,
+    "text": "В каком порядке выполняются несколько defer?",
+    "explanation": "defer работает как стек — последний добавленный выполняется первым. (LIFO)",
+    "answers": [
+      {
+        "text": "В порядке объявления"
+      },
+      {
+        "text": "В случайном порядке"
+      },
+      {
+        "text": "В обратном порядке",
+        "correct": true
+      },
+      {
+        "text": "Параллельно"
+      }
+    ]
+  },
+  {
+    "topic_id": 12,
+    "text": "Когда НЕ выполнится defer?",
+    "explanation": "Объяснение: os.Exit() немедленно завершает программу, defer при этом не выполняется.",
+    "answers": [
+      {
+        "text": "При return"
+      },
+      {
+        "text": "При panic"
+      },
+      {
+        "text": "При os.Exit()",
+        "correct": true
+      },
+      {
+        "text": "При выходе из main"
+      }
+    ]
+  },
+  {
+    "topic_id": 12,
+    "text": "Что выведет код?",
+    "code": "for i := 0; i \u003c 3; i++ {\r\n    defer fmt.Print(i)\r\n}",
+    "explanation": "Каждый defer получает своё значение i, а выполняются они в обратном порядке.",
+    "answers": [
+      {
+        "text": "012"
+      },
+      {
+        "text": "210",
+        "correct": true
+      },
+      {
+        "text": "333"
+      },
+      {
+        "text": "000"
+      }
+    ]
+  },
+  {
+    "topic_id": 12,
+    "text": "Что выведет код?",
+    "code": "x := 5\r\n\r\ndefer func() {\r\n    fmt.Println(x)\r\n}()\r\n\r\nx = 10",
+    "explanation": "defer откладывает вызов функции, но не копирует значения переменных внутри замыкания.\r\nАнонимная функция замыкает переменную x, а не её значение.\r\nЗначение x берётся в момент выполнения defer, то есть при выходе из функции, а не при объявлении defer.",
+    "answers": [
+      {
+        "text": "10",
+        "correct": true
+      },
+      {
+        "text": "5"
+      },
+      {
+        "text": "компилятор выдаст ошибку"
+      },
+      {
+        "text": "undefined behavior"
+      }
+    ]
+  },
+  {
+    "topic_id": 12,
+    "text": "Что выведет код?",
+    "code": "x := 5\r\n\r\ndefer func(x int) {\r\n    fmt.Println(x)\r\n}(x)\r\n\r\nx = 10",
+    "explanation": "Потому что значение x передаётся аргументом и копируется в момент defer.",
+    "answers": [
+      {
+        "text": "5",
+        "correct": true
+      },
+      {
+        "text": "10"
+      },
+      {
+        "text": "компилятор выдаст ошибку"
+      },
+      {
+        "text": "undefined behavior"
+      }
+    ]
+  },
+  {
+    "topic_id": 12,
+    "text": "Что выведет код?",
+    "code": "for i := 0; i \u003c 3; i++ {\r\n    defer func() {\r\n        fmt.Print(i)\r\n    }()\r\n}",
+    "explanation": "Начиная с Go 1.22, переменная цикла i в for i := ... создаётся заново на каждой итерации, а не одна на весь цикл.",
+    "answers": [
+      {
+        "text": "210"
+      },
+      {
+        "text": "333"
+      },
+      {
+        "text": "222"
+      },
+      {
+        "text": "Зависит от версии Go",
+        "correct": true
+      }
+    ]
+  },
+  {
+    "topic_id": 1,
+    "text": "Что выведет код?",
+    "code": "x := 10\r\nf := func() {\r\n    fmt.Println(x)\r\n}\r\nx = 20\r\nf()",
+    "explanation": "Замыкания захватывают переменные, а не значения",
+    "answers": [
+      {
+        "text": "20",
+        "correct": true
+      },
+      {
+        "text": "10"
+      },
+      {
+        "text": "undefined behavior"
+      },
+      {
+        "text": "компилятор выдаст ошибку"
+      }
+    ]
+  },
+  {
+    "topic_id": 1,
+    "text": "Что выведет код?",
+    "code": "var i int\r\nfor i = 0; i \u003c 3; i++ {\r\n    defer func() {\r\n        fmt.Print(i)\r\n    }()\r\n}",
+    "explanation": "Потому что i не создаётся внутри цикла.",
+    "answers": [
+      {
+        "text": "3 3 3",
+        "correct": true
+      },
+      {
+        "text": "0 1 2"
+      },
+      {
+        "text": "2 1 0"
+      },
+      {
+        "text": "2 2 2"
+      }
+    ]
+  },
+  {
+    "topic_id": 1,
+    "text": "Что выведет код?",
+    "code": "x := 1\r\nf := func() { x++ }\r\ng := func() { x++ }\r\n\r\nf()\r\ng()\r\nfmt.Println(x)",
+    "explanation": "одно storage, два замыкания",
+    "answers": [
+      {
+        "text": "1"
+      },
+      {
+        "text": "2"
+      },
+      {
+        "text": "3",
+        "correct": true
+      },
+      {
+        "text": "Ошибка"
+      }
+    ]
+  },
+  {
+    "topic_id": 12,
+    "text": "Почему defer внутри цикла может быть опасен?",
+    "explanation": "Каждый defer кладётся в стек — в длинных циклах это может привести к лишнему расходу памяти",
+    "answers": [
+      {
+        "text": "Он не выполнится"
+      },
+      {
+        "text": "Он выполняется сразу"
+      },
+      {
+        "text": "Он накапливает вызовы и потребляет память",
+        "correct": true
+      },
+      {
+        "text": "Он ломает panic"
+      }
+    ]
+  },
+  {
+    "topic_id": 12,
+    "text": "Можно ли использовать defer в горутине?",
+    "explanation": "defer привязан к текущей горутине и выполняется при её завершении",
+    "answers": [
+      {
+        "text": "Нет"
+      },
+      {
+        "text": "Да, но он выполнится в main"
+      },
+      {
+        "text": "Да, он выполнится при выходе из горутины",
+        "correct": true
+      },
+      {
+        "text": "Только с WaitGroup"
+      }
+    ]
+  },
+  {
+    "topic_id": 12,
+    "text": "Что выведет код?",
+    "code": "func f() {\r\n    defer fmt.Println(\"world\")\r\n    fmt.Println(\"hello\")\r\n}",
+    "explanation": "Сначала выполняется обычный код, затем — defer",
+    "answers": [
+      {
+        "text": "world hello"
+      },
+      {
+        "text": "hello world",
+        "correct": true
+      },
+      {
+        "text": "Только hello"
+      },
+      {
+        "text": "Только world"
+      }
+    ]
+  },
+  {
+    "topic_id": 12,
+    "text": "Где чаще всего используется defer?",
+    "explanation": "defer идеально подходит для Close(), Unlock(), Recover() — гарантирует очистку ресурсов.",
+    "answers": [
+      {
+        "text": "Для циклов"
+      },
+      {
+        "text": "Для освобождения ресурсов",
+        "correct": true
+      },
+      {
+        "text": "Для ускорения кода"
+      },
+      {
+        "text": "Для логирования только"
+      }
+    ]
+  },
+  {
+    "topic_id": 12,
+    "text": "Как defer ведёт себя с именованным return?",
+    "code": "func f() (x int) {\r\n    defer func() {\r\n        x++\r\n    }()\r\n    return 1\r\n}",
+    "explanation": "defer выполняется после присваивания return-значения, но до выхода из функции",
+    "answers": [
+      {
+        "text": "Вернёт 1"
+      },
+      {
+        "text": "Вернёт 2",
+        "correct": true
+      },
+      {
+        "text": "Вернёт 0"
+      },
+      {
+        "text": "Паника"
+      }
+    ]
   }
 ]
