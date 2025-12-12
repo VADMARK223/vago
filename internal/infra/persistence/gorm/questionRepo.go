@@ -32,20 +32,13 @@ func (q QuestionRepo) All() ([]*domain.Question, error) {
 	result := make([]*domain.Question, 0, len(entities))
 
 	for _, e := range entities {
-		q := &domain.Question{
-			ID:   e.ID,
-			Text: e.Text,
-		}
+		question := questionToDomain(e)
 
 		for _, a := range e.Answers {
-			q.Answers = append(q.Answers, domain.Answer{
-				ID:        a.ID,
-				Text:      a.Text,
-				IsCorrect: a.IsCorrect,
-			})
+			question.Answers = append(question.Answers, *answerToDomain(a))
 		}
 
-		result = append(result, q)
+		result = append(result, question)
 	}
 
 	return result, nil
@@ -86,16 +79,40 @@ func (q QuestionRepo) Random() (*domain.Question, error) {
 	res := questionToDomain(entity)
 
 	for _, a := range entity.Answers {
-		res.Answers = append(res.Answers, domain.Answer{
-			ID:        a.ID,
-			Text:      a.Text,
-			IsCorrect: a.IsCorrect,
-		})
+		res.Answers = append(res.Answers, *answerToDomain(a))
 	}
 
 	shuffleAnswers(res.Answers)
 
 	return res, nil
+}
+
+func (q QuestionRepo) FindByTopicID(topicID uint) ([]*domain.Question, error) {
+	var entities []QuestionEntity
+
+	err := q.db.
+		Preload("Answers").
+		Where("topic_id = ?", topicID).
+		Order("id").
+		Find(&entities).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]*domain.Question, 0, len(entities))
+
+	for _, e := range entities {
+		question := questionToDomain(e)
+
+		for _, a := range e.Answers {
+			question.Answers = append(question.Answers, *answerToDomain(a))
+		}
+
+		result = append(result, question)
+	}
+
+	return result, nil
 }
 
 func (q QuestionRepo) GetByID(id uint) (*domain.Question, error) {
@@ -139,5 +156,13 @@ func questionToDomain(e QuestionEntity) *domain.Question {
 		Code:        e.Code,
 		Explanation: e.Explanation,
 		TopicID:     e.TopicID,
+	}
+}
+
+func answerToDomain(e AnswerEntity) *domain.Answer {
+	return &domain.Answer{
+		ID:        e.ID,
+		Text:      e.Text,
+		IsCorrect: e.IsCorrect,
 	}
 }

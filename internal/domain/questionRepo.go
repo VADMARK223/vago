@@ -6,4 +6,5 @@ type QuestionRepository interface {
 	Random() (*Question, error)
 	GetByID(id uint) (*Question, error)
 	RandomID() (uint, error)
+	FindByTopicID(topicID uint) ([]*Question, error)
 }

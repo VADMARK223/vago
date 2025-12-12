@@ -7,6 +7,7 @@ import (
 	"vago/internal/application/quiz"
 	"vago/internal/application/topic"
 	"vago/internal/config/code"
+	"vago/internal/domain"
 	"vago/internal/seed"
 
 	"github.com/gin-gonic/gin"
@@ -78,19 +79,54 @@ func (h *QuizHandler) Check() func(c *gin.Context) {
 	}
 }
 
-func (h *QuizHandler) ShowQuizAdmin() func(c *gin.Context) {
+func (h *QuizHandler) ShowAddQuestion() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		topics, _ := h.topicSvc.AllWithCount()
 
 		questions, _ := h.quizSvc.AllQuestions()
 
-		data := tplWithCapture(c, "Админка викторины")
+		data := tplWithCapture(c, "Добавление вопроса")
 		data[code.Topics] = topics
-		data[code.Questions] = questions
 		data[code.QuestionsCount] = len(questions)
 
-		c.HTML(http.StatusOK, "questions.html", data)
+		c.HTML(http.StatusOK, "add_question.html", data)
 	}
+}
+
+func (h *QuizHandler) ShowQuestions(c *gin.Context) {
+	topicIDStr := c.Query("topic_id")
+
+	topics, _ := h.topicSvc.AllWithCount()
+
+	var (
+		topicID   uint64
+		questions []*domain.Question
+		err       error
+	)
+
+	if topicIDStr != "" {
+		topicID, err = strconv.ParseUint(topicIDStr, 10, 64)
+		if err != nil {
+			ShowError(c, "Ошибка", err.Error())
+			return
+		}
+		questions, err = h.quizSvc.GetQuestionsByTopic(uint(topicID))
+	} else {
+		questions, err = h.quizSvc.AllQuestions()
+	}
+
+	if err != nil {
+		ShowError(c, "Ошибка выборки", err.Error())
+		return
+	}
+
+	data := tplWithCapture(c, "Редактор вопросов")
+	data[code.Topics] = topics
+	data["topic_id"] = topicID
+	data[code.Questions] = questions
+	data[code.QuestionsCount] = len(questions)
+
+	c.HTML(http.StatusOK, "questions.html", data)
 }
 
 func (h *QuizHandler) AddQuestion() func(c *gin.Context) {
@@ -132,17 +168,7 @@ func (h *QuizHandler) AddQuestion() func(c *gin.Context) {
 			return
 		}
 
-		c.Redirect(http.StatusSeeOther, "/questions")
-	}
-}
-
-func (h *QuizHandler) DeleteAllQuestions() func(c *gin.Context) {
-	return func(c *gin.Context) {
-		err := h.quizSvc.DeleteAll()
-		if err != nil {
-			ShowError(c, "Ошибка удаления всех вопросов", err.Error())
-		}
-		c.Redirect(http.StatusSeeOther, "/quiz")
+		c.Redirect(http.StatusSeeOther, "/add_questions")
 	}
 }
 
@@ -153,7 +179,7 @@ func (h *QuizHandler) RunQuestionsSeed() func(c *gin.Context) {
 			ShowError(c, "Ошибка сидирования", err.Error())
 			return
 		}
-		c.Redirect(http.StatusSeeOther, "/questions")
+		c.Redirect(http.StatusSeeOther, "/add_questions")
 	}
 }
 
@@ -164,6 +190,6 @@ func (h *QuizHandler) RunTopicsSeed() func(c *gin.Context) {
 			ShowError(c, "Ошибка сидирования", err.Error())
 			return
 		}
-		c.Redirect(http.StatusSeeOther, "/questions")
+		c.Redirect(http.StatusSeeOther, "/add_questions")
 	}
 }

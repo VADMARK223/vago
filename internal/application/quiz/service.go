@@ -87,3 +87,7 @@ func (s *Service) CheckAnswer(qID, aID uint) (bool, string) {
 	}
 	return false, q.Explanation
 }
+
+func (s *Service) GetQuestionsByTopic(topicId uint) ([]*domain.Question, error) {
+	return s.questionRepo.FindByTopicID(topicId)
+}

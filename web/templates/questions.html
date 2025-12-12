@@ -2,162 +2,62 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Админка викторины</title>
+    <title>Книга</title>
     <link rel="stylesheet" href="/static/css/index.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/darcula.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/go/go.min.js"></script>
+    <link rel="stylesheet" href="/static/css/github-dark.min.css">
+    <script src="/static/js/highlight.min.js"></script>
 </head>
 <body>
 {{ template "header" . }}
 
 <main>
     <div class="container">
-        <div class="list">
-            <div class="panel">
-                <div style="display: flex; flex-direction: column; align-items: start; gap: 4px; width: 100%;">
-                    <div style="display: flex; align-items: center; justify-content: start; gap: 4px; width: 100%;">
-                        <form class="form-add" action="/runQuestionsSeed" method="POST">
-                            <div>
-                                <button type="submit" class="btn">Question seed</button>
-                            </div>
-                        </form>
-                        <form class="form-add" action="/runTopicsSeed" method="POST">
-                            <div>
-                                <button type="submit" class="btn">Topics seed</button>
-                            </div>
-                        </form>
-                        <form class="form-add" action="/questionsDeleteAll" method="POST">
-                            <div>
-                                <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </form>
-                        <span>Вопросов: {{.questions_count}}</span>
-                    </div>
+        <form method="get" action="/questions">
+            <label>
+                <select name="topic_id" onchange="this.form.submit()">
+                    <option value="" disabled selected>Выберите тему</option>
+                    {{ range .topics }}
+                    <option value="{{ .ID }}"
+                            {{ if eq $.topic_id .ID }}selected{{ end }}
+                    >
+                        {{ .Name }}
+                    </option>
+                    {{ end }}
+                </select>
+            </label>
+        </form>
 
-                    <div style="width: 100%;">
-                        <form class="form-add" action="/questions" method="POST">
-                            {{ template "component.inputWithClear" dict
-                            "ID" "textInput"
-                            "Name" "text"
-                            "Placeholder" "Введите вопрос"
-                            "Required" "true"
-                            "Value" "Что выведет код?"
-                            }}
-
-                            <label>
-                                <textarea id="code-field" name="code" placeholder="Пример кода" style="height: 155px"></textarea>
-                            </label>
-
-                            {{ template "component.inputWithClear" dict
-                            "ID" "answer1Input"
-                            "Name" "answer1"
-                            "Placeholder" "Ответ 1"
-                            "Required" "true"
-                            }}
-
-                            {{ template "component.inputWithClear" dict
-                            "ID" "answer2Input"
-                            "Name" "answer2"
-                            "Placeholder" "Ответ 2"
-                            "Required" "true"
-                            }}
-
-                            {{ template "component.inputWithClear" dict
-                            "ID" "answer3Input"
-                            "Name" "answer3"
-                            "Placeholder" "Ответ 3"
-                            "Required" "true"
-                            }}
-
-                            {{ template "component.inputWithClear" dict
-                            "ID" "answer4Input"
-                            "Name" "answer4"
-                            "Placeholder" "Ответ 4"
-                            "Required" "true"
-                            }}
-
-                            <div style="display: flex; align-items: center; justify-content: start; gap: 4px; width: 100%;">
-                                <span>Правильный:</span>
-                                <label>
-                                    <select id="correctAnswer" name="correct_answer_index" required>
-                                        <option value="" disabled selected>Выберите</option>
-                                        <option value="0">Ответ 1</option>
-                                        <option value="1">Ответ 2</option>
-                                        <option value="2">Ответ 3</option>
-                                        <option value="3">Ответ 4</option>
-                                    </select>
-                                </label>
-
-                                <span>Тема:</span>
-                                <label>
-                                    <select id="topic" name="topic_id" required>
-                                        <option value="" disabled selected>Выберите</option>
-                                        {{ range .topics }}
-                                        <option value="{{ .ID }}">{{ .Name }}</option>
-                                        {{ end }}
-                                    </select>
-                                </label>
-                            </div>
-
-                            <label>
-                                <textarea name="explanation" placeholder="Объяснение ответа" required></textarea>
-                            </label>
-
-                            <div>
-                                <button type="submit" class="btn"><i class="fa-solid fa-plus"></i>Создать вопрос
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <hr>
         <div class="scrollable-content">
-            <div class="list">
-                {{ range .topics }}
-                <span style="font-size: small">{{.ID}}: {{.Name}} ({{.QuestionsCount}})</span>
-                {{end}}
+            {{range .questions}}
+            <div class="panel" id="message-{{.ID}}">
+                <div>
+                    <p>{{.ID}}: <b>{{.Text}}</b></p>
 
-                <!--{{range .questions}}
-                <div class="item" id="message-{{.ID}}">
-                    <div>
-                        <p>{{.ID}}: <b>{{.Text}}</b></p>
+                    {{if .Code}}
+                    <pre><code class="language-go">{{.Code}}</code></pre>
+                    {{end}}
 
-                        <div class="answers">
-                            {{range .Answers}}
-                            <div class="answer">
-                                <span>{{.ID}}) {{.Text}}</span>
-                                {{if .IsCorrect}}
-                                <span class="correct">✔</span>
-                                {{end}}
-                            </div>
-                            {{else}}
-                            <div class="empty">Ответов пока нет</div>
-                            {{end}}
-                        </div>
+                    {{range .Answers}}
+                    <div style="font-size: small">
+                        <span>{{.ID}}) {{.Text}}</span>
+                        {{if .IsCorrect}}
+                        <span class="correct">✔</span>
+                        {{end}}
                     </div>
+                    {{else}}
+                    <div class="empty">Ответов пока нет</div>
+                    {{end}}
+                    <div style="background: #2e6230 !important; border-color: #3fa34d;">{{.Explanation}}</div>
                 </div>
-                {{else}}
-                <p class="empty">Вопросов нет</p>
-                {{end}}-->
             </div>
+            {{else}}
+            <p class="empty">Вопросов нет</p>
+            {{end}}
         </div>
     </div>
 </main>
 
 {{ template "footer" . }}
-<script type="module" src="/static/js/bundle.js"></script>
-<script>
-    CodeMirror.fromTextArea(document.getElementById("code-field"), {
-        lineNumbers: true,
-        mode: "text/x-go",
-        theme: "darcula",
-        indentUnit: 4,
-        tabSize: 4
-    });
-</script>
+<script>hljs.highlightAll();</script>
 </body>
 </html>
