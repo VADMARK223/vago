@@ -16,9 +16,17 @@
             <label>
                 <select name="chapter_id" onchange="this.form.submit()">
                     <option value="" disabled selected>Выберите главу</option>
-                    <option value="2" {{ if eq $.chapter_id 2 }}selected{{ end }}>Срезы (Slices)</option>
-                    <option value="9" {{ if eq $.chapter_id 9 }}selected{{ end }}>Каналы</option>
-                    <option value="12" {{ if eq $.chapter_id 12 }}selected{{ end }}>Defer</option>
+                    {{ range .chapters }}
+                    <option value="{{ .ID }}"
+                            {{ if eq $.chapter_id .ID }}selected{{ end }}
+                    >{{ .Name }}</option>
+                    {{ end }}
+                    <option value="" disabled>------------</option>
+                    {{ range .tasks }}
+                    <option value="{{ .ID }}"
+                            {{ if eq $.chapter_id .ID }}selected{{ end }}
+                    >{{ .Name }}</option>
+                    {{ end }}
                 </select>
             </label>
         </form>
@@ -29,6 +37,8 @@
                 {{ template "book.defer" . }}
             {{ else if eq .chapter_id 2 }}
                 {{ template "book.slices" . }}
+            {{ else if eq .chapter_id -1 }}
+                {{ template "task.go1" . }}
             {{ else }}
                 <div class="muted">Выберите главу</div>
             {{ end }}

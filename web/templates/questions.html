@@ -20,7 +20,7 @@
                     <option value="{{ .ID }}"
                             {{ if eq $.topic_id .ID }}selected{{ end }}
                     >
-                        {{ .Name }}
+                        {{ .ID }}: {{ .Name }} ({{.QuestionsCount}})
                     </option>
                     {{ end }}
                 </select>

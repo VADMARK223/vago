@@ -1059,5 +1059,47 @@
         "text": "Чтобы избежать panic"
       }
     ]
+  },
+  {
+    "topic_id": 2,
+    "text": "Что выведет код?",
+    "code": "a1 := make([]int, 0, 10)\r\na1 = append(a1, []int{1, 2, 3, 4, 5}...)\r\na2 := append(a1, 6)\r\na3 := append(a1, 7)\r\nfmt.Println(a1, a2, a3)",
+    "explanation": "append возвращает новый срез, но не гарантирует новый массив.\r\nЕсли хватает capacity — данные будут общими.",
+    "answers": [
+      {
+        "text": "[1 2 3 4 5] [1 2 3 4 5 7] [1 2 3 4 5 7]",
+        "correct": true
+      },
+      {
+        "text": "[1 2 3 4 5] [1 2 3 4 5 6] [1 2 3 4 5 7]"
+      },
+      {
+        "text": "[1 2 3 4 5 6] [1 2 3 4 5 6] [1 2 3 4 5 7]"
+      },
+      {
+        "text": "[1 2 3 4 5] [1 2 3 4 5 6] [1 2 3 4 5]"
+      }
+    ]
+  },
+  {
+    "topic_id": 2,
+    "text": "Что выведет код?",
+    "code": "a1 := make([]int, 0)\r\na1 = append(a1, []int{1, 2, 3, 4, 5}...)\r\nfmt.Println(len(a1), cap(a1))",
+    "explanation": "capacity после append НЕ обязана быть равна len. \r\nlen увеличился корректно, а cap \u003e= len\r\n",
+    "answers": [
+      {
+        "text": "5 5"
+      },
+      {
+        "text": "5 6"
+      },
+      {
+        "text": "6 6"
+      },
+      {
+        "text": "Определяется runtime",
+        "correct": true
+      }
+    ]
   }
 ]
