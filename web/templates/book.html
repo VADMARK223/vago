@@ -12,26 +12,10 @@
 
 <main>
     <div class="container">
-        <h3>Defer</h3>
-        <pre><code class="language-go">x := 5
-defer func() { fmt.Println(x) }()
-x = 10
-// Вывод 10</code></pre>
-        <ul>
-            <li><code>defer</code> откладывает вызов функции, но не копирует значения переменных внутри замыкания.</li>
-            <li>Анонимная функция замыкает переменную <code>x</code>, а не её значение.</li>
-            <li>Значение <code>x</code> берётся в момент выполнения <code>defer</code>, то есть при выходе из функции, а не при объявлении <code>defer</code>.</li>
-        </ul>
-
-        <pre><code class="language-go">x := 5
-defer func(x int) {
-    fmt.Println(x)
-}(x)
-
-x = 10
-// Вывод 5</code></pre>
-        <span>Потому что значение <code>x</code> передаётся аргументом и копируется в момент <code>defer</code>.</span>
-
+        <div class="scrollable-content">
+            {{ template "book.channels"}}
+            {{ template "book.defer"}}
+        </div>
     </div>
 </main>
 

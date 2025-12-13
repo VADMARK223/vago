@@ -21,28 +21,6 @@
     width: 100%;
 }
 
-h1 {
-    margin: 0 0 var(--space-4);
-}
-
-h2 {
-    margin: 0 0 var(--space-3);
-}
-
-h3 {
-    margin: 0 0 var(--space-2);
-}
-
-h1, h2, h3 {
-    color: var(--accent);
-}
-
-hr {
-    border: none;
-    height: 1px;
-    background: var(--bg-border);
-}
-
 a, .link {
     color: var(--accent-strong);
     text-decoration: none;

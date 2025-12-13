@@ -1,14 +1,20 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
-func main() {
-	fmt.Println(f())
+type Person struct {
+	Name string
 }
 
-func f() (x int) {
-	defer func() {
-		x++
-	}()
-	return 1
+func changeName(person *Person) {
+	person.Name = "Mark"
+}
+
+func main() {
+	person := Person{"Vad"}
+	fmt.Println(person.Name)
+	changeName(&person)
+	fmt.Println(person.Name)
 }

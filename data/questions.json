@@ -244,6 +244,7 @@
   {
     "topic_id": 7,
     "text": "Что такое goroutine?",
+    "explanation": "Горутина в Go стартует с динамическим стеком ~2 KB плюс несколько сотен байт служебных структур runtime, итого ~2–4 KB. Стек растёт и сжимается автоматически.",
     "answers": [
       {
         "text": "Отдельный процесс ОС"
@@ -911,6 +912,151 @@
       },
       {
         "text": "Значение будет записано в очередь планировщика"
+      }
+    ]
+  },
+  {
+    "topic_id": 14,
+    "text": "Что выведет код?",
+    "code": "type Person struct {\r\n\tName string\r\n}\r\n\r\nfunc changeName(person *Person) {\r\n\tperson = \u0026Person{\"Mark\"}\r\n}\r\n\r\nfunc main() {\r\n\tperson := \u0026Person{\"Vad\"}\r\n\tfmt.Println(person.Name)\r\n\tchangeName(person)\r\n\tfmt.Println(person.Name)\r\n}",
+    "explanation": "В функции указатель пересоздается.",
+    "answers": [
+      {
+        "text": "Vad Vad",
+        "correct": true
+      },
+      {
+        "text": "Vad Mark"
+      },
+      {
+        "text": "Mark Mark"
+      },
+      {
+        "text": "Mark Vad"
+      }
+    ]
+  },
+  {
+    "topic_id": 14,
+    "text": "Что выведет код?",
+    "code": "type Person struct {\r\n\tName string\r\n}\r\n\r\nfunc changeName(person *Person) {\r\n\t*person = Person{\"Mark\"}\r\n}\r\n\r\nfunc main() {\r\n\tperson := Person{\"Vad\"}\r\n\tfmt.Println(person.Name)\r\n\tchangeName(\u0026person)\r\n\tfmt.Println(person.Name)\r\n}",
+    "explanation": "У методе полная перезапись структуры, на которую указывает указатель",
+    "answers": [
+      {
+        "text": "Vad Mark",
+        "correct": true
+      },
+      {
+        "text": "Vad Vad"
+      },
+      {
+        "text": "Mark Mark"
+      },
+      {
+        "text": "Mark Vad"
+      }
+    ]
+  },
+  {
+    "topic_id": 9,
+    "text": "Что произойдёт?",
+    "code": "var ch chan int\r\nfmt.Println(\u003c-ch)",
+    "explanation": "чтение из nil-канала блокирует навсегда.",
+    "answers": [
+      {
+        "text": "Напечатает 0"
+      },
+      {
+        "text": "Panic"
+      },
+      {
+        "text": "Заблокируется навсегда",
+        "correct": true
+      },
+      {
+        "text": "Компилятор выдаст ошибку"
+      }
+    ]
+  },
+  {
+    "topic_id": 9,
+    "text": "Какой результат?",
+    "code": "var ch chan int\r\nselect {\r\ncase ch \u003c- 1:\r\n    fmt.Println(\"send\")\r\ndefault:\r\n    fmt.Println(\"default\")\r\n}",
+    "explanation": "nil-канал в select не выбирается → выполняется default",
+    "answers": [
+      {
+        "text": "Panic"
+      },
+      {
+        "text": "send"
+      },
+      {
+        "text": "default",
+        "correct": true
+      },
+      {
+        "text": "Deadlock"
+      }
+    ]
+  },
+  {
+    "topic_id": 9,
+    "text": "Что произойдёт?",
+    "code": "var ch chan int\r\nclose(ch)",
+    "explanation": "close(nil) вызывает panic",
+    "answers": [
+      {
+        "text": "Ничего"
+      },
+      {
+        "text": "Канал закроется"
+      },
+      {
+        "text": "Panic",
+        "correct": true
+      },
+      {
+        "text": "Deadlock"
+      }
+    ]
+  },
+  {
+    "topic_id": 9,
+    "text": "Чем nil-канал отличается от закрытого?",
+    "explanation": "закрытый канал при чтении сразу возвращает (zero, false), nil — блокирует",
+    "answers": [
+      {
+        "text": "Ничем"
+      },
+      {
+        "text": "Закрытый блокирует чтение"
+      },
+      {
+        "text": "nil возвращает zero-value"
+      },
+      {
+        "text": "Закрытый сразу отдаёт значение",
+        "correct": true
+      }
+    ]
+  },
+  {
+    "topic_id": 9,
+    "text": "Зачем разработчики используют nil-каналы?",
+    "explanation": "nil-канал — стандартный паттерн для динамического управления select",
+    "answers": [
+      {
+        "text": "Для экономии памяти"
+      },
+      {
+        "text": "Чтобы отключать кейсы в select",
+        "correct": true
+      },
+      {
+        "text": "Для ускорения каналов"
+      },
+      {
+        "text": "Чтобы избежать panic"
       }
     ]
   }
