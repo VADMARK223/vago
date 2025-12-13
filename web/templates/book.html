@@ -12,9 +12,26 @@
 
 <main>
     <div class="container">
+        <form method="get" action="/book">
+            <label>
+                <select name="chapter_id" onchange="this.form.submit()">
+                    <option value="" disabled selected>Выберите главу</option>
+                    <option value="2" {{ if eq $.chapter_id 2 }}selected{{ end }}>Срезы (Slices)</option>
+                    <option value="9" {{ if eq $.chapter_id 9 }}selected{{ end }}>Каналы</option>
+                    <option value="12" {{ if eq $.chapter_id 12 }}selected{{ end }}>Defer</option>
+                </select>
+            </label>
+        </form>
         <div class="scrollable-content">
-            {{ template "book.channels"}}
-            {{ template "book.defer"}}
+            {{ if eq .chapter_id 9 }}
+                {{ template "book.channels" . }}
+            {{ else if eq .chapter_id 12 }}
+                {{ template "book.defer" . }}
+            {{ else if eq .chapter_id 2 }}
+                {{ template "book.slices" . }}
+            {{ else }}
+                <div class="muted">Выберите главу</div>
+            {{ end }}
         </div>
     </div>
 </main>

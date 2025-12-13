@@ -1,0 +1,45 @@
+{{ define "book.slices" }}
+<h1>Срезы</h1>
+<span>Slice - это обёртка над массивом, которая хранит указатель на массив, длину и ёмкость.</span>
+<h2>Отличие nil-среза от пустого среза</h2>
+<ul>
+    <li>nil slice - это срез, который не указывает ни на какой массив.</li>
+    <li>Пустой slice - это срез, указывающий на реальный массив длиной 0.</li>
+</ul>
+<table>
+    <thead>
+    <tr>
+        <th>Свойство</th>
+        <th>nil slice</th>
+        <th>Пустой slice</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Инициализация</td>
+        <td>var s []int</td>
+        <td>s := []int{}</td>
+    </tr>
+    <tr>
+        <td>Состояние</td>
+        <td>s == nil это true</td>
+        <td>s == nil это false</td>
+    </tr>
+    <tr>
+        <td>Длина</td>
+        <td>len(s) == 0</td>
+        <td>len(s) == 0</td>
+    </tr>
+    <tr>
+        <td>Емкость</td>
+        <td>cap(s) == 0</td>
+        <td>cap(s) == 0</td>
+    </tr>
+    <tr>
+        <td>Использование</td>
+        <td>Можно использовать с `append` без проблем</td>
+        <td>Можно использовать с `append` без проблем</td>
+    </tr>
+    </tbody>
+</table>
+{{ end }}
