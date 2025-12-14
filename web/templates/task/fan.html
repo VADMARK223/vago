@@ -1,0 +1,123 @@
+{{ define "task.fan" }}
+<span>Базовый пример (без контекста)</span>
+<pre><code class="language-go">const workerCount = 3
+
+type Worker struct {
+    id     int
+    chanId int
+    value  int
+}
+
+func main() {
+    ch1 := createChannel(1)
+    ch2 := createChannel(2)
+
+    ch3 := make(chan int)
+    go func() {
+        ch3 <- 100
+        close(ch3)
+    }()
+
+    outChannel := merge(ch1, ch2, ch3, nil)
+
+    var sum int
+    for v := range outChannel {
+        fmt.Println("Получили из общего канала:", v)
+        sum += v
+    }
+
+    fmt.Println("Выход из главного потока с результатом:", sum)
+}
+
+// Fan-out
+func createChannel(chanId int) chan int {
+    wg := sync.WaitGroup{}
+    ch := make(chan int)
+
+    for i := 0; i < workerCount; i++ {
+        wg.Add(1)
+        go startWork(Worker{id: i, chanId: chanId, value: i}, &wg, ch)
+    }
+
+    go func() { // Параллельно ждем всех воркеров, чтобы потом закрыть горутину и остановить range
+        wg.Wait()
+        close(ch)
+    }()
+
+    return ch
+}
+
+// Fan-in
+func merge(inChannels ...chan int) chan int {
+    outChannels := make(chan int)
+    wg := sync.WaitGroup{}
+
+    for _, inChannel := range inChannels { // Важно идти по каналам, а не по индексам (_, inChannel)
+        if inChannel == nil {
+            continue
+        }
+        wg.Add(1)
+
+        go func(ch <-chan int) {
+            defer wg.Done()
+            for v := range ch {
+                outChannels <- v
+            }
+        }(inChannel) // С версии 1.22 можно без прокидки.
+    }
+
+    go func() {
+        wg.Wait()
+        close(outChannels)
+    }()
+
+    return outChannels
+}
+
+func startWork(worker Worker, wg *sync.WaitGroup, ch chan<- int) {
+    defer wg.Done()
+    fmt.Println(" Начали работу worker", worker.id, "Канал:", worker.chanId)
+    time.Sleep(1 * time.Second)
+    ch <- worker.value
+    fmt.Println(" Закончили работу worker", worker.id)
+}</code></pre>
+<br>
+<span>С контекстом</span>
+<pre><code class="language-go">main (ctx)
+ ├─ createChannel(ctx, 1) ─ fan-out ─▶ ch1 ─┐
+ ├─ createChannel(ctx, 2) ─ fan-out ─▶ ch2 ─┼─▶ merge ─▶ out ─▶ main
+ ├─ ch3 (single writer) ──────────────────▶ ┘
+</code></pre>
+<span>Дополнение к первому примеру:</span>
+<pre><code class="language-go">func main() {
+    ctx, cancel := context.WithTimeout(context.Background(), contextWait) // Единая точка отмены
+    defer func() {
+        cancel()
+    }()
+    ch1 := createChannel(ctx, 1)
+    ch2 := createChannel(ctx, 2)
+...}
+
+// ctx прокидывается через creteChannel
+func startWork(ctx context.Context, worker Worker, wg *sync.WaitGroup, ch chan<- int) {
+    defer wg.Done()
+    fmt.Println(" Начали работу:", worker.id, "Канал:", worker.chanId)
+
+    select {
+    case <-ctx.Done():
+        fmt.Println("Отмена во время работы:", worker.id)
+        return
+    case <-time.After(workTimeout):
+        fmt.Println("Отработал worker", worker.id)
+    }
+
+    select {
+    case <-ctx.Done():
+        fmt.Println("Отмена перед отправкой", worker.id)
+    case ch <- worker.value:
+        fmt.Println(" Закончили работу worker", worker.id)
+    }
+}</code></pre>
+Сейчас Fan-in (метод merge) не реагирует на отмену, если main перестанет читать <code>outChannels</code>, fan-in может заблокироваться на <code>outChannels <- v</code>
+
+{{ end }}

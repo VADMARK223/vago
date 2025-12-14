@@ -1,5 +1,40 @@
 {{ define "book.channels" }}
 <h1>Каналы</h1>
+<h2>Общие рекомендации</h2>
+<blockquote class="note">
+    Начинай с небуферизованного канала.
+    Добавляй буфер только когда понимаешь, зачем он нужен.
+</blockquote>
+<span>Это официальный Go-style подход.</span>
+<br><br>
+<blockquote class="note">
+    Буферизованный канал скрывает синхронизацию
+</blockquote>
+<span>Он <b>ослабляет</b> связь между <i>producer</i> и <i>consumer</i>.</span>
+<br><br>
+<h3>Сравнение</h3>
+<table>
+    <thead>
+    <tr>
+        <th>Канал</th>
+        <th>Что дает</th>
+        <th>Риск</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Небуферизованный</td>
+        <td>Чёткую синхронизацию</td>
+        <td>Может тормозить</td>
+    </tr>
+    <tr>
+        <td>Буферизованный</td>
+        <td>Производительность</td>
+        <td>Скрытые баги</td>
+    </tr>
+    </tbody>
+</table>
+<br><br>
 <h2>nil-каналы</h2>
 <span>Если канал объявлен, но не инициализирован, он равен nil.</span>
 <pre><code class="language-go">var ch chan int

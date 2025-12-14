@@ -54,3 +54,10 @@ hr {
     height: 1px;
     background: var(--bg-border);
 }
+
+blockquote.note {
+    border-left: 4px solid #ffb347;
+    padding-left: 12px;
+    margin-left: 0;
+    font-style: italic;
+}

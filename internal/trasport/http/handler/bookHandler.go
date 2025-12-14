@@ -19,10 +19,12 @@ func ShowBook(c *gin.Context) {
 		{ID: 2, Name: "Срезы (Slices)"},
 		{ID: 9, Name: "Каналы"},
 		{ID: 12, Name: "Defer"},
+		{ID: 16, Name: "Контекст (Context)"},
 	}
 
 	bookTasks := []bookChapter{
 		{ID: -1, Name: "Задача 1"},
+		{ID: -2, Name: "Fan-out / Fan-in"},
 	}
 
 	var (

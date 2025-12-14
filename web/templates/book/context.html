@@ -1,0 +1,26 @@
+{{ define "book.context" }}
+<h1>Контекст</h1>
+<span><code>context</code> в Go — это <b>стандартный механизм управления жизненным циклом операций</b>: отмена, дедлайны, таймауты и прокидывание request-scoped данных между горутинами.</span>
+<span>Это <b>интерфейс:</b></span>
+<pre><code class="language-go">type Context interface {
+    Deadline() (deadline time.Time, ok bool) // крайний срок
+    Done() <-chan struct{} // канал, который закрывается при отмене
+    Err() error // причина отмены
+    Value(key any) any // request-scoped данные
+}</code></pre>
+
+<blockquote class="note">
+    ❌ context не может остановить горутину сам<br>
+    ✔ он сигнализирует, что надо остановиться
+</blockquote>
+<span>Каждая горутина должна сама:</span>
+<ul>
+    <li>проверять ctx.Done()</li>
+    <li>корректно выходить</li>
+</ul>
+<span>Это <b>кооперативная отмена</b>.</span>
+
+
+
+
+{{ end }}
