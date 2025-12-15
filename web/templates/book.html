@@ -14,7 +14,7 @@
     <div class="container">
         <form method="get" action="/book">
             <label>
-                <select name="chapter_id" onchange="this.form.submit()">
+                <select name="chapter_id" onchange="this.form.submit()" style="margin-bottom: var(--space-2)">
                     <option value="" disabled selected>Выберите главу</option>
                     {{ range .chapters }}
                     <option value="{{ .ID }}"
@@ -31,7 +31,9 @@
             </label>
         </form>
         <div class="scrollable-content">
-            {{ if eq .chapter_id 2 }}
+            {{ if eq .chapter_id 1 }}
+                {{ template "book.common" . }}
+            {{ else if eq .chapter_id 2 }}
                 {{ template "book.slices" . }}
             {{ else if eq .chapter_id 9 }}
                 {{ template "book.channels" . }}
@@ -45,7 +47,9 @@
             {{ else if eq .chapter_id -2 }}
                 {{ template "task.fan" . }}
             {{ else }}
-                <div class="muted">Выберите главу</div>
+                {{ range .chapters }}
+                    <a href="/book?chapter_id={{ .ID }}">{{ .ID }}. {{ .Name }}</a><br>
+                {{ end }}
             {{ end }}
         </div>
     </div>

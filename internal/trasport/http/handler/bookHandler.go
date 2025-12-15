@@ -16,6 +16,7 @@ func ShowBook(c *gin.Context) {
 	chapterIDStr := c.Query("chapter_id")
 
 	bookChapters := []bookChapter{
+		{ID: 1, Name: "Общие вопросы"},
 		{ID: 2, Name: "Срезы (Slices)"},
 		{ID: 9, Name: "Каналы"},
 		{ID: 12, Name: "Defer"},
