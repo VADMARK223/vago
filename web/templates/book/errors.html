@@ -1,0 +1,94 @@
+{{ define "book.errors" }}
+<h1>Errors</h1>
+<p>В Go ошибка — это обычное значение, а не исключение.</p>
+<pre><code class="language-go">type error interface {
+    Error() string
+}</code></pre>
+<p>👉 Ошибки возвращаются явно и обрабатываются там, где возникли.</p>
+<pre><code class="language-go">data, err := os.ReadFile("config.yaml")
+if err != nil {
+    return err
+}</code></pre>
+<h2>Частые ошибки</h2>
+<p>❌ Игнорировать ошибку:</p>
+<pre><code class="language-go">data, _ := os.ReadFile("file")</code></pre>
+<p>❌ Логировать на каждом уровне</p>
+<p>❌ Терять ошибку без %w</p>
+<p>❌ Сравнивать ошибки через ==</p>
+<p>❌ Использовать panic вместо error</p>
+<h2>Идиоматичный пример</h2>
+<pre><code class="language-go">var (
+    ErrTooSmall = errors.New("значение слишком маленькое")
+    ErrTooLarge = errors.New("значение слишком большое")
+)
+
+func main() {
+    err := test(7)
+
+    switch {
+    case errors.Is(err, ErrTooLarge):
+        fmt.Println("Чисто большое")
+    case errors.Is(err, ErrTooSmall):
+        fmt.Println("Чисто маленькое")
+    case err != nil:
+        fmt.Println("Неизвестная ошибка:", err)
+    }
+}
+
+func test(n int) error {
+    if n < 5 {
+        return fmt.Errorf("test(): случайное число меньше порога: %w", ErrTooSmall)
+    }
+    return fmt.Errorf("test(): случайное число больше порога: %w", ErrTooLarge)
+}</code></pre>
+
+<h2>Создание</h2>
+<h3>errors.New — простая ошибка</h3>
+<pre><code class="language-go">var ErrNotFound = errors.New("not found")</code></pre>
+
+<h3>fmt.Errorf — форматирование</h3>
+<pre><code class="language-go">return fmt.Errorf("open file %s: %v", path, err)
+</code></pre>
+<p>⚠️ Но так теряется тип ошибки, если не использовать <code>%w</code>.</p>
+
+<h2>Wrapping ошибок (%w) — КЛЮЧЕВО 🔑</h2>
+<pre><code class="language-go">return fmt.Errorf("load config: %w", err)</code></pre>
+<p>Теперь:</p>
+<ul>
+    <li>сохраняется оригинальная ошибка</li>
+    <li>можно проверить причину через <code>errors.Is</code></li>
+</ul>
+<pre><code class="language-go">if errors.Is(err, os.ErrNotExist) {
+    // файл не найден
+}</code></pre>
+<blockquote class="note">Всегда используй <code>%w</code>, если ошибка идёт дальше вверх по стеку</blockquote>
+
+<h2>errors.Is и errors.As</h2>
+<h3>errors.Is — проверка причины</h3>
+<pre><code class="language-go">if errors.Is(err, sql.ErrNoRows) {
+    return ErrNotFound
+}</code></pre>
+<p>Работает даже через несколько уровней wrapping.</p>
+<h3>errors.As — извлечение типа</h3>
+<pre><code class="language-go">var pathErr *fs.PathError
+if errors.As(err, &pathErr) {
+    log.Println("Ошибка пути:", pathErr.Path)
+}</code></pre>
+<p>Используй, когда важны детали структуры ошибки.</p>
+
+<h2>Panic vs error (важно!)</h2>
+<p>❌ panic — не для бизнес-ошибок</p>
+<p>Используется только для:</p>
+<ul>
+    <li>программных багов</li>
+    <li>невозможных состояний</li>
+    <li>инициализации</li>
+</ul>
+<pre><code class="language-go">panic("unreachable")</code></pre>
+<p>В веб-сервисе:</p>
+<ul>
+    <li>panic ловится middleware</li>
+    <li>конвертируется в 500</li>
+</ul>
+
+{{ end }}

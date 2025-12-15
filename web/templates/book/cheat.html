@@ -1,5 +1,82 @@
 {{ define "book.cheat" }}
 <h1>Шпаргалка</h1>
+<h2>Форматирующие глаголы (format verbs)</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Глагол</th>
+        <th>Когда использовать</th>
+        <th>Пример</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td><code>%d</code></td>
+        <td>int</td>
+        <td><pre><code class="language-go">d := 10
+fmt.Printf("Число = '%d'.", d) // Число = '10'.</code></pre></td>
+    </tr>
+    <tr>
+        <td><code>%s</code></td>
+        <td>string</td>
+        <td><pre><code class="language-go">s := "s" // string
+fmt.Printf("Строка = '%s'.", s) // Строка = 's'. </code></pre></td>
+    </tr>
+    <tr>
+        <td><code>%t</code></td>
+        <td>bool</td>
+        <td><pre><code class="language-go">b := true
+fmt.Printf("Булево = '%t'.", b) // Булево = 'true'.</code></pre></td>
+    </tr>
+    <tr>
+        <td><code>%v</code></td>
+        <td>Любое значение</td>
+        <td><pre><code class="language-go">user := User{Name: "Vadmark"}
+fmt.Printf("%v", user) // {Vadmark}</code></pre></td>
+    </tr>
+    <tr>
+        <td><code>%+v</code></td>
+        <td>Структура с полями</td>
+        <td><pre><code class="language-go">user := User{Name: "Vadmark"}
+fmt.Printf("%+v", user) // {Name:Vadmark}</code></pre></td>
+    </tr>
+    <tr>
+        <td><code>%#v</code></td>
+        <td>Go синтаксис</td>
+        <td><pre><code class="language-go">user := User{Name: "Vadmark"}
+fmt.Printf("%#v", user) // main.User{Name:"John"}</code></pre></td>
+    </tr>
+    <tr>
+        <td><code>%w</code></td>
+        <td>обернуть ошибку</td>
+        <td><pre><code class="language-go">// %w работает только в fmt.Errorf
+// Только один %w
+// Нужно для errors.Is / errors.As
+return fmt.Errorf("не удалось сохранить пользователя: %w", err)</code></pre></td>
+    </tr>
+    <tr>
+        <td><code>%p</code></td>
+        <td>адрес</td>
+        <td><pre><code class="language-go">v := new(int) // *int
+*v = 30
+fmt.Printf("Адрес = '%p'.", v) // Адрес = '0xc00009a008'.</code></pre></td>
+    </tr>
+    <tr>
+        <td><code>%T</code></td>
+        <td>тип</td>
+        <td><pre><code class="language-go">s := 's' // rune
+fmt.Printf("Тип = '%T'.", s) // Тип = 'int32'.</code></pre></td>
+    </tr>
+    <tr>
+        <td><code>%f</code></td>
+        <td>float</td>
+        <td><pre><code class="language-go">f := 1.236 // float
+fmt.Printf("%.2f", f) // 1.24 (2 знака после запятой)</code></pre></td>
+    </tr>
+    </tbody>
+</table>
+
+
 <h2>Конвертация</h2>
 <pre><code class="language-go">strconv.Itoa(100) // "100"
 num, err := strconv.Atoi("100") // 100</code></pre>

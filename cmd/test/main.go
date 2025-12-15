@@ -1,13 +1,12 @@
 package main
 
-import (
-	"fmt"
-	"strings"
-)
+import "fmt"
+
+type User struct {
+	Name string
+}
 
 func main() {
-	s := "1,2,3"
-	arr := strings.Split(s, ",")
-	s1 := strings.Join(arr, "-")
-	fmt.Println(s1)
+	user := User{Name: "John"}
+	fmt.Printf("%#v", user)
 }

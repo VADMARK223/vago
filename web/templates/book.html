@@ -41,6 +41,8 @@
                 {{ template "book.maps" . }}
             {{ else if eq .chapter_id 9 }}
                 {{ template "book.channels" . }}
+            {{ else if eq .chapter_id 11 }}
+                {{ template "book.errors" . }}
             {{ else if eq .chapter_id 12 }}
                 {{ template "book.defer" . }}
             {{ else if eq .chapter_id 16 }}
