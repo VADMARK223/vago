@@ -14,5 +14,6 @@
   {"id": 13, "name": "Стек и куча"},
   {"id": 14, "name": "Указатели (Pointers)"},
   {"id": 15, "name": "Garbage collector"},
-  {"id": 16, "name": "Контекст (Context)"}
+  {"id": 16, "name": "Контекст (Context)"},
+  {"id": 17, "name": "Строки (Strings)"}
 ]

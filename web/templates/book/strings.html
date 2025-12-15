@@ -1,0 +1,79 @@
+{{ define "book.strings" }}
+<h1>Строки</h1>
+<h2>Определение</h2>
+<p>В Go <code>string</code> - это:</p>
+<ul>
+    <li><b>неизменяемая (immutable)</b> последовательность <b>байт</b></li>
+    <li>обычно содержит <b>UTF-8</b></li>
+    <li>под капотом: <b>указатель на массив + длина</b></li>
+</ul>
+
+<p>👉 Это значит:</p>
+<ul>
+    <li>len(s) — количество байт, а не символов</li>
+    <li>символ ≠ байт (из-за Unicode)</li>
+</ul>
+
+<h2>UTF-8 и len()</h2>
+<pre><code class="language-go">s := "привет"
+fmt.Println(len(s))        // 12 байт
+fmt.Println(len([]rune(s))) // 6 символов
+fmt.Println(utf8.RuneCountInString(s)) // 6 символов
+</code></pre>
+
+<table>
+    <thead>
+    <tr>
+        <th>Тип</th>
+        <th>Что считает</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td><code>len(string)</code></td>
+        <td>байты</td>
+    </tr>
+    <tr>
+        <td><code>[]rune</code></td>
+        <td>Unicode-кодпоинты</td>
+    </tr>
+    </tbody>
+</table>
+<p>⚠️ Частая ошибка: считать <code>len(s)</code> как длину строки для UI.</p>
+
+<h2>rune - что это?</h2>
+<pre><code class="language-go">type rune = int32</code></pre>
+<p><code>rune</code> - это <b>Unicode code point</b>.</p>
+<pre><code class="language-go">for i, r := range "привет" {
+    fmt.Printf("%d: %c\n", i, r)
+}
+</code></pre>
+<p><code>range</code> по строке:</p>
+<ul>
+    <li>декодирует UTF-8</li>
+    <li>i - индекс <b>байта</b></li>
+    <li>r - rune</li>
+</ul>
+
+
+
+<h2>Пакет strings</h2>
+<h3>Split и Join</h3>
+<pre><code class="language-go">s := "1,2,3"
+arr := strings.Split(s, ",") // [1 2 3]
+strings.Join(arr, "-") // 1-2-3</code></pre>
+
+<h3>Конкатенация с помощью Builder</h3>
+<pre><code class="language-go">var b strings.Builder
+for i := 0; i < 1000; i++ {
+    b.WriteString("a")
+}
+s := b.String()</code></pre>
+<p>💡 <code>strings.Builder</code>:</p>
+<ul>
+    <li>минимальные аллокации</li>
+    <li>потокобезопасность <b>не гарантируется</b></li>
+</ul>
+
+
+{{ end }}

@@ -15,11 +15,13 @@
         <form method="get" action="/book">
             <label>
                 <select name="chapter_id" onchange="this.form.submit()" style="margin-bottom: var(--space-2)">
-                    <option value="" disabled selected>Выберите главу</option>
+                    <option value="0"
+                            {{ if eq $.chapter_id .ID }}selected{{ end }}
+                    >Оглавление</option>
                     {{ range .chapters }}
                     <option value="{{ .ID }}"
                             {{ if eq $.chapter_id .ID }}selected{{ end }}
-                    >{{ .Name }}</option>
+                    >{{ if not .HideID }}{{ .ID }}. {{ end }} {{ .Name }}</option>
                     {{ end }}
                     <option value="" disabled>------------</option>
                     {{ range .tasks }}
@@ -41,6 +43,10 @@
                 {{ template "book.defer" . }}
             {{ else if eq .chapter_id 16 }}
                 {{ template "book.context" . }}
+            {{ else if eq .chapter_id 17 }}
+                {{ template "book.strings" . }}
+            {{ else if eq .chapter_id 100 }}
+                {{ template "book.cheat" . }}
 
             {{ else if eq .chapter_id -1 }}
                 {{ template "task.go1" . }}
@@ -48,7 +54,7 @@
                 {{ template "task.fan" . }}
             {{ else }}
                 {{ range .chapters }}
-                    <a href="/book?chapter_id={{ .ID }}">{{ .ID }}. {{ .Name }}</a><br>
+                    <a href="/book?chapter_id={{ .ID }}">{{ if not .HideID }}{{ .ID }}. {{ end }} {{ .Name }}</a><br>
                 {{ end }}
             {{ end }}
         </div>

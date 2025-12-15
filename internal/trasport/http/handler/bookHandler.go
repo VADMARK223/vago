@@ -8,19 +8,22 @@ import (
 )
 
 type bookChapter struct {
-	ID   int64
-	Name string
+	ID     int64
+	Name   string
+	HideID bool
 }
 
 func ShowBook(c *gin.Context) {
 	chapterIDStr := c.Query("chapter_id")
 
 	bookChapters := []bookChapter{
+		{ID: 100, HideID: true, Name: "Шпаргалка"},
 		{ID: 1, Name: "Общие вопросы"},
 		{ID: 2, Name: "Срезы (Slices)"},
 		{ID: 9, Name: "Каналы"},
 		{ID: 12, Name: "Defer"},
 		{ID: 16, Name: "Контекст (Context)"},
+		{ID: 17, Name: "Строки (Strings)"},
 	}
 
 	bookTasks := []bookChapter{

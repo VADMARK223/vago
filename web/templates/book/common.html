@@ -2,32 +2,34 @@
 <h1>Типы данных</h1>
 <h2>Простые</h2>
 <span>
-    <code>int</code> целое число (32 или 64 бита, зависит от платформы)<br>
-    byte тоже самое, что и uint8<br>
-    bool true<br>
-    rune один символ типа 'Y'<br>
+    <code>int</code> - целое число (32 или 64 бита, зависит от платформы)<br>
+    <code>byte</code> - то же самое, что и <code>uint8</code><br>
+    <code>bool</code> - логический тип<br>
+    <code>rune</code> - один символ ('Y') это под капотом <code>int32</code><br>
 </span>
 
 <h2>Математические</h2>
+<span>Имеют ошибку точности, для точных данных, к примеру денег лучше использовать Decimals</span>
 <span>float32, float64</span>
-<span>complex32, complex64</span>
+<span>complex64, complex128</span>
 
 <h2>Составные</h2>
 <span>
-    array [3]int{1, 2, 3}<br>
-    slice []int{1, 2, 3}<br>
-    map map[string]int<br>
-    string строки immutable, из изменять нельзя<br>
-    struct
+    <code>array</code> - массив [3]int{1, 2, 3}<br>
+    <code>slice</code> - срез []int{1, 2, 3}<br>
+    <code>map</code> - карта map[string]int<br>
+    <code>string</code> - строка immutable, из изменять нельзя<br>
+    <code>struct</code> - структура
 </span>
-<span></span>
 
 <h2>Другие</h2>
 <span>
-    error <br>
-    chat chan int
+    <code>error</code> - ошибка<br>
+    <code>chat chan [T]</code> - канал
 </span>
 
+<h1>Прочее</h1>
+<span>Сколько занимает переменная: <code>unsafe.SizeOf(a)</code></span>
 
 <h1>Изменения</h1>
 <h2>1.22</h2>

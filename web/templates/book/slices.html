@@ -1,7 +1,28 @@
 {{ define "book.slices" }}
 <h1>Срезы</h1>
 <span>Slice - это обёртка над массивом, которая хранит указатель на массив, длину и ёмкость.</span>
+<h2>Пакет slices</h2>
+<h3>Sort</h3>
+<p>Сортировка среза</p>
+<pre><code class="language-go">a := []int{2, 1}
+slices.Sort(a)
+fmt.Println(a) // [1 2]</code></pre>
+
+<h3>Index</h3>
+<p>Поиск индекса числа по его значение, ищется первое попавшееся, если их два, если не найдено то <code>-1</code></p>
+<pre><code class="language-go">a := []int{2, 4, 12, 3, 12}
+idx12 := slices.Index(a, 12)
+idx100 := slices.Index(a, 100)
+fmt.Println(idx12, idx100) // 2 -1</code></pre>
+
+<h3>Insert</h3>
+<span>Вставка значение по индексу</span>
+<pre><code class="language-go">a := []int{1, 2, 3}
+a = slices.Insert(a, 1, 99)
+fmt.Println(a) // [1 99 2 3]</code></pre>
+
 <h2>Отличие nil-среза от пустого среза</h2>
+<p><code>zero-value</code> для срезов это <code>nil</code></p>
 <ul>
     <li>nil slice - это срез, который не указывает ни на какой массив.</li>
     <li>Пустой slice - это срез, указывающий на реальный массив длиной 0.</li>

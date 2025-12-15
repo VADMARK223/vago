@@ -1101,5 +1101,205 @@
         "correct": true
       }
     ]
+  },
+  {
+    "topic_id": 17,
+    "text": "Что из перечисленного верно про string в Go?",
+    "explanation": "В Go string — это immutable последовательность байт, обычно с UTF-8 содержимым",
+    "answers": [
+      {
+        "text": "string — изменяемый тип"
+      },
+      {
+        "text": "string хранит UTF-16"
+      },
+      {
+        "text": "string — неизменяемая последовательность байт",
+        "correct": true
+      },
+      {
+        "text": "string всегда ASCII"
+      }
+    ]
+  },
+  {
+    "topic_id": 17,
+    "text": "Что вернёт len(\"привет\")?",
+    "explanation": "Каждый кириллический символ занимает 2 байта в UTF-8 → 6 × 2 = 12.",
+    "answers": [
+      {
+        "text": "6"
+      },
+      {
+        "text": "12",
+        "correct": true
+      },
+      {
+        "text": "5"
+      },
+      {
+        "text": "Ошибку компиляции"
+      }
+    ]
+  },
+  {
+    "topic_id": 17,
+    "text": "Что такое rune?",
+    "explanation": "rune = int32, используется для представления Unicode-символов",
+    "answers": [
+      {
+        "text": "Алиас для byte"
+      },
+      {
+        "text": "Тип для UTF-16 символов"
+      },
+      {
+        "text": "Алиас для int32, представляющий Unicode code point",
+        "correct": true
+      },
+      {
+        "text": "Тип для строк"
+      }
+    ]
+  },
+  {
+    "topic_id": 17,
+    "text": "Что делает range при обходе строки?",
+    "explanation": "range декодирует UTF-8 и возвращает rune",
+    "answers": [
+      {
+        "text": "Идёт по байтам"
+      },
+      {
+        "text": "Идёт по runes (Unicode code points)",
+        "correct": true
+      },
+      {
+        "text": "Идёт по словам"
+      },
+      {
+        "text": "Идёт по grapheme clusters"
+      }
+    ]
+  },
+  {
+    "topic_id": 17,
+    "text": "Что означает индекс i в for i, r := range s?",
+    "explanation": "i — это байтовый индекс начала rune в строке",
+    "answers": [
+      {
+        "text": "Номер символа"
+      },
+      {
+        "text": "Номер rune"
+      },
+      {
+        "text": "Смещение в байтах",
+        "correct": true
+      },
+      {
+        "text": "Всегда 0,1,2..."
+      }
+    ]
+  },
+  {
+    "topic_id": 17,
+    "text": "Почему s += \"a\" в цикле — плохая идея?",
+    "explanation": "Строки неизменяемы, каждое += создаёт новую строку",
+    "answers": [
+      {
+        "text": "Может привести к deadlock"
+      },
+      {
+        "text": "Создаёт много аллокаций",
+        "correct": true
+      },
+      {
+        "text": "Работает только с ASCII"
+      },
+      {
+        "text": "Не компилируется"
+      }
+    ]
+  },
+  {
+    "topic_id": 17,
+    "text": "Какой способ конкатенации строк наиболее эффективен?",
+    "explanation": "strings.Builder минимизирует аллокации",
+    "answers": [
+      {
+        "text": "s += part"
+      },
+      {
+        "text": "fmt.Sprintf"
+      },
+      {
+        "text": "strings.Builder",
+        "correct": true
+      },
+      {
+        "text": "[]rune"
+      }
+    ]
+  },
+  {
+    "topic_id": 17,
+    "text": "Что произойдёт при s[0] = 'H'?",
+    "explanation": "string в Go — неизменяемый тип",
+    "answers": [
+      {
+        "text": "Строка изменится"
+      },
+      {
+        "text": "Panic во время выполнения"
+      },
+      {
+        "text": "Ошибка компиляции",
+        "correct": true
+      },
+      {
+        "text": "Ничего"
+      }
+    ]
+  },
+  {
+    "topic_id": 17,
+    "text": "Почему s[:2] может быть опасным для UTF-8 строки?",
+    "explanation": "Срез строки идёт по байтам, а не по rune",
+    "answers": [
+      {
+        "text": "Может вызвать panic"
+      },
+      {
+        "text": "Работает медленно"
+      },
+      {
+        "text": "Может разрезать символ",
+        "correct": true
+      },
+      {
+        "text": "Всегда возвращает пустую строку"
+      }
+    ]
+  },
+  {
+    "topic_id": 17,
+    "text": "Может ли string быть nil?",
+    "explanation": "string — value type, нулевое значение — пустая строка \"\"",
+    "answers": [
+      {
+        "text": "Да"
+      },
+      {
+        "text": "Нет",
+        "correct": true
+      },
+      {
+        "text": "Только через unsafe"
+      },
+      {
+        "text": "Только в map"
+      }
+    ]
   }
 ]
