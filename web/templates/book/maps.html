@@ -1,0 +1,86 @@
+{{ define "book.maps" }}
+<h1>Карты</h1>
+<p><code>map</code> в Go — это встроенный тип данных для хранения пар <b>ключ → значение</b> с быстрым доступом по ключу.</p>
+<h2>Типы ключей</h2>
+<p>Ключ должен быть <b>сравнимым</b> (<code>comparable</code>):</p>
+<p>✅ Можно:</p>
+<ul>
+    <li>string</li>
+    <li>int, float64</li>
+    <li>bool</li>
+    <li>struct (если все поля comparable)</li>
+    <li>array</li>
+</ul>
+<p>❌ Нельзя:</p>
+<ul>
+    <li>slice</li>
+    <li>map</li>
+    <li>func</li>
+</ul>
+<hr/>
+<p>⚠️ Map не потокобезопасен</p>
+<pre><code class="language-go">go func() { m["a"] = 1 }()
+go func() { m["b"] = 2 }() // race</code></pre>
+<p>⚠️ Нельзя писать в nil-map</p>
+<pre><code class="language-go">var m map[string]int
+m["a"] = 1 // panic
+fmt.Println(m["a"]) // 0 Но читать можно
+</code></pre>
+
+<h2>Map — ссылочный тип</h2>
+<pre><code class="language-go">func change(m map[string]int) {
+    m["a"] = 10
+}
+
+func main() {
+    m := map[string]int{"a": 1}
+    change(m)
+    fmt.Println(m["a"]) // 10
+}</code></pre>
+<p>❗ Map передаётся <b>по ссылке на структуру данных</b>, копии нет.</p>
+
+<h2>Итерация по map</h2>
+<pre><code class="language-go">for k, v := range m {
+    fmt.Println(k, v)
+}</code></pre>
+<p>⚠️ <b>Порядок всегда случайный</b></p>
+<p>Нельзя на него полагаться (даже между запусками).</p>
+<p>Если нужен порядок:</p>
+<pre><code class="language-go">keys := make([]string, 0, len(m))
+for k := range m {
+    keys = append(keys, k)
+}
+sort.Strings(keys)
+
+for _, k := range keys {
+    fmt.Println(k, m[k])
+}</code></pre>
+
+<h2>Создание</h2>
+<h3>Через литерал</h3>
+<pre><code class="language-go">m := map[string]int{
+    "a": 1,
+    "b": 2,
+}</code></pre>
+<h3>Через make</h3>
+<pre><code class="language-go">m := make(map[string]int)
+m["a"] = 1</code></pre>
+
+<h2>Доступ к элементу</h2>
+<pre><code class="language-go">v, ok := m["a"]
+if ok { // Проверка важна!
+    fmt.Println("Есть:", v)
+}</code></pre>
+
+<h2>Добавление и обновление</h2>
+<pre><code class="language-go">m["c"] = 3      // добавление
+m["a"] = 100    // обновление</code></pre>
+
+<h2>Удаление</h2>
+<pre><code class="language-go">delete(m, "a")</code></pre>
+<ul>
+    <li>безопасно вызывать, даже если ключа нет</li>
+    <li>panic не будет</li>
+</ul>
+
+{{ end }}

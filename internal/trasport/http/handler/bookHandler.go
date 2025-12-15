@@ -20,6 +20,7 @@ func ShowBook(c *gin.Context) {
 		{ID: 100, HideID: true, Name: "Шпаргалка"},
 		{ID: 1, Name: "Общие вопросы"},
 		{ID: 2, Name: "Срезы (Slices)"},
+		{ID: 4, Name: "Карты (Maps)"},
 		{ID: 9, Name: "Каналы"},
 		{ID: 12, Name: "Defer"},
 		{ID: 16, Name: "Контекст (Context)"},

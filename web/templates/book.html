@@ -37,6 +37,8 @@
                 {{ template "book.common" . }}
             {{ else if eq .chapter_id 2 }}
                 {{ template "book.slices" . }}
+            {{ else if eq .chapter_id 4 }}
+                {{ template "book.maps" . }}
             {{ else if eq .chapter_id 9 }}
                 {{ template "book.channels" . }}
             {{ else if eq .chapter_id 12 }}
