@@ -118,7 +118,7 @@ func loadTemplates() *template.Template {
 			return err
 		}
 
-		if !info.IsDir() && strings.HasSuffix(path, ".html") {
+		if !info.IsDir() && (strings.HasSuffix(path, ".html") || strings.HasSuffix(path, ".gohtml")) {
 			_, err = tmpl.ParseFiles(path)
 			if err != nil {
 				return fmt.Errorf("parse error in %s: %w", path, err)

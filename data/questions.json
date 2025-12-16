@@ -918,7 +918,7 @@
   {
     "topic_id": 14,
     "text": "Что выведет код?",
-    "code": "type Person struct {\r\n\tName string\r\n}\r\n\r\nfunc changeName(person *Person) {\r\n\tperson = \u0026Person{\"Mark\"}\r\n}\r\n\r\nfunc main() {\r\n\tperson := \u0026Person{\"Vad\"}\r\n\tfmt.Println(person.Name)\r\n\tchangeName(person)\r\n\tfmt.Println(person.Name)\r\n}",
+    "code": "type Person struct {\r\n    Name string\r\n}\r\n\r\nfunc changeName(person *Person) {\r\n    person = \u0026Person{\"Mark\"}\r\n}\r\n\r\nfunc main() {\r\n    person := \u0026Person{\"Vad\"}\r\n    fmt.Println(person.Name)\r\n    changeName(person)\r\n    fmt.Println(person.Name)\r\n}",
     "explanation": "В функции указатель пересоздается.",
     "answers": [
       {
@@ -939,7 +939,7 @@
   {
     "topic_id": 14,
     "text": "Что выведет код?",
-    "code": "type Person struct {\r\n\tName string\r\n}\r\n\r\nfunc changeName(person *Person) {\r\n\t*person = Person{\"Mark\"}\r\n}\r\n\r\nfunc main() {\r\n\tperson := Person{\"Vad\"}\r\n\tfmt.Println(person.Name)\r\n\tchangeName(\u0026person)\r\n\tfmt.Println(person.Name)\r\n}",
+    "code": "type Person struct {\r\n    Name string\r\n}\r\n\r\nfunc changeName(person *Person) {\r\n    *person = Person{\"Mark\"}\r\n}\r\n\r\nfunc main() {\r\n    person := Person{\"Vad\"}\r\n    fmt.Println(person.Name)\r\n    changeName(\u0026person)\r\n    fmt.Println(person.Name)\r\n}",
     "explanation": "У методе полная перезапись структуры, на которую указывает указатель",
     "answers": [
       {
@@ -1499,6 +1499,211 @@
       },
       {
         "text": "Игнорирование ошибок"
+      }
+    ]
+  },
+  {
+    "topic_id": 14,
+    "text": "Что выведет код?",
+    "code": "func inc(x int) {\r\n    x++\r\n}\r\n\r\nfunc main() {\r\n    a := 5\r\n    inc(a)\r\n    fmt.Println(a)\r\n}",
+    "explanation": "В Go аргументы передаются по значению. x — копия a, оригинал не меняется.",
+    "answers": [
+      {
+        "text": "6"
+      },
+      {
+        "text": "5",
+        "correct": true
+      },
+      {
+        "text": "panic"
+      },
+      {
+        "text": "undefined"
+      }
+    ]
+  },
+  {
+    "topic_id": 14,
+    "text": "Что выведет код?",
+    "code": "func inc(x *int) {\r\n    *x++\r\n}\r\n\r\nfunc main() {\r\n    a := 5\r\n    inc(\u0026a)\r\n    fmt.Println(a)\r\n}",
+    "explanation": "Передан указатель, функция меняет значение по адресу a",
+    "answers": [
+      {
+        "text": "5"
+      },
+      {
+        "text": "6",
+        "correct": true
+      },
+      {
+        "text": "panic"
+      },
+      {
+        "text": "не скомпилируется"
+      }
+    ]
+  },
+  {
+    "topic_id": 14,
+    "text": "Что произойдёт при выполнении?",
+    "code": "func f(p *int) {\r\n    p = nil\r\n}\r\n\r\nfunc main() {\r\n    a := 10\r\n    p := \u0026a\r\n    f(p)\r\n    fmt.Println(*p)\r\n}",
+    "explanation": "p передаётся по значению. Внутри f меняется только локальная копия указателя",
+    "answers": [
+      {
+        "text": "panic"
+      },
+      {
+        "text": "10",
+        "correct": true
+      },
+      {
+        "text": "nil"
+      },
+      {
+        "text": "не скомпилируется"
+      }
+    ]
+  },
+  {
+    "topic_id": 14,
+    "text": "Что выведет код?",
+    "code": "type User struct {\r\n    Name string\r\n}\r\n\r\nfunc rename(u User) {\r\n    u.Name = \"Bob\"\r\n}\r\n\r\nfunc main() {\r\n    user := User{Name: \"Alice\"}\r\n    rename(user)\r\n    fmt.Println(user.Name)\r\n}",
+    "explanation": "Передана копия структуры, оригинал не изменился.",
+    "answers": [
+      {
+        "text": "Bob"
+      },
+      {
+        "text": "Alice",
+        "correct": true
+      },
+      {
+        "text": "panic"
+      },
+      {
+        "text": "пустую строку"
+      }
+    ]
+  },
+  {
+    "topic_id": 14,
+    "text": "Что выведет код?",
+    "code": "type User struct {\r\n    Name string\r\n}\r\n\r\nfunc rename(u *User) {\r\n    u.Name = \"Bob\"\r\n}\r\n\r\nfunc main() {\r\n    user := User{Name: \"Alice\"}\r\n    rename(\u0026user)\r\n    fmt.Println(user.Name)\r\n}",
+    "explanation": "Передан указатель, изменение происходит над оригинальным объектом.",
+    "answers": [
+      {
+        "text": "Alice"
+      },
+      {
+        "text": "Bob",
+        "correct": true
+      },
+      {
+        "text": "panic"
+      },
+      {
+        "text": "undefined"
+      }
+    ]
+  },
+  {
+    "topic_id": 14,
+    "text": "Что из этого верно для Go?",
+    "explanation": "В Go всё передаётся по значению, включая указатели.",
+    "answers": [
+      {
+        "text": "В Go есть передача по ссылке"
+      },
+      {
+        "text": "В Go есть только передача по значению",
+        "correct": true
+      },
+      {
+        "text": "Указатели передаются по ссылке"
+      },
+      {
+        "text": "Структуры всегда передаются по ссылке"
+      }
+    ]
+  },
+  {
+    "topic_id": 14,
+    "text": "Почему говорят “указатели ≠ ссылки” в Go?",
+    "explanation": "Указатель — это обычное значение с адресом, без скрытой магии.",
+    "answers": [
+      {
+        "text": "Потому что указатели нельзя разыменовывать"
+      },
+      {
+        "text": "Потому что ссылки работают быстрее"
+      },
+      {
+        "text": "Потому что указатель — явное значение, а ссылка — неявная абстракция",
+        "correct": true
+      },
+      {
+        "text": "Потому что ссылки устарели"
+      }
+    ]
+  },
+  {
+    "topic_id": 14,
+    "text": "Что передаётся в функцию при вызове f(\u0026x)?",
+    "explanation": "Передаётся копия указателя, но он указывает на тот же адрес.",
+    "answers": [
+      {
+        "text": "Сам объект x"
+      },
+      {
+        "text": "Ссылка на x"
+      },
+      {
+        "text": "Копия указателя на x",
+        "correct": true
+      },
+      {
+        "text": "Адрес функции f"
+      }
+    ]
+  },
+  {
+    "topic_id": 14,
+    "text": "Почему Go-дизайн с указателями важен для concurrency?",
+    "explanation": "Явность владения данными упрощает reasoning в многопоточности",
+    "answers": [
+      {
+        "text": "Потому что указатели потокобезопасны"
+      },
+      {
+        "text": "Потому что убирает неявные изменения данных",
+        "correct": true
+      },
+      {
+        "text": "Потому что запрещает shared state"
+      },
+      {
+        "text": "Потому что ускоряет GC"
+      }
+    ]
+  },
+  {
+    "topic_id": 14,
+    "text": "Когда использование указателя оправдано?",
+    "explanation": "Указатели нужны по делу, а не «на всякий случай»",
+    "answers": [
+      {
+        "text": "Всегда"
+      },
+      {
+        "text": "Никогда"
+      },
+      {
+        "text": "Когда нужно изменить объект или избежать копирования",
+        "correct": true
+      },
+      {
+        "text": "Только для примитивов"
       }
     ]
   }

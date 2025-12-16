@@ -45,6 +45,8 @@
                 {{ template "book.errors" . }}
             {{ else if eq .chapter_id 12 }}
                 {{ template "book.defer" . }}
+            {{ else if eq .chapter_id 14 }}
+                {{ template "book.pointers" . }}
             {{ else if eq .chapter_id 16 }}
                 {{ template "book.context" . }}
             {{ else if eq .chapter_id 17 }}

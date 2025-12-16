@@ -71,9 +71,19 @@ for i := 0; i < 1000; i++ {
 s := b.String()</code></pre>
 <p>💡 <code>strings.Builder</code>:</p>
 <ul>
-    <li>минимальные аллокации</li>
-    <li>потокобезопасность <b>не гарантируется</b></li>
+    <li>Минимальные аллокации</li>
+    <li>Потокобезопасность <b>не гарантируется</b></li>
 </ul>
+<h3>Replace</h3>
+<p>Замена всех вхождений</p>
+<pre><code class="language-go">s := "bad word in bad string."
+s1 := strings.ReplaceAll(s, "bad", "good")
+fmt.Println("Result:", s1) // Result: good word in good string.</code></pre>
 
+<h3>HasPrefix и HasSuffix</h3>
+<p>Проверка начала и конца строки</p>
+<pre><code class="language-go">s := "test.gohtml"
+hasPrefix := strings.HasPrefix(s, "test")    // true
+hasSuffix := strings.HasSuffix(s, ".gohtml") //true</code></pre>
 
 {{ end }}

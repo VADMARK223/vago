@@ -48,6 +48,7 @@ fmt.Println(ch == nil) // true</code></pre>
 </ul>
 <h3>nil-канал в select</h3>
 <span>❗ В select nil-канал никогда не выбирается. 👉 Это официальный паттерн.</span>
+
 <pre><code class="language-go">var ch chan int
 if enabled {
     ch = realChan

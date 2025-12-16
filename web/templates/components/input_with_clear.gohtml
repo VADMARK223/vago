@@ -1,5 +1,5 @@
 {{ define "component.inputWithClear" }}
-<div class="input-wrap">
+    <div class="input-wrap">
         <input
                 {{ if .ID }}id="{{ .ID }}"{{ end }}
                 {{ if .Class }}class="{{ .Class }}"{{ end }}
@@ -12,6 +12,6 @@
                 aria-label="{{ .Placeholder }}"
         >
 
-    <button type="button" class="clear-btn" data-clear aria-label="clear-btn">×</button>
-</div>
+        <button type="button" class="clear-btn" data-clear aria-label="clear-btn">×</button>
+    </div>
 {{ end }}

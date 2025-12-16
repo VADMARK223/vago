@@ -155,7 +155,7 @@ func (h *QuizHandler) AddQuestion() func(c *gin.Context) {
 			answers[correctIdx].Correct = true
 		}
 
-		err := seed.AddQuestion(seed.Question{
+		err := seed.AddQuestion(h.dsn, seed.Question{
 			TopicID:     topicId,
 			Text:        text,
 			Code:        codeStr,

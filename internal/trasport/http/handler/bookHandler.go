@@ -24,6 +24,7 @@ func ShowBook(c *gin.Context) {
 		{ID: 9, Name: "Каналы"},
 		{ID: 11, Name: "Ошибка (Errors)"},
 		{ID: 12, Name: "Defer"},
+		{ID: 14, Name: "Указатели (Pointers)"},
 		{ID: 16, Name: "Контекст (Context)"},
 		{ID: 17, Name: "Строки (Strings)"},
 	}

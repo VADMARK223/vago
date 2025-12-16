@@ -79,5 +79,7 @@ fmt.Printf("%.2f", f) // 1.24 (2 знака после запятой)</code></p
 
 <h2>Конвертация</h2>
 <pre><code class="language-go">strconv.Itoa(100) // "100"
-num, err := strconv.Atoi("100") // 100</code></pre>
+num, err := strconv.Atoi("100") // 100
+s := string(bytes) // Срез байтов к строке
+bytes := []byte(s) // Строка к срезу байт</code></pre>
 {{ end }}

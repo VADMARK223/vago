@@ -1,0 +1,162 @@
+{{ define "book.pointers" }}
+<h1>Указатели</h1>
+<h2>1. Что такое указатель в Go</h2>
+<p><b>Указатель</b> — это переменная, которая хранит <b>адрес в памяти</b> другой переменной.</p>
+<pre><code class="language-go">x := 10
+p := &x</code></pre>
+<ul>
+    <li><code>x</code> - значение <code>10</code></li>
+    <li><code>&x</code> - адрес переменной <code>x</code></li>
+    <li><code>p</code> - указатель типа <code>*int</code></li>
+</ul>
+<pre><code class="language-go">fmt.Println(p)   // например: 0xc0000120a8
+fmt.Println(*p)  // 10</code></pre>
+<h3>Операторы</h3>
+<table>
+    <thead>
+    <tr>
+        <th>Операторы</th>
+        <th>Значения</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td><code>&x</code></td>
+        <td>взять адрес</td>
+    </tr>
+    <tr>
+        <td><code>*p</code></td>
+        <td>разыменовать указатель</td>
+    </tr>
+    </tbody>
+</table>
+<div class="panel">
+    Используй указатель, если объект:
+    <ul>
+        <li>должен изменяться</li>
+        <li>большой</li>
+        <li>имеет состояние</li>
+        <li>может быть <code>nil</code></li>
+    </ul>
+</div>
+<blockquote class="note">
+    ❌ В Go нет «передачи по ссылке»<br>
+    ✅ В Go есть <b>передача указателя по значению</b>
+</blockquote>
+
+<h2>2. Типы указателей</h2>
+<pre><code class="language-go">var p *int</code></pre>
+<ul>
+    <li><code>*int</code> — указатель на <code>int</code></li>
+    <li><code>*User</code> — указатель на структуру <code>User</code></li>
+    <li><code>**int</code> — указатель на указатель (используется редко)</li>
+</ul>
+<p>⚠️ В Go <b>нет pointer arithmetic</b>, как в C:</p>
+<pre><code class="language-go">p++ // ❌ запрещено</code></pre>
+
+<h2>3. nil-указатель</h2>
+<p>По умолчанию указатель равен <code>nil</code>.</p>
+<pre><code class="language-go">var p *int
+fmt.Println(p == nil) // true
+</code></pre>
+<p>Разыменовывать <code>nil</code> нельзя:</p>
+<pre><code class="language-go">*p = 10 // panic: nil pointer dereference
+</code></pre>
+<p>✅ Всегда проверяй:</p>
+<pre><code class="language-go">if p != nil {
+    fmt.Println(*p)
+}
+</code></pre>
+
+<h2>4. Передача по значению vs по указателю</h2>
+<p>❌ Передача по значению</p>
+<pre><code class="language-go">func inc(x int) {
+    x++
+}
+a := 10
+inc(a)
+fmt.Println(a) // 10</code></pre>
+<p>✅ Передача по указателю</p>
+<pre><code class="language-go">func inc(x *int) {
+    (*x)++
+}
+a := 10
+inc(&a)
+fmt.Println(a) // 11</code></pre>
+<p><b>📌 Go всегда передаёт аргументы по значению</b>, но значением может быть указатель.</p>
+
+<h2>5. Указатели и структуры</h2>
+<p>Передача структуры по значению (копия)</p>
+<pre><code class="language-go">type User struct {
+    Name string
+}
+
+func rename(u User) {
+    u.Name = "Bob"
+}</code></pre>
+<p>Передача по указателю (изменение оригинала)</p>
+<pre><code class="language-go">func rename(u *User) {
+    // Go автоматически разыменовывает
+    u.Name = "Bob" // (*u).Name — можно без скобок
+}</code></pre>
+
+<h2>6. Методы с указателями</h2>
+<pre><code class="language-go">type Counter struct {
+    value int
+}
+
+func (c *Counter) Inc() {
+    c.value++
+}</code></pre>
+<p>Почему <code>*Counter</code>?</p>
+<ul>
+    <li>метод <b>изменяет состояние</b></li>
+    <li>не копируется структура</li>
+    <li>единый method set</li>
+</ul>
+<pre><code class="language-go">c := Counter{}
+c.Inc() // Go сам возьмёт &c</code></pre>
+
+<h2>7. Когда нужно использовать указатели</h2>
+<h3>✅ 1. Нужно изменить объект</h3>
+<pre><code class="language-go">func Update(u *User) {}</code></pre>
+<h3>✅ 2. Большая структура (производительность)</h3>
+<pre><code class="language-go">type Big struct {
+    Data [1024]int
+}</code></pre>
+<p>Передача <code>Big</code> → копия</p>
+<p>Передача <code>*Big</code> → дешево</p>
+<h3>✅ 3. Общий доступ к состоянию</h3>
+<pre><code class="language-go">type Service struct {
+    repo *Repo
+}</code></pre>
+<h3>✅ 4. Возможность nil как состояние</h3>
+<pre><code class="language-go">var user *User = nil</code></pre>
+
+<h2>8. Указатели и escape analysis</h2>
+<pre><code class="language-go">func create() *User {
+    u := User{Name: "Bob"}
+    return &u
+}</code></pre>
+<p>⚠️ u будет <b>выделен в heap</b>, а не в stack.</p>
+<p>Go сам решает:</p>
+<ul>
+    <li>stack — быстро</li>
+    <li>heap — если объект “убегает” из функции</li>
+</ul>
+<p>Можно проверить:</p>
+<pre><code class="language-go">go build -gcflags="-m"</code></pre>
+
+<h2>9. Указатели и new</h2>
+<pre><code class="language-go">p := new(int)
+*p = 10
+// Эквивалентно:
+x := 10
+p := &x
+// Для структур:
+u := new(User)
+u.Name = "Alice"
+// Но чаще используют:
+u := &User{Name: "Alice"}</code></pre>
+
+{{ end }}

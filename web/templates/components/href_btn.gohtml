@@ -1,0 +1,17 @@
+{{ define "component.href_btn" }}
+    <a class="btn"
+            {{ if .Disabled}}
+                aria-disabled="true"
+                tabindex="-1"
+            {{ else }}
+                href="{{.Href}}"
+            {{ end }}
+    >
+        <div class="icon-item">
+            {{ if .Icon }}
+                <i class="{{.Icon}}"></i>
+            {{ end }}
+            <span>{{.Name}}</span>
+        </div>
+    </a>
+{{ end }}

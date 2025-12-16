@@ -33,7 +33,7 @@ const (
 	dataFileTopics    = "data/topics.json"
 )
 
-func AddQuestion(question Question) error {
+func AddQuestion(dsn string, question Question) error {
 	data, err := os.ReadFile(dataFileQuestions)
 	if err != nil {
 		return err
@@ -57,7 +57,7 @@ func AddQuestion(question Question) error {
 
 	log.Println("Question added.")
 
-	return nil
+	return SyncQuestions(dsn)
 }
 
 func Topics(dsn string) error {
