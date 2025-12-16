@@ -1706,5 +1706,210 @@
         "text": "Только для примитивов"
       }
     ]
+  },
+  {
+    "topic_id": 18,
+    "text": "С какого релиза в Go появились Generics?",
+    "explanation": "Generics официально добавлены в Go 1.18",
+    "answers": [
+      {
+        "text": "Go 1.16"
+      },
+      {
+        "text": "Go 1.17"
+      },
+      {
+        "text": "Go 1.18",
+        "correct": true
+      },
+      {
+        "text": "Go 1.20"
+      }
+    ]
+  },
+  {
+    "topic_id": 18,
+    "text": "Что означает T any в сигнатуре функции?",
+    "explanation": "any — это alias для interface{}",
+    "answers": [
+      {
+        "text": "T — любой интерфейс"
+      },
+      {
+        "text": "T — указатель"
+      },
+      {
+        "text": "T — любой тип",
+        "correct": true
+      },
+      {
+        "text": "T — алиас struct{}"
+      }
+    ]
+  },
+  {
+    "topic_id": 18,
+    "text": "Чем Generics принципиально лучше interface{}?",
+    "explanation": "Главное преимущество — типобезопасность на этапе",
+    "answers": [
+      {
+        "text": "Быстрее на этапе выполнения"
+      },
+      {
+        "text": "Проверка типов на compile-time",
+        "correct": true
+      },
+      {
+        "text": "Меньше кода"
+      },
+      {
+        "text": "Работают с reflection"
+      }
+    ]
+  },
+  {
+    "topic_id": 18,
+    "text": "Можно ли использовать операторы (+, ==) с T any?",
+    "explanation": "Без constraint компилятор не знает, какие операции разрешены.",
+    "answers": [
+      {
+        "text": "Да, всегда"
+      },
+      {
+        "text": "Да, если тип известен"
+      },
+      {
+        "text": "Только через reflection"
+      },
+      {
+        "text": "Нет, нужен constraint",
+        "correct": true
+      }
+    ]
+  },
+  {
+    "topic_id": 18,
+    "text": "Заменяют ли Generics интерфейсы в Go?",
+    "explanation": "Generics — про данные, интерфейсы — про поведение",
+    "answers": [
+      {
+        "text": "Да"
+      },
+      {
+        "text": "Частично"
+      },
+      {
+        "text": "Только в структурах"
+      },
+      {
+        "text": "Нет",
+        "correct": true
+      }
+    ]
+  },
+  {
+    "topic_id": 18,
+    "text": "Скомпилируется ли код?",
+    "code": "func Add[T any](a, b T) T {\r\n    return a + b\r\n}",
+    "explanation": "any не гарантирует наличие оператора +",
+    "answers": [
+      {
+        "text": "Да"
+      },
+      {
+        "text": "Нет",
+        "correct": true
+      },
+      {
+        "text": "Зависит от T"
+      },
+      {
+        "text": "Неопределенное поводение"
+      }
+    ]
+  },
+  {
+    "topic_id": 18,
+    "text": "Что не так с этим кодом?",
+    "code": "type Box[T any] struct {\r\n    Value T\r\n}\r\n\r\nfunc (b Box[T]) Map[R any](f func(T) R) R {\r\n    return f(b.Value)\r\n}",
+    "explanation": "В Go методы не могут объявлять свои generic-параметры",
+    "answers": [
+      {
+        "text": "Ошибка синтаксиса"
+      },
+      {
+        "text": "Нельзя использовать generics в методах"
+      },
+      {
+        "text": "Метод не может иметь собственный тип-параметр",
+        "correct": true
+      },
+      {
+        "text": "Всё корректно"
+      }
+    ]
+  },
+  {
+    "topic_id": 18,
+    "text": "Скомпилируется ли вызов?",
+    "code": "func Identity[T any](v T) T { return v }\r\n\r\nvar x any = 10\r\nIdentity(x)",
+    "explanation": "Тип T выводится как any, а не int",
+    "answers": [
+      {
+        "text": "Да, вернёт int"
+      },
+      {
+        "text": "Да, вернёт any",
+        "correct": true
+      },
+      {
+        "text": "Нет"
+      },
+      {
+        "text": "С panic"
+      }
+    ]
+  },
+  {
+    "topic_id": 18,
+    "text": "Скомпилируется ли код?",
+    "code": "func Equal[T comparable](a, b T) bool {\r\n    return a == b\r\n}\r\n\r\nEqual([]int{1}, []int{1})",
+    "explanation": "slice не comparable, даже если элементы comparable",
+    "answers": [
+      {
+        "text": "Да"
+      },
+      {
+        "text": "Нет",
+        "correct": true
+      },
+      {
+        "text": "Panic"
+      },
+      {
+        "text": "Неопределенное поведение"
+      }
+    ]
+  },
+  {
+    "topic_id": 18,
+    "text": "Что выведет программа?",
+    "code": "func Print[T any](v T) {\r\n    fmt.Printf(\"%T\\n\", v)\r\n}\r\n\r\nPrint(10)\r\nPrint(\"hi\")",
+    "explanation": "Generic подставляет конкретный тип, не стирая его",
+    "answers": [
+      {
+        "text": "T и T"
+      },
+      {
+        "text": "any и any"
+      },
+      {
+        "text": "int и string",
+        "correct": true
+      },
+      {
+        "text": "Ошибка компиляции"
+      }
+    ]
   }
 ]

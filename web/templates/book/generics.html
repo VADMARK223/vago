@@ -1,0 +1,127 @@
+{{ define "book.generics" }}
+<h1>Generics (Обобщения)</h1>
+<p>Generics (обобщения) в Go появились начиная с <b>Go 1.18</b> и сильно упростили написание <b>переиспользуемого и
+    типобезопасного</b> кода — без <code>interface{}</code> и кастов.</p>
+<pre><code class="language-go">func Identity[T any](v T) T {
+    return v
+}</code></pre>
+<p>Когда использовать</p>
+<p>✅ Используй, если:</p>
+<ul>
+    <li>Алгоритм одинаковый</li>
+    <li>Разные типы данных</li>
+    <li>Нужна типобезопасность</li>
+</ul>
+<p>❌ Не используй, если:</p>
+<ul>
+    <li>Разное поведение</li>
+    <li>Логика зависит от типа</li>
+    <li>Можно обойтись интерфейсом</li>
+</ul>
+
+<h2>1. Назначение</h2>
+<p>До generics было два варианта:</p>
+<h3>❌ Дублирование</h3>
+<pre><code class="language-go">func MaxInt(a, b int) int       { if a > b { return a }; return b }
+func MaxFloat(a, b float64) float64 { ... }</code></pre>
+<h3>❌ interface{} + type assertion</h3>
+<pre><code class="language-go">func Max(a, b interface{}) interface{} {
+	ai := a.(int) // 💥 panic если не int
+}</code></pre>
+
+<h2>2. Ограничение типов</h2>
+<p>any — любой тип</p>
+<pre><code class="language-go">func Print[T any](v T) {
+    fmt.Println(v)
+}</code></pre>
+<p>comparable — можно сравнивать <code>== !=</code></p>
+<pre><code class="language-go">func Contains[T comparable](s []T, v T) bool {
+    for _, x := range s {
+        if x == v {
+            return true
+        }
+    }
+    return false
+}</code></pre>
+<p>✔ Работает с:</p>
+<ul>
+    <li>int</li>
+    <li>string</li>
+    <li>struct (если все поля comparable)</li>
+</ul>
+<p>❌ Не работает с:</p>
+<ul>
+    <li>slice</li>
+    <li>map</li>
+    <li>func</li>
+</ul>
+
+<h2>3. Собственные constraints (интерфейсы типов)</h2>
+<p>Пример: числа</p>
+<pre><code class="language-go">type Number interface {
+    int | int64 | float64
+}
+
+func Sum[T Number](a, b T) T {
+    return a + b
+}</code></pre>
+<p>
+    ✔ <code>Sum(1, 2)</code><br>
+    ✔ <code>Sum(1.5, 2.5)</code><br>
+    ❌ <code>Sum("a", "b")</code>
+</p>
+
+<h2>4. Generics + структуры</h2>
+<pre><code class="language-go">type Box[T any] struct {
+    Value T
+}
+
+b := Box[int]{Value: 10}
+s := Box[string]{Value: "hi"}</code></pre>
+
+<p>📌 Очень полезно для:</p>
+<ul>
+    <li>DTO</li>
+    <li>Result / Option</li>
+    <li>Cache</li>
+    <li>Queue / Stack</li>
+</ul>
+
+<h2>5. Методы с generics — ВАЖНО</h2>
+<p>❌ Методы НЕ могут иметь свои параметры типа</p>
+<pre><code class="language-go">func (b Box[T]) Map[R any](f func(T) R) R { ❌ }</code></pre>
+<p>✔ Нужно параметризовать тип, а не метод:</p>
+<pre><code class="language-go">type Box[T any] struct {
+    Value T
+}</code></pre>
+
+<h2>6. Generics vs interface{} — ключевая разница</h2>
+<table>
+    <thead>
+    <tr>
+        <th>interface{}</th>
+        <th>Generics</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Нет проверки типов</td>
+        <td>Проверка на compile-time</td>
+    </tr>
+    <tr>
+        <td>Нужны касты</td>
+        <td>Нет кастов</td>
+    </tr>
+    <tr>
+        <td>Возможен panic</td>
+        <td>Безопасно</td>
+    </tr>
+    <tr>
+        <td>Медленнее</td>
+        <td>Быстрее</td>
+    </tr>
+    </tbody>
+</table>
+
+
+{{ end }}

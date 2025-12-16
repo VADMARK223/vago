@@ -27,6 +27,7 @@ func ShowBook(c *gin.Context) {
 		{ID: 14, Name: "Указатели (Pointers)"},
 		{ID: 16, Name: "Контекст (Context)"},
 		{ID: 17, Name: "Строки (Strings)"},
+		{ID: 18, Name: "Обобщения (Generics)"},
 	}
 
 	bookTasks := []bookChapter{

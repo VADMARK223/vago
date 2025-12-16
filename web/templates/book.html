@@ -51,6 +51,8 @@
                 {{ template "book.context" . }}
             {{ else if eq .chapter_id 17 }}
                 {{ template "book.strings" . }}
+            {{ else if eq .chapter_id 18 }}
+                {{ template "book.generics" . }}
             {{ else if eq .chapter_id 100 }}
                 {{ template "book.cheat" . }}
 
