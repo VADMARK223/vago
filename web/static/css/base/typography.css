@@ -38,6 +38,9 @@ pre code {
 }
 
 pre code.hljs {
+    tab-size: 4;        /* стандарт */
+    -moz-tab-size: 4;  /* Firefox */
+    -o-tab-size: 4;    /* старый Opera */
     padding: var(--space-1) var(--space-2) !important;
 }
 

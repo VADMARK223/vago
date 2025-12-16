@@ -23,7 +23,7 @@
   {
     "topic_id": 2,
     "text": "Что напечатает код?",
-    "code": "s := []int{1, 2, 3}\ns2 := s[:1]       // len=1, cap=3\ns3 := append(s2, 9)\nfmt.Println(s, s3)\n",
+    "code": "s := []int{1, 2, 3}\ns2 := s[:1] // len=1, cap=3\ns3 := append(s2, 9)\nfmt.Println(s, s3)\n",
     "explanation": "append пишет в общую память: срез s тоже меняется.",
     "answers": [
       {
@@ -107,7 +107,7 @@
   {
     "topic_id": 9,
     "text": "Что произойдёт при исполнении?",
-    "code": "ch := make(chan int)\ngo func() {\n    ch \u003c- 10\n}()\nfmt.Println(\u003c-ch)\n",
+    "code": "ch := make(chan int)\ngo func() {\n\tch \u003c- 10\n}()\nfmt.Println(\u003c-ch)\n",
     "explanation": "Обычная синхронная передача данных.",
     "answers": [
       {
@@ -128,7 +128,7 @@
   {
     "topic_id": 4,
     "text": "Что выведет код?",
-    "code": "m := make(map[string]int)\nm[\"a\"] = 1\nfor k := range m {\n    delete(m, k)\n}\nfmt.Println(len(m))\n",
+    "code": "m := make(map[string]int)\nm[\"a\"] = 1\nfor k := range m {\n\tdelete(m, k)\n}\nfmt.Println(len(m))\n",
     "explanation": "Go допускает удаление элементов из map во время итерации.",
     "answers": [
       {
@@ -1894,7 +1894,7 @@
   {
     "topic_id": 18,
     "text": "Что выведет программа?",
-    "code": "func Print[T any](v T) {\r\n    fmt.Printf(\"%T\\n\", v)\r\n}\r\n\r\nPrint(10)\r\nPrint(\"hi\")",
+    "code": "func Print[T any](v T) {\r\n\tfmt.Printf(\"%T\\n\", v)\r\n}\r\n\r\nPrint(10)\r\nPrint(\"hi\")",
     "explanation": "Generic подставляет конкретный тип, не стирая его",
     "answers": [
       {
@@ -1909,6 +1909,90 @@
       },
       {
         "text": "Ошибка компиляции"
+      }
+    ]
+  },
+  {
+    "topic_id": 11,
+    "text": "Что выведет программа?",
+    "code": "func main() {\r\n\tfmt.Println(\"Start\")\r\n\tsafe()\r\n\tfmt.Println(\"End\")\r\n}\r\nfunc safe() {\r\n\tdefer fmt.Println(\"Defer1\")\r\n\tdefer func() {\r\n\t\tif r := recover(); r != nil {\r\n\t\t\tfmt.Println(\"Recovered\")\r\n        }\r\n\t}()\r\n\tdefer fmt.Println(\"Defer2\")\r\n\tpanic(\"Boom\")\r\n}",
+    "explanation": "Defer выполняются в обратном порядке.",
+    "answers": [
+      {
+        "text": "Start Defer2 Recovered Defer1 End",
+        "correct": true
+      },
+      {
+        "text": "Start Defer1 Recovered Defer2 End"
+      },
+      {
+        "text": "Start Recovered Defer2 Defer1 End"
+      },
+      {
+        "text": "Start Recovered End"
+      }
+    ]
+  },
+  {
+    "topic_id": 11,
+    "text": "Будет ли программа падать?",
+    "code": "func main() {\r\n\tgo worker()\r\n\tfmt.Println(\"main done\")\r\n}\r\n\r\nfunc worker() {\r\n\tdefer func() {\r\n\t\tif r := recover(); r != nil {\r\n\t\t\tfmt.Println(\"worker recovered:\", r)\r\n\t\t}\r\n\t}()\r\n\r\n\tpanic(\"goroutine panic\")\r\n}",
+    "explanation": "main завершится, процесс остановится, вывод из worker может не появиться",
+    "answers": [
+      {
+        "text": "Программа упадёт из-за panic"
+      },
+      {
+        "text": "Panic будет пойман, но main завершит процесс",
+        "correct": true
+      },
+      {
+        "text": "Программа зависнет"
+      },
+      {
+        "text": "Recover не сработает"
+      }
+    ]
+  },
+  {
+    "topic_id": 11,
+    "text": "Что выведет код?",
+    "code": "defer fmt.Println(\"defer\")\r\ndefer func() {\r\n    fmt.Println(\"end\")\r\n    if err := recover(); err != nil {\r\n        fmt.Println(\"covered\")\r\n    }\r\n}()\r\nfmt.Println(\"start\")\r\npanic(\"panic\")",
+    "explanation": "Паника отловлена, defer выполняются в обратном порядке.",
+    "answers": [
+      {
+        "text": "start end covered defer",
+        "correct": true
+      },
+      {
+        "text": "start defer end covered"
+      },
+      {
+        "text": "start defer covered end"
+      },
+      {
+        "text": "start covered end defer"
+      }
+    ]
+  },
+  {
+    "topic_id": 11,
+    "text": "Что выведет код?",
+    "code": "func tryRecover() {\r\n\tif err := recover(); err != nil {\r\n\t\tfmt.Println(\"covered\")\r\n\t}\r\n}\r\n\r\nfunc main() {\r\n\tdefer fmt.Println(\"defer\")\r\n\tdefer func() {\r\n\t\tfmt.Println(\"end\")\r\n\t\ttryRecover()\r\n\t}()\r\n\tfmt.Println(\"start\")\r\n\tpanic(\"panic\")\r\n}",
+    "explanation": "recover() работает ТОЛЬКО если он вызван НЕПОСРЕДСТВЕННО внутри defer-функции",
+    "answers": [
+      {
+        "text": "start end covered defer"
+      },
+      {
+        "text": "start end defer",
+        "correct": true
+      },
+      {
+        "text": "start defer covered end"
+      },
+      {
+        "text": "start covered end"
       }
     ]
   }

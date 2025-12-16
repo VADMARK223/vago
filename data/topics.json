@@ -9,7 +9,7 @@
   {"id": 8, "name": "Планировщик"},
   {"id": 9, "name": "Каналы (Channels)"},
   {"id": 10, "name": "Синхронизация"},
-  {"id": 11, "name": "Ошибки (Errors)"},
+  {"id": 11, "name": "Ошибки и паники (Error and panics)"},
   {"id": 12, "name": "Defer"},
   {"id": 13, "name": "Стек и куча"},
   {"id": 14, "name": "Указатели (Pointers)"},
