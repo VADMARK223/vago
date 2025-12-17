@@ -1,5 +1,6 @@
 {{ define "task.sandbox" }}
 <h1>Песочница</h1>
+<a href="#strings">Задачи по строкам</a>
 <h2>Slices</h2>
 <p>Написать программу, которая возвращает слайс с заданным количеством случайных уникальных чисел</p>
 <pre><code class="language-go">func main() {
@@ -28,7 +29,8 @@ func uniqRandom(n, max int) []int {
 	return result
 }</code></pre>
 
-<h2>Strings</h2>
+<h2 id="strings">Strings</h2>
+<h3>Задача 1</h3>
 <p>Написать функцию, которая разворачивает строку.<code>func reverse(s string) string</code></p>
 <pre><code class="language-go">func main() {
 	fmt.Println("result:", reverse("вадим"))
@@ -62,5 +64,27 @@ func reverse(s string) string {
 	return string(r)
 }
 </code></pre>
+<h3>Задача 2</h3>
+<p>Удалить все повторяющиеся символы из строки, сохранив порядок.<code>func unique(s string) string </code></p>
+<pre><code class="language-go">func main() {
+	fmt.Println("result:", unique("вваааддиииммм"))
+}
+
+func unique(s string) string {
+	runes := []rune(s)
+	seen := make(map[rune]struct{}, len(runes))
+	var result strings.Builder
+	result.Grow(len(runes)) // Необязательная оптимизация
+
+	for _, r := range runes { // Можно идти и по s
+		_, ok := seen[r]
+		if !ok {
+			seen[r] = struct{}{}
+			result.WriteRune(r)
+		}
+	}
+
+	return result.String() // вадим
+}</code></pre>
 
 {{ end }}

@@ -1,5 +1,6 @@
 {{ define "book.errors" }}
 <h1>Ошибки и паники</h1>
+<a href="#panic">Раздел panic</a>
 <p>В Go ошибка — это обычное значение, а не исключение.</p>
 <pre><code class="language-go">type error interface {
     Error() string
@@ -77,7 +78,7 @@ if errors.As(err, &pathErr) {
 <p>Используй, когда важны детали структуры ошибки.</p>
 
 <hr/>
-<h2>Panic</h2>
+<h2 id="panic">Panic</h2>
 <p><code>panic</code> — это <b>аварийное завершение нормального потока выполнения</b>.</p>
 <pre><code class="language-go">panic("something went wrong")</code></pre>
 <p>После <code>panic</code>:</p>

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 )
 
 // strings1 Напиши функцию, которая разворачивает строку. func reverse(s string) string
@@ -27,4 +28,26 @@ func reverse(s string) string {
 	}
 
 	return string(result)
+}
+
+// Удалить все повторяющиеся символы из строки, сохранив порядок.
+func strings2() {
+	fmt.Println("result:", unique("вваааддиииммм"))
+}
+
+func unique(s string) string {
+	runes := []rune(s)
+	seen := make(map[rune]struct{}, len(runes))
+	var result strings.Builder
+	result.Grow(len(runes)) // Необязательная оптимизация
+
+	for _, r := range runes { // Можно идти и по s
+		_, ok := seen[r]
+		if !ok {
+			seen[r] = struct{}{}
+			result.WriteRune(r)
+		}
+	}
+
+	return result.String()
 }
