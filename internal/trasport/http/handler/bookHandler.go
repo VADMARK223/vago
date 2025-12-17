@@ -31,8 +31,9 @@ func ShowBook(c *gin.Context) {
 	}
 
 	bookTasks := []bookChapter{
-		{ID: -1, Name: "Задача 1"},
+		{ID: -1, Name: "Песочница"},
 		{ID: -2, Name: "Fan-out / Fan-in"},
+		{ID: -3, Name: "Контроль долго выполняющейся функции"},
 	}
 
 	var (

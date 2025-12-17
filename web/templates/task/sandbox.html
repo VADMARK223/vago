@@ -1,0 +1,66 @@
+{{ define "task.sandbox" }}
+<h1>Песочница</h1>
+<h2>Slices</h2>
+<p>Написать программу, которая возвращает слайс с заданным количеством случайных уникальных чисел</p>
+<pre><code class="language-go">func main() {
+	fmt.Println(uniqRandom(10, 11))
+}
+
+func uniqRandom(n, max int) []int {
+	if n > max {
+		panic("n > max будет бесконечный цикл")
+	}
+    // Результирующий срез (резервируем емкость, чтобы избежать аллокаций базового массива)
+	result := make([]int, 0, n)
+    // Срез для кеширования чисел
+	memory := make(map[int]struct{}, n)
+
+	for len(result) < n {
+		val := rand.IntN(max)
+		if _, ok := memory[val]; ok {
+			continue
+		} else {
+			memory[val] = struct{}{}
+			result = append(result, val)
+		}
+	}
+
+	return result
+}</code></pre>
+
+<h2>Strings</h2>
+<p>Написать функцию, которая разворачивает строку.<code>func reverse(s string) string</code></p>
+<pre><code class="language-go">func main() {
+	fmt.Println("result:", reverse("вадим"))
+}
+
+func reverse(s string) string {
+	runes := []rune(s)
+	fmt.Println("Кол-во байтов в строке: ", len(s))     // 10
+	fmt.Println("Кол-во rune (символов): ", len(runes)) // 5
+
+	// Понятный вариант:
+	var result = make([]rune, 0, len(runes))
+	for i := len(runes) - 1; i >= 0; i-- {
+		result = append(result, runes[i])
+	}
+
+	// Можно короче:
+	/*var result = make([]rune, len(runes))
+	for i := range runes {
+		result[len(runes)-1-i] = runes[i]
+	}*/
+
+	return string(result)
+}</code></pre>
+<p>Более компактный</p>
+<pre><code class="language-go">func reverse(s string) string {
+	r := []rune(s)
+	for i, j := 0, len(r)-1; i < j; i, j = i+1, j-1 {
+		r[i], r[j] = r[j], r[i]
+	}
+	return string(r)
+}
+</code></pre>
+
+{{ end }}

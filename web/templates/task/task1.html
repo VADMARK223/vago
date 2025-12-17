@@ -13,7 +13,8 @@ go func(readCh chan<- string) {
     select {
     case readCh <- result:
         fmt.Println("Получен результат в горутине:", result)
-    case <-ctx.Done(): // Защита от блокировки на отправку, если главный поток уже вышел по cxt.Done()
+    // Защита от блокировки на отправку, если главный поток уже вышел по cxt.Done()
+    case <-ctx.Done():
         fmt.Println("Контекст выполнился, завершаем горутину.")
     }
 }(ch)

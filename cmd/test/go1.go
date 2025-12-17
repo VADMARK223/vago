@@ -16,7 +16,7 @@ func getText() string {
 	return "VADMARK"
 }
 
-func Run() {
+func RunGo1() {
 	ch := make(chan string, 1)
 	ctx, cancel := context.WithTimeout(context.Background(), waitTime)
 	defer cancel()

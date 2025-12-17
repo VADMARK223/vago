@@ -57,9 +57,11 @@
                 {{ template "book.cheat" . }}
 
             {{ else if eq .chapter_id -1 }}
-                {{ template "task.go1" . }}
+                {{ template "task.sandbox" . }}
             {{ else if eq .chapter_id -2 }}
                 {{ template "task.fan" . }}
+            {{ else if eq .chapter_id -3 }}
+                {{ template "task.go1" . }}
             {{ else }}
                 {{ range .chapters }}
                     <a href="/book?chapter_id={{ .ID }}">{{ if not .HideID }}{{ .ID }}. {{ end }} {{ .Name }}</a><br>
