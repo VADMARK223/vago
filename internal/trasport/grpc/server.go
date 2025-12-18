@@ -77,10 +77,6 @@ func NewServer(ctx *app.Context, grpcPort, grpcWebPort string, provider *token.J
 			if corsAllowedOrigins[origin] {
 				w.Header().Set("Access-Control-Allow-Origin", origin)
 				w.Header().Set("Vary", "Origin")
-			} else {
-				ctx.Log.Infow("BAD")
-				ctx.Log.Infow("test", "origin", origin)
-				ctx.Log.Infow("test", "corsAllowedOrigins", corsAllowedOrigins)
 			}
 			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 			w.Header().Set("Access-Control-Allow-Headers",

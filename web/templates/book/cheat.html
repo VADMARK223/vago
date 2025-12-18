@@ -1,5 +1,39 @@
 {{ define "book.cheat" }}
 <h1>Шпаргалка</h1>
+<h2>Каналы</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Операция</th>
+        <th>Открытый</th>
+        <th>Закрытый</th>
+        <th>Неинициализированный</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Чтение</td>
+        <td><span class="orange">блокировка до прихода значения или закрытия канала</span></td>
+        <td><span class="green">вернет zero value</span></td>
+        <td><span class="red">блокировка навсегда</span></td>
+    </tr>
+    <tr>
+        <td>Запись</td>
+        <td><span class="orange">блокировка до прихода читателя (или до освобождения места в буфере( для буф. каналов))</span></td>
+        <td><span class="red">panic</span></td>
+        <td><span class="red">блокировка навсегда</span></td>
+    </tr>
+    <tr>
+        <td>Закрытие</td>
+        <td><span class="green">канал закроется</span></td>
+        <td><span class="red">panic</span></td>
+        <td><span class="red">panic</span></td>
+    </tr>
+    </tbody>
+</table>
+
+
+
 <h2>Форматирующие глаголы (format verbs)</h2>
 <table>
     <thead>

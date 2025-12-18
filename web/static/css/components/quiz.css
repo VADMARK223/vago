@@ -26,11 +26,11 @@
 }
 
 #result.ok {
-    color: #4CAF50;
+    color: var(--green);
 }
 
 #result.bad {
-    color: #F44336;
+    color: var(--red);
 }
 
 .hidden {

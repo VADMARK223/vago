@@ -9,9 +9,12 @@
     --text: #a9b7c6;
     --accent: #6897bb;
     --accent-strong: #4e94ce;
-    --orange: #cc7832;
+    --orange: #ffb347;
     --error: #d9534f;
     --danger: #c94f4f;
+
+    --green: #4CAF50;
+    --red: #F44336;
 
     --layout-min-width: 320px;
     --layout-max-width: 870px;

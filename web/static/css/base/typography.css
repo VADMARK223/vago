@@ -15,20 +15,6 @@ ol {
 
 pre {
     padding: 0;
-    /*padding: 14px 16px;
-    border-radius: 12px;
-    overflow: auto;
-    font-size: 14px;
-    line-height: 1.5;*/
-    /*background: #2b2d30;
-    padding: 12px;
-    border-radius: 6px;
-    overflow-x: auto;
-    color: #a9b7c6;
-    font-size: 14px;
-    line-height: 1.4;
-    border: 1px solid #4b4e50;
-    margin: 10px 0;*/
 }
 
 pre code {
@@ -59,8 +45,20 @@ hr {
 }
 
 blockquote.note {
-    border-left: 4px solid #ffb347;
+    border-left: 4px solid var(--orange);
     padding-left: 12px;
     margin-left: 0;
     font-style: italic;
+}
+
+.orange {
+    color: var(--orange);
+}
+
+.green {
+    color: var(--green);
+}
+
+.red {
+    color: var(--red);
 }

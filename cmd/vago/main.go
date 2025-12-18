@@ -221,6 +221,7 @@ func startHTTPServer(ctx context.Context, appCtx *ctx.Context, wg *sync.WaitGrou
 }
 
 func loadEnv() {
+	log.SetOutput(os.Stdout)
 	env := os.Getenv("APP_ENV")
 	if env == "" {
 		env = code.Local // по умолчанию, если не задано
