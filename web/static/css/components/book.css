@@ -1,0 +1,10 @@
+.chapter {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem; /*1rem = font-size у html*/
+}
+
+.chapter h1 {
+    /*1em = размер шрифта текущего элемента*/
+    font-size: 1.8em;
+}

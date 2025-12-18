@@ -1995,5 +1995,295 @@
         "text": "start covered end"
       }
     ]
+  },
+  {
+    "topic_id": 4,
+    "text": "Что выведет код?",
+    "code": "m := map[string]int{\r\n\t\"a\": 1,\r\n\t\"b\": 2,\r\n\t\"c\": 3,\r\n}\r\n\r\nfor k, v := range m {\r\n\tif v%2 == 1 {\r\n\t\tdelete(m, k)\r\n\t}\r\n}\r\n\r\nfmt.Println(len(m))",
+    "explanation": "Удаление элементов во время итерации разрешено и безопасно.\r\nУдаляются \"a\" и \"c\" (нечётные значения), остаётся только \"b\".",
+    "answers": [
+      {
+        "text": "0"
+      },
+      {
+        "text": "1",
+        "correct": true
+      },
+      {
+        "text": "2"
+      },
+      {
+        "text": "panic"
+      }
+    ]
+  },
+  {
+    "topic_id": 4,
+    "text": "Что выведет код?",
+    "code": "m := map[string]int{\r\n\t\"a\": 1,\r\n\t\"b\": 2,\r\n}\r\n\r\ncount := 0\r\nfor k := range m {\r\n\tcount++\r\n\tm[\"x\"+k] = 10\r\n}\r\n\r\nfmt.Println(count, len(m))",
+    "explanation": "range гарантированно пройдёт только по элементам, существовавшим в начале итерации.\r\nНовые ключи (\"xa\", \"xb\") могут не быть пройдены, но они будут добавлены в map.",
+    "answers": [
+      {
+        "text": "2 4",
+        "correct": true
+      },
+      {
+        "text": "4 4"
+      },
+      {
+        "text": "2 2"
+      },
+      {
+        "text": "panic"
+      }
+    ]
+  },
+  {
+    "topic_id": 4,
+    "text": "Что выведет код?",
+    "code": "m := map[string]int{\r\n\t\"a\": 1,\r\n\t\"b\": 2,\r\n}\r\n\r\nfor k := range m {\r\n\tm[k] = m[k] * 10\r\n}\r\n\r\nfmt.Println(m[\"a\"], m[\"b\"])",
+    "explanation": "Обновление значения существующего ключа во время range полностью безопасно и детерминировано.",
+    "answers": [
+      {
+        "text": "1 2"
+      },
+      {
+        "text": "10 20",
+        "correct": true
+      },
+      {
+        "text": "неопределено"
+      },
+      {
+        "text": "panic"
+      }
+    ]
+  },
+  {
+    "topic_id": 4,
+    "text": "Что выведет код?",
+    "code": "m := map[int]int{\r\n\t1: 1,\r\n\t2: 2,\r\n}\r\n\r\ngo func() {\r\n\tfor k := range m {\r\n\t\tfmt.Println(k)\r\n\t}\r\n}()\r\n\r\nm[3] = 3\r\ntime.Sleep(time.Second)\r\n",
+    "explanation": "Одновременная итерация и запись в map из разных горутин →\r\nfatal error: concurrent map iteration and map write.\r\n\r\nКомпилятор это не ловит, ошибка возникает в рантайме.",
+    "answers": [
+      {
+        "text": "всё нормально"
+      },
+      {
+        "text": "может быть panic"
+      },
+      {
+        "text": "всегда panic",
+        "correct": true
+      },
+      {
+        "text": "компилятор не позволит"
+      }
+    ]
+  },
+  {
+    "topic_id": 4,
+    "text": "Что выведет код?",
+    "code": "m := map[string]int{\r\n\t\"a\": 1,\r\n\t\"b\": 2,\r\n}\r\n\r\nfor k := range m {\r\n\tif k == \"a\" {\r\n\t\tdelete(m, \"b\")\r\n\t}\r\n}\r\n\r\nfmt.Println(m)\r\n",
+    "explanation": "Удалять любой ключ во время range разрешено, не только текущий.\r\nКлюч \"b\" будет удалён корректно, panic не будет.",
+    "answers": [
+      {
+        "text": "map[a:1]",
+        "correct": true
+      },
+      {
+        "text": "map[a:1 b:2]"
+      },
+      {
+        "text": "пустая map"
+      },
+      {
+        "text": "panic"
+      }
+    ]
+  },
+  {
+    "topic_id": 3,
+    "text": "Что из перечисленного является корректным объявлением массива?",
+    "explanation": "В Go сначала идёт длина в квадратных скобках, потом тип: [3]int.",
+    "answers": [
+      {
+        "text": "var a []int{1,2,3}"
+      },
+      {
+        "text": "a := [3]int{1,2,3}",
+        "correct": true
+      },
+      {
+        "text": "a := int[3]{1,2,3}"
+      },
+      {
+        "text": "var a int[3]"
+      }
+    ]
+  },
+  {
+    "topic_id": 3,
+    "text": "Что произойдёт?",
+    "code": "var a [3]int\r\nfmt.Println(a)",
+    "explanation": "Массив инициализируется нулевыми значениями типа.",
+    "answers": [
+      {
+        "text": "panic"
+      },
+      {
+        "text": "[nil nil nil]"
+      },
+      {
+        "text": "[0 0 0]",
+        "correct": true
+      },
+      {
+        "text": "Ошибка компиляции"
+      }
+    ]
+  },
+  {
+    "topic_id": 3,
+    "text": "Являются ли [3]int и [4]int одним типом?",
+    "explanation": "Длина массива — часть типа.",
+    "answers": [
+      {
+        "text": "Да"
+      },
+      {
+        "text": "Нет",
+        "correct": true
+      },
+      {
+        "text": "Только при одинаковых значениях"
+      },
+      {
+        "text": "Зависит от архитектуры"
+      }
+    ]
+  },
+  {
+    "topic_id": 3,
+    "text": "Что выведет код?",
+    "code": "a := [3]int{1, 2, 3}\r\nb := a\r\nb[0] = 100\r\nfmt.Println(a)",
+    "explanation": "Присваивание массива копирует его целиком.",
+    "answers": [
+      {
+        "text": "[100 2 3]"
+      },
+      {
+        "text": "[1 2 3]",
+        "correct": true
+      },
+      {
+        "text": "[0 2 3]"
+      },
+      {
+        "text": "panic"
+      }
+    ]
+  },
+  {
+    "topic_id": 3,
+    "text": "Что произойдёт при передаче массива в функцию?",
+    "code": "func f(a [3]int) {\r\n\ta[0] = 9\r\n}",
+    "explanation": "Массив передаётся по значению (копируется).",
+    "answers": [
+      {
+        "text": "Изменится оригинальный массив"
+      },
+      {
+        "text": "Изменится только первый элемент"
+      },
+      {
+        "text": "Изменения не выйдут наружу",
+        "correct": true
+      },
+      {
+        "text": "panic"
+      }
+    ]
+  },
+  {
+    "topic_id": 3,
+    "text": "Как правильно изменить массив внутри функции?",
+    "explanation": "Указатель на массив позволяет изменить оригинал.",
+    "answers": [
+      {
+        "text": "Передать []int"
+      },
+      {
+        "text": "Передать *[3]int",
+        "correct": true
+      },
+      {
+        "text": "Использовать copy()"
+      },
+      {
+        "text": "Это невозможно"
+      }
+    ]
+  },
+  {
+    "topic_id": 3,
+    "text": "Что выведет код?",
+    "code": "a := [...]int{1, 2, 3, 4}\r\nfmt.Println(len(a))",
+    "explanation": "... позволяет компилятору вывести длину массива.",
+    "answers": [
+      {
+        "text": "3"
+      },
+      {
+        "text": "4",
+        "correct": true
+      },
+      {
+        "text": "0"
+      },
+      {
+        "text": "Ошибка компиляции"
+      }
+    ]
+  },
+  {
+    "topic_id": 3,
+    "text": "Что произойдёт?",
+    "code": "a := [3]int{1, 2, 3}\r\nfmt.Println(a[3])",
+    "explanation": "Проверка границ происходит во время выполнения.",
+    "answers": [
+      {
+        "text": "Выведет 0"
+      },
+      {
+        "text": "panic",
+        "correct": true
+      },
+      {
+        "text": "nil"
+      },
+      {
+        "text": "Ошибка компиляции"
+      }
+    ]
+  },
+  {
+    "topic_id": 3,
+    "text": "Почему массивы редко используют напрямую в Go?",
+    "explanation": "Фиксированный размер делает массивы неудобными — чаще используют срезы.",
+    "answers": [
+      {
+        "text": "Они медленные"
+      },
+      {
+        "text": "Их нельзя передавать в функции"
+      },
+      {
+        "text": "У них фиксированный размер",
+        "correct": true
+      },
+      {
+        "text": "Они не поддерживаются стандартной библиотекой"
+      }
+    ]
   }
 ]
