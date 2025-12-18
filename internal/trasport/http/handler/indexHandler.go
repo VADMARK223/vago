@@ -11,6 +11,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const version = "0.6.0"
+
 func ShowIndex(provider *token.JWTProvider) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		capture := "Vago портал"
@@ -21,7 +23,7 @@ func ShowIndex(provider *token.JWTProvider) gin.HandlerFunc {
 
 		updateTokenInfo(c, data)
 		updateRefreshTokenInfo(c, data, provider)
-
+		data["version"] = version
 		c.HTML(http.StatusOK, "index.html", data)
 	}
 }

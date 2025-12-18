@@ -1,0 +1,14 @@
+{{ define "book.common.context" }}
+<p>Контекст может координировать отмены горутин</p>
+<pre><code class="language-go">ctx, cancel := context.WithCancel(context.Background())
+
+go func() {
+    select {
+    case <-ctx.Done():
+        return
+    }
+}()
+
+cancel()</code></pre>
+<p>📌 <code>context</code> не о <b>защите данных</b>, а о <b>жизненном цикле горутин</b></p>
+{{ end }}

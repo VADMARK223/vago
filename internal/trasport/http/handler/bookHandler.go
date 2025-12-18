@@ -23,12 +23,14 @@ func ShowBook(c *gin.Context) {
 		{ID: 3, Name: "Массивы (Array)"},
 		{ID: 4, Name: "Карты (Maps)"},
 		{ID: 9, Name: "Каналы (Channels)"},
+		{ID: 10, Name: "Синхронизация (Sync)"},
 		{ID: 11, Name: "Ошибки и паники (Error and panics)"},
 		{ID: 12, Name: "Defer"},
 		{ID: 14, Name: "Указатели (Pointers)"},
 		{ID: 16, Name: "Контекст (Context)"},
 		{ID: 17, Name: "Строки (Strings)"},
 		{ID: 18, Name: "Обобщения (Generics)"},
+		{ID: 19, Name: "Мультиплексор событий Select"},
 	}
 
 	bookTasks := []bookChapter{

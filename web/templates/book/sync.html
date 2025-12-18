@@ -1,0 +1,211 @@
+{{ define "book.sync" }}
+<h1>Синхронизация</h1>
+<a href="#mutex">sync.Mutex (RWMutex)</a>
+<a href="#waitGroup">sync.WaitGroup</a>
+<a href="#atomic">Атомики</a>
+<a href="/book?chapter_id=16">Раздел: 16. "Контекст (Context)"</a>
+<a href="#package_sync">Пакет sync</a>
+<a href="#classic_problems">Классические проблемы</a>
+<p><b>Синхронизация в Go</b> — это набор механизмов, которые позволяют <b>безопасно координировать работу горутин и
+    защищать общие данные</b> от гонок.</p>
+<hr>
+<h2>Зачем вообще нужна синхронизация</h2>
+<p>Если несколько горутин:</p>
+<ul>
+    <li>читают и пишут <b>одну переменную</b></li>
+    <li>работают с <b>общей структурой данных</b></li>
+    <li>должны <b>дождаться друг друга</b></li>
+</ul>
+<p>→ без синхронизации получишь <b>data race</b>, неопределённое поведение или падения.</p>
+
+<h2 id="mutex">sync.Mutex</h2>
+<p>В один момент времени <b>только одна горутина</b> может войти в критическую секцию.</p>
+<pre><code class="language-go">var mu sync.Mutex
+var counter int
+
+func inc() {
+    mu.Lock()
+    counter++
+    mu.Unlock()
+}
+
+// Хорошая практика
+func inc1() {
+    defer mu.Unlock()
+    mu.Lock()
+    counter++
+}
+</code></pre>
+<p>Важно помнить</p>
+<ul>
+    <li><code>Lock()</code> блокирует <b>горутины</b>, не потоки</li>
+    <li>Забытый <code>Unlock()</code> = дедлок</li>
+    <li>❌ Нельзя копировать <code>Mutex</code></li>
+</ul>
+
+<h3>sync.RWMutex</h3>
+<p>Когда нужен</p>
+<ul>
+    <li>Много чтений</li>
+    <li>Редкие записи</li>
+</ul>
+<pre><code class="language-go">var mu sync.RWMutex
+var data map[string]int
+
+func read(k string) int {
+    mu.RLock()
+    defer mu.RUnlock()
+    return data[k]
+}
+
+func write(k string, v int) {
+    mu.Lock()
+    defer mu.Unlock()
+    data[k] = v
+}
+</code></pre>
+<p>Подводные камни</p>
+<ul>
+    <li>Писатели блокируют всех</li>
+    <li>Не апгрейдится <code>RLock → Lock</code></li>
+</ul>
+
+<h2 id="waitGroup">sync.WaitGroup</h2>
+<p>Позволяет дождаться горутины</p>
+<pre><code class="language-go">var wg sync.WaitGroup
+
+for i := 0; i < 3; i++ {
+    wg.Add(1)
+    go func(i int) {
+        defer wg.Done()
+        fmt.Println(i)
+    }(i)
+}
+
+wg.Wait()</code></pre>
+<p>Частые ошибки</p>
+<ul>
+    <li>❌ <code>Add()</code> внутри горутины</li>
+    <li>❌ <code>Done()</code> забыли</li>
+    <li>❌ отрицательный счётчик</li>
+</ul>
+
+<h2 id="atomic">Атомики</h2>
+<pre><code class="language-go">var x int64
+atomic.AddInt64(&x, 1)
+</code></pre>
+<p>Ограничения</p>
+<ul>
+    <li>только примитивы</li>
+    <li>нет композиции операций</li>
+    <li>сложно читать и поддерживать</li>
+</ul>
+
+<h2>Context - координация отмены</h2>
+<a href="/book?chapter_id=16">Раздел: 16. "Контекст (Context)"</a>
+{{ template "book.common.context" . }}
+
+<h2>Каналы как синхронизация</h2>
+<h3>Канал = блокировка + передача данных</h3>
+<pre><code class="language-go">ch := make(chan int)
+
+go func() {
+    ch <- 42 // блокируется пока не прочитают
+}()
+
+v := <-ch</code></pre>
+
+<h3>Канал вместо Mutex</h3>
+<pre><code class="language-go">type Counter struct {
+    inc chan struct{}
+    val chan int
+}
+
+func NewCounter() *Counter {
+    c := &Counter{
+        inc: make(chan struct{}),
+        val: make(chan int),
+    }
+    go c.loop()
+    return c
+}
+
+func (c *Counter) loop() {
+    var n int
+    for {
+        select {
+        case <-c.inc:
+            n++
+        case c.val <- n:
+        }
+    }
+}</code></pre>
+
+<h2 id="package_sync">Пакет sync</h2>
+<h3>sync.Once — выполнить ровно один раз</h3>
+<pre><code class="language-go">var once sync.Once
+
+func initConfig() {
+    once.Do(func() {
+        fmt.Println("init")
+    })
+}</code></pre>
+<p>Используется для:</p>
+<ul>
+    <li>lazy init</li>
+    <li>singleton</li>
+    <li>инициализации кэша</li>
+</ul>
+<h3>sync.Cond — условные переменные (редко, но мощно)</h3>
+<pre><code class="language-go">cond := sync.NewCond(&sync.Mutex{})
+ready := false
+
+go func() {
+    cond.L.Lock()
+    ready = true
+    cond.Signal()
+    cond.L.Unlock()
+}()
+
+cond.L.Lock()
+for !ready {
+    cond.Wait()
+}
+cond.L.Unlock()</code></pre>
+<p>📌 Используй, когда:</p>
+<ul>
+    <li>есть сложные условия</li>
+    <li>каналы становятся неудобными</li>
+</ul>
+
+<h2 id="classic_problems">🔥 Классические проблемы</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Проблема</th>
+        <th>Причина</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Data race</td>
+        <td>нет синхронизации</td>
+    </tr>
+    <tr>
+        <td>Deadlock</td>
+        <td>забыли Unlock / циклическая блокировка</td>
+    </tr>
+    <tr>
+        <td>Livelock</td>
+        <td>горутины мешают друг другу</td>
+    </tr>
+    <tr>
+        <td>Starvation</td>
+        <td>RWMutex, приоритет читателей</td>
+    </tr>
+    </tbody>
+</table>
+<p>Проверка:</p>
+<pre><code class="language-go">go test -race</code></pre>
+
+{{ end }}
