@@ -49,6 +49,8 @@
                 {{ template "book.functions" . }}
                 {{ else if eq .chapter_id 6 }}
                 {{ template "book.interfaces" . }}
+                {{ else if eq .chapter_id 7 }}
+                {{ template "book.goroutines" . }}
                 {{ else if eq .chapter_id 9 }}
                 {{ template "book.channels" . }}
                 {{ else if eq .chapter_id 10 }}

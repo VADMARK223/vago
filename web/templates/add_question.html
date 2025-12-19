@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <title>Админка викторины</title>
     <link rel="stylesheet" href="/static/css/index.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/darcula.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/go/go.min.js"></script>
+    <link rel="stylesheet" href="/static/css/lib/codemirror.min.css">
+    <link rel="stylesheet" href="/static/css/lib/darcula.min.css">
+    <script src="/static/js/lib/codemirror.min.js"></script>
+    <script src="/static/js/lib/go.min.js"></script>
 </head>
 <body>
 {{ template "header" . }}
@@ -19,12 +19,12 @@
                 <div style="display: flex; flex-direction: column; align-items: start; gap: 4px; width: 100%;">
                     <div style="display: flex; align-items: center; justify-content: start; gap: 4px; width: 100%;">
                         <button class="btn" id="questionsSeedBtn">Questions seed</button>
-                        <span>Вопросов: {{.questions_count}}</span>
                         <form class="form-add" action="/runTopicsSeed" method="POST">
                             <div>
-                                <button type="submit" class="btn">Topics seed</button>
+                                <button type="submit" class="btn btn-danger">Topics seed</button>
                             </div>
                         </form>
+                        <span>Вопросов: {{.questions_count}}</span>
                     </div>
 
                     <div style="width: 100%;">
@@ -72,7 +72,7 @@
 
                             <div style="display: flex; align-items: center; justify-content: start; gap: 4px; width: 100%;">
                                 <span>Правильный:</span>
-                                <label>
+                                <label style="flex: 1;">
                                     <select id="correctAnswer" name="correct_answer_index" required>
                                         <option value="" disabled selected>Выберите</option>
                                         <option value="0">Ответ 1</option>
@@ -83,11 +83,11 @@
                                 </label>
 
                                 <span>Тема:</span>
-                                <label>
+                                <label style="flex: 1;">
                                     <select id="topic" name="topic_id" required>
                                         <option value="" disabled selected>Выберите</option>
                                         {{ range .topics }}
-                                        <option value="{{ .ID }}">{{ .Name }}</option>
+                                        <option value="{{ .ID }}">{{ .ID }}. {{ .Name }}</option>
                                         {{ end }}
                                     </select>
                                 </label>

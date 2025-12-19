@@ -24,6 +24,7 @@ func ShowBook(c *gin.Context) {
 		{ID: 4, Name: "Карты (Maps)"},
 		{ID: 5, Name: "Функции и методы (Functions and methods)"},
 		{ID: 6, Name: "Интерфейсы (Interfaces)"},
+		{ID: 7, Name: "Горутины (Goroutines)"},
 		{ID: 9, Name: "Каналы (Channels)"},
 		{ID: 10, Name: "Синхронизация (Sync)"},
 		{ID: 11, Name: "Ошибки и паники (Error and panics)"},
