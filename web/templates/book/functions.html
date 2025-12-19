@@ -1,0 +1,143 @@
+{{ define "book.functions" }}
+<h1>Функции и методы</h1>
+<a href="#functions">Функции</a>
+<a href="#methods">Методы</a>
+<h2 id="functions">Функции</h2>
+<p>Функции в Go — это один из ключевых строительных блоков языка.</p>
+<h3>Базовый синтаксис функции</h3>
+<pre><code class="language-go">func add(a int, b int) int {
+	return a + b
+}</code></pre>
+<ul>
+    <li><code>func</code> — ключевое слово</li>
+    <li>имя функции — <code>add</code></li>
+    <li>параметры: <code>(a int, b int)</code></li>
+    <li>тип возвращаемого значения — <code>int</code></li>
+    <li><code>return</code> обязателен, если есть возвращаемое значение</li>
+</ul>
+<p>Сокращение типов параметров:</p>
+<pre><code class="language-go">func add(a, b int) int {
+	return a + b
+}</code></pre>
+<h3>Функция без возвращаемого значения</h3>
+<pre><code class="language-go">func printHello() {
+	fmt.Println("Hello")
+}</code></pre>
+<p>тип возврата отсутствует → <code>void</code> по сути</p>
+<h3>Несколько возвращаемых значений</h3>
+<pre><code class="language-go">func divide(a, b int) (int, error) {
+	if b == 0 {
+		return 0, errors.New("division by zero")
+	}
+	return a / b, nil
+}</code></pre>
+<p>Использование:</p>
+<pre><code class="language-go">res, err := divide(10, 2)
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Println(res)</code></pre>
+<p><b>💡 Идеология Go:</b></p>
+<blockquote class="note">ошибки — это обычные значения, а не исключения</blockquote>
+<h3>Именованные возвращаемые значения</h3>
+<pre><code class="language-go">func sum(a, b int) (result int) {
+	result = a + b
+	return // return без аргументов
+}</code></pre>
+<p><b>⚠️ Осторожно:</b></p>
+<ul>
+    <li>может ухудшить читаемость</li>
+    <li>часто используется в <code>defer</code> / <code>recover</code></li>
+</ul>
+<h3>Variadic-функции (переменное число аргументов)</h3>
+<pre><code class="language-go">func sum(nums ...int) int {
+	total := 0
+	for _, n := range nums {
+		total += n
+	}
+	return total
+}</code></pre>
+<p>Вызов:</p>
+<pre><code class="language-go">sum(1, 2, 3)
+sum([]int{1, 2, 3}...)</code></pre>
+<p>📌 <code>...int</code> → внутри это <code>[]int</code></p>
+<h3>Функции как значения (first-class functions)</h3>
+<pre><code class="language-go">func apply(a, b int, op func(int, int) int) int {
+	return op(a, b)
+}</code></pre>
+<pre><code class="language-go">add := func(x, y int) int {
+	return x + y
+}
+
+fmt.Println(apply(2, 3, add))</code></pre>
+<p>➡️ функции можно:</p>
+<ul>
+    <li>передавать как аргументы</li>
+    <li>возвращать из функций</li>
+    <li>хранить в переменных</li>
+</ul>
+<h3>Анонимные функции и замыкания</h3>
+<pre><code class="language-go">counter := 0
+
+inc := func() int {
+	counter++
+	return counter
+}
+
+fmt.Println(inc()) // 1
+fmt.Println(inc()) // 2</code></pre>
+<p>📌 Замыкание захватывает переменные по ссылке, а не по значению<br>(частая ловушка в goroutines!)</p>
+
+<h3>Функции и контекст</h3>
+<pre><code class="language-go">func work(ctx context.Context) error {
+	select {
+	case <-time.After(time.Second):
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+}</code></pre>
+<p>✔ стандарт:</p>
+<ul>
+    <li><code>context.Context</code> — <b>первый параметр</b></li>
+    <li>не хранить в структуре</li>
+    <li>не передавать <code>nil</code></li>
+</ul>
+<h3>Хорошие практики</h3>
+<p>✅ Делай:</p>
+<ul>
+    <li>маленькие функции</li>
+    <li>одно действие — одна функция</li>
+    <li>возвращай ошибки явно</li>
+    <li>принимай интерфейсы, возвращай структуры</li>
+</ul>
+<p>❌ Не делай:</p>
+<ul>
+    <li>функции на 200 строк</li>
+    <li>panic вместо error</li>
+    <li>скрытую магию через named return без причины</li>
+</ul>
+
+
+<hr>
+<h2 id="methods">Методы</h2>
+<p>Это функции с получателем</p>
+<pre><code class="language-go">type User struct {
+	Name string
+}
+
+func (u User) Greet() {
+	fmt.Println("Hello,", u.Name)
+}</code></pre>
+<h3>Указатель vs значение</h3>
+<pre><code class="language-go">func (u *User) Rename(name string) {
+	u.Name = name
+}</code></pre>
+<p>📌 Правила:</p>
+<ul>
+    <li><code>*T</code> — если меняешь состояние</li>
+    <li><code>T</code> — если только читаешь</li>
+    <li>интерфейсы чаще ожидают методы с <b>value receiver</b></li>
+</ul>
+
+{{ end }}

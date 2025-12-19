@@ -3,7 +3,5 @@ package main
 import "fmt"
 
 func main() {
-	a := [...]int{1, 2, 3, 4}
-	fmt.Println(len(a))
-
+	fmt.Printf("count = %d\n", "10")
 }

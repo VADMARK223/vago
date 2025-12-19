@@ -18,11 +18,7 @@
             <div class="panel">
                 <div style="display: flex; flex-direction: column; align-items: start; gap: 4px; width: 100%;">
                     <div style="display: flex; align-items: center; justify-content: start; gap: 4px; width: 100%;">
-                        <form class="form-add" action="/runQuestionsSeed" method="POST">
-                            <div>
-                                <button type="submit" class="btn">Question seed</button>
-                            </div>
-                        </form>
+                        <button class="btn" id="questionsSeedBtn">Questions seed</button>
                         <span>Вопросов: {{.questions_count}}</span>
                         <form class="form-add" action="/runTopicsSeed" method="POST">
                             <div>
@@ -42,7 +38,8 @@
                             }}
 
                             <label>
-                                <textarea id="code-field" name="code" placeholder="Пример кода" style="height: 155px"></textarea>
+                                <textarea id="code-field" name="code" placeholder="Пример кода"
+                                          style="height: 155px"></textarea>
                             </label>
 
                             {{ template "component.inputWithClear" dict
@@ -130,6 +127,38 @@
         indentUnit: 4,
         tabSize: 4
     });
+
+    const questionsSeedBtn = document.getElementById("questionsSeedBtn")
+    const questionsSeedBtnText = questionsSeedBtn.textContent
+
+    questionsSeedBtn.addEventListener("click", async () => {
+        questionsSeedBtn.disabled = true
+        questionsSeedBtn.textContent = "Running..."
+
+        try {
+            await runSeed("/run_questions_seed", {method: "POST"})
+            location.reload()
+        } catch (err) {
+            alert("Error: " + err.message)
+        } finally {
+            resetQuestionsSeedBtn()
+        }
+
+        function resetQuestionsSeedBtn() {
+            questionsSeedBtn.disabled = false;
+            questionsSeedBtn.textContent = questionsSeedBtnText
+        }
+    })
+
+    async function runSeed(url, options) {
+        const resp = await fetch(url, options);
+        const data = await resp.json();
+        if (!resp.ok) {
+            throw new Error(data.error || resp.statusText);
+        }
+
+        return data
+    }
 </script>
 </body>
 </html>

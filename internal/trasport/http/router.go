@@ -36,7 +36,11 @@ func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine
 	localCache := app.NewLocalCache()
 
 	// Хендлеры
+	topicRepo := gorm.NewTopicRepo(ctx.DB)
+	questionSvc := quiz.NewService(gorm.NewQuestionRepo(ctx.DB), topicRepo)
+	topicSvc := topic.NewService(topicRepo)
 	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret, ctx.Cfg.RefreshTTLInt(), ctx.Log)
+	quizHandler := handler.NewQuizHandler(questionSvc, topicSvc, ctx.Cfg.PostgresDsn)
 
 	gin.SetMode(ctx.Cfg.GinMode)
 	r := gin.New()
@@ -67,6 +71,12 @@ func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine
 	r.POST(route.Register, handler.PerformRegister(userSvc))
 	r.POST(route.Logout, handler.Logout)
 
+	r.GET("/quiz", quizHandler.ShowQuizRandom())
+	r.GET("/quiz/:id", quizHandler.ShowQuizByID())
+	r.POST("/quiz/check", quizHandler.Check())
+
+	r.GET("/questions", quizHandler.ShowQuestions)
+
 	// Защищенные маршруты
 	auth := r.Group("/")
 	auth.Use(middleware.CheckAuthAndRedirect())
@@ -88,19 +98,11 @@ func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine
 		auth.POST("/messagesDeleteAll", messagesHandler.DeleteAll())
 		auth.DELETE("/messages/:id", messagesHandler.Delete())
 
-		topicRepo := gorm.NewTopicRepo(ctx.DB)
-		questionSvc := quiz.NewService(gorm.NewQuestionRepo(ctx.DB), topicRepo)
-		topicSvc := topic.NewService(topicRepo)
-
-		quizHandler := handler.NewQuizHandler(questionSvc, topicSvc, ctx.Cfg.PostgresDsn)
 		auth.GET("/add_questions", quizHandler.ShowAddQuestion())
 		auth.POST("/add_questions", quizHandler.AddQuestion())
-		auth.GET("/questions", quizHandler.ShowQuestions)
-		auth.GET("/quiz", quizHandler.ShowQuizRandom())
-		auth.GET("/quiz/:id", quizHandler.ShowQuizByID())
-		auth.POST("/quiz/check", quizHandler.Check())
-		auth.POST("/runQuestionsSeed", quizHandler.RunQuestionsSeed())
+
 		auth.POST("/runTopicsSeed", quizHandler.RunTopicsSeed())
+		auth.POST("/run_questions_seed", quizHandler.RunQuestionsSeedNew())
 	}
 
 	r.NoRoute(handler.NotFoundHandler)

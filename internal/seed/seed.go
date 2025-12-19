@@ -1,7 +1,9 @@
 package seed
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -29,11 +31,12 @@ type Topic struct {
 }
 
 const (
+	batchSize         = 100
 	dataFileQuestions = "data/questions.json"
 	dataFileTopics    = "data/topics.json"
 )
 
-func AddQuestion(dsn string, question Question) error {
+func AddQuestion(ctx context.Context, dsn string, question Question) error {
 	data, err := os.ReadFile(dataFileQuestions)
 	if err != nil {
 		return err
@@ -57,7 +60,110 @@ func AddQuestion(dsn string, question Question) error {
 
 	log.Println("Question added.")
 
-	return SyncQuestions(dsn)
+	return SyncQuestions(ctx, dsn)
+}
+
+func SyncQuestions(ctx context.Context, dsn string) error {
+	start := time.Now()
+	fmt.Printf("➡️ \033[93m%s: \033[92m%v\033[0m\n", "Start seed questions", dsn)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return err
+	}
+	db = db.WithContext(ctx)
+
+	data, err := os.ReadFile(dataFileQuestions)
+	if err != nil {
+		return err
+	}
+
+	var questions []Question
+	if err := json.Unmarshal(data, &questions); err != nil {
+		return err
+	}
+
+	if err := truncateTables(db); err != nil {
+		return err
+	}
+
+	for i := 0; i < len(questions); i += batchSize {
+		fmt.Printf("➡️ \033[93m%s: \033[92m%v\033[0m\n", "Batch", i)
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+
+		end := min(i+batchSize, len(questions))
+		if err := insertBatch(ctx, db, questions[i:end]); err != nil {
+			return err
+		}
+	}
+
+	fmt.Printf("➡️ \033[93m%s: \033[92m%v\033[0m\n", "End seed questions", time.Since(start))
+	return nil
+}
+
+func truncateTables(db *gorm.DB) error {
+	if err := db.Exec(
+		"TRUNCATE TABLE answers RESTART IDENTITY CASCADE",
+	).Error; err != nil {
+		return err
+	}
+
+	if err := db.Exec(
+		"TRUNCATE TABLE questions RESTART IDENTITY CASCADE",
+	).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func insertBatch(ctx context.Context, db *gorm.DB, batch []Question) error {
+	tx := db.Begin()
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	// если что-то пойдёт не так — откатываем
+	committed := false
+	defer func() {
+		if !committed {
+			tx.Rollback()
+		}
+	}()
+
+	for _, q := range batch {
+		// 🔴 точка отмены ВНУТРИ батча
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+
+		var questionID int
+		if err := tx.Raw(
+			`INSERT INTO questions (topic_id, text, code, explanation)
+			 VALUES (?, ?, ?, ?) RETURNING id`,
+			q.TopicID, q.Text, q.Code, q.Explanation,
+		).Scan(&questionID).Error; err != nil {
+			return err
+		}
+
+		for _, a := range q.Answers {
+			if err := tx.Exec(
+				`INSERT INTO answers (question_id, text, is_correct)
+				 VALUES (?, ?, ?)`,
+				questionID, a.Text, a.Correct,
+			).Error; err != nil {
+				return err
+			}
+		}
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return err
+	}
+
+	committed = true
+	return nil
 }
 
 func Topics(dsn string) error {
@@ -86,50 +192,5 @@ func Topics(dsn string) error {
 
 	elapsed := time.Since(start)
 	log.Println("Topics seeding complete: ", elapsed)
-	return nil
-}
-
-func SyncQuestions(dsn string) error {
-	start := time.Now()
-	log.Println("Start questions: ", dsn)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		return err
-	}
-
-	data, err := os.ReadFile(dataFileQuestions)
-	if err != nil {
-		return err
-	}
-
-	var questions []Question
-	if err := json.Unmarshal(data, &questions); err != nil {
-		return err
-	}
-
-	db.Exec("TRUNCATE TABLE answers RESTART IDENTITY CASCADE")
-	db.Exec("TRUNCATE TABLE questions RESTART IDENTITY CASCADE")
-
-	for _, q := range questions {
-		var id int
-		errInsert := db.Raw(
-			`INSERT INTO questions (topic_id, text, code, explanation) 
-             VALUES (?, ?, ?, ?) RETURNING id`,
-			q.TopicID, q.Text, q.Code, q.Explanation,
-		).Scan(&id).Error
-
-		if errInsert != nil {
-			return errInsert
-		}
-
-		for _, a := range q.Answers {
-			db.Exec(
-				`INSERT INTO answers (question_id, text, is_correct) VALUES (?, ?, ?)`,
-				id, a.Text, a.Correct,
-			)
-		}
-	}
-	elapsed := time.Since(start)
-	log.Println("Questions seeding complete:", elapsed)
 	return nil
 }

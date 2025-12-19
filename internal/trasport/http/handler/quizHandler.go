@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 	"vago/internal/application/quiz"
 	"vago/internal/application/topic"
 	"vago/internal/config/code"
@@ -155,7 +157,10 @@ func (h *QuizHandler) AddQuestion() func(c *gin.Context) {
 			answers[correctIdx].Correct = true
 		}
 
-		err := seed.AddQuestion(h.dsn, seed.Question{
+		ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+		defer cancel()
+
+		err := seed.AddQuestion(ctx, h.dsn, seed.Question{
 			TopicID:     topicId,
 			Text:        text,
 			Code:        codeStr,
@@ -172,9 +177,9 @@ func (h *QuizHandler) AddQuestion() func(c *gin.Context) {
 	}
 }
 
-func (h *QuizHandler) RunQuestionsSeed() func(c *gin.Context) {
+func (h *QuizHandler) RunTopicsSeed() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		err := seed.SyncQuestions(h.dsn)
+		err := seed.Topics(h.dsn)
 		if err != nil {
 			ShowError(c, "Ошибка сидирования", err.Error())
 			return
@@ -183,13 +188,27 @@ func (h *QuizHandler) RunQuestionsSeed() func(c *gin.Context) {
 	}
 }
 
-func (h *QuizHandler) RunTopicsSeed() func(c *gin.Context) {
+func (h *QuizHandler) RunQuestionsSeedNew() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		err := seed.Topics(h.dsn)
-		if err != nil {
-			ShowError(c, "Ошибка сидирования", err.Error())
+		ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+		defer cancel()
+
+		if err := seed.SyncQuestions(ctx, h.dsn); err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
 			return
 		}
+
+		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	}
+}
+
+func (h *QuizHandler) RunTopicsSeedNew() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		//err := seed.SyncQuestionsNew(h.dsn)
+		//if err != nil {
+		//	ShowError(c, "Ошибка сидирования топиков", err.Error())
+		//	return
+		//}
 		c.Redirect(http.StatusSeeOther, "/add_questions")
 	}
 }

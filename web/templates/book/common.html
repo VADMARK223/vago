@@ -1,5 +1,80 @@
 {{ define "book.common" }}
-<h1>Типы данных</h1>
+<a href="#cli">Команды CLI</a>
+<a href="#types">Типы данных</a>
+
+<h1 id="cli">Основные команды <code>go</code></h1>
+<p>Это то, чем ты пользуешься каждый день.</p>
+<h2>📦 Работа с модулями</h2>
+<ul>
+    <li><code>go mod init &lt;name&gt;</code> — создать <code>go.mod</code></li>
+    <li><code>go mod tidy</code> — привести зависимости в порядок</li>
+    <li><code>go mod download</code> — скачать зависимости</li>
+    <li><code>go mod vendor</code> — сохранить зависимости в <code>vendor/</code></li>
+    <li><code>go mod graph</code> — граф зависимостей</li>
+    <li><code>go list -m all</code> — список всех модулей</li>
+</ul>
+
+<h2>🛠 Сборка и запуск</h2>
+<ul>
+    <li><code>go build /main.go</code> — собрать бинарник</li>
+    <li><code>go run [-race] /main.go</code> — собрать + запустить (можно с обнаружением гонок)</li>
+    <li><code>go install</code> — установить бинарник в <code>$GOBIN</code></li>
+    <li><code>go clean</code> — очистка кешей</li>
+</ul>
+
+<h2>🧪 Тесты</h2>
+<ul>
+    <li><code>go test</code> — запустить тесты</li>
+    <li><code>go test -run TestName</code> — запуск конкретного теста</li>
+    <li><code>go test ./...</code> — все пакеты</li>
+    <li><code>go test -v</code> — подробный вывод</li>
+    <li><code>go test -race</code> — race detector 🔥</li>
+    <li><code>go test -cover</code> — покрытие</li>
+    <li><code>go test -bench=.</code> — бенчмарки</li>
+</ul>
+<hr>
+<h2>🧠 Анализ и качество кода</h2>
+<h3>🧹 Стиль и форматирование</h3>
+<ul>
+    <li><code>go fmt</code> — форматирование</li>
+    <li><code>gofmt -w .</code> — форматирование файлов</li>
+    <li><code>go vet</code> — статический анализ</li>
+</ul>
+<h3>🔍 Анализ зависимостей и пакетов</h3>
+<ul>
+    <li><code>go list</code> — инфа о пакетах</li>
+    <li><code>go doc</code> — документация прямо из CLI</li>
+    <li><code>go env</code> — окружение Go</li>
+</ul>
+<hr>
+<h2>⚙️ Профилирование и отладка</h2>
+<h3>📊 pprof</h3>
+<ul>
+    <li><code>go test -cpuprofile=cpu.out</code> — </li>
+    <li><code>go test -memprofile=mem.out</code> — </li>
+    <li><code>go tool pprof cpu.out</code> — </li>
+</ul>
+<h3>🧰 Go tools</h3>
+<ul>
+    <li><code>go tool compile</code> — </li>
+    <li><code>go tool trace</code> — </li>
+    <li><code>go tool pprof</code> — </li>
+    <li><code>go tool objdump</code> — </li>
+</ul>
+<blockquote class="note">Обычно напрямую их не дергают, но полезно знать, что они существуют.</blockquote>
+<hr>
+<h2>🌍 Работа с версиями Go</h2>
+<ul>
+    <li><code>go version</code> — версия Go</li>
+    <li><code>go env GOROOT GOPATH</code> — пути</li>
+</ul>
+<hr>
+<h2>🧩 Генерация кода</h2>
+<ul>
+    <li><code>go generate</code> — запуск генераторов (<code>//go:generate</code>)</li>
+</ul>
+
+<h1 id="types">Типы данных</h1>
 <h2>Простые</h2>
 <span>
     <code>int</code> - целое число (32 или 64 бита, зависит от платформы)<br>

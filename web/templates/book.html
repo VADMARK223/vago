@@ -45,6 +45,10 @@
                 {{ template "book.arrays" . }}
                 {{ else if eq .chapter_id 4 }}
                 {{ template "book.maps" . }}
+                {{ else if eq .chapter_id 5 }}
+                {{ template "book.functions" . }}
+                {{ else if eq .chapter_id 6 }}
+                {{ template "book.interfaces" . }}
                 {{ else if eq .chapter_id 9 }}
                 {{ template "book.channels" . }}
                 {{ else if eq .chapter_id 10 }}

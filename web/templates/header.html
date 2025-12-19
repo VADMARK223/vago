@@ -18,7 +18,12 @@
             "Href" "/quiz"
             "Name" "Quiz"
             "Icon" "fa-solid fa-check-double"
-            "Disabled" (not .user_id)
+            }}
+
+            {{ template "component.href_btn" dict
+            "Href" "/questions"
+            "Name" "Вопросы"
+            "Icon" "fa-solid fa-circle-question"
             }}
 
             {{ template "component.href_btn" dict
@@ -38,7 +43,7 @@
             {{if .user_id}}
             {{if .is_admin}}
             <a href="/add_questions" class="btn"><i class="fa-solid fa-plus"></i></a>
-            <a href="/questions" class="btn"><i class="fa-solid fa-check-double"></i></a>
+
             <a href="/messages" class="btn"><i class="fa-solid fa-comment"></i></a>
             <a href="/users" class="btn"><i class="fa-solid fa-users"></i></a>
             <a href="/grpc-test" class="btn"><i class="fa-solid fa-j"></i></a>

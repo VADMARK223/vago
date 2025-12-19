@@ -1,0 +1,299 @@
+{{ define "book.interfaces" }}
+<h1>Interfaces</h1>
+<p><b>Интерфейс</b> — <b>это набор методов</b>, который описывает <i>поведение</i>, а не структуру данных.</p>
+<pre><code class="language-go">type Reader interface {
+	Read(p []byte) (n int, err error)
+}</code></pre>
+<p>👉 Интерфейс говорит:</p>
+<blockquote class="note">«Мне нужен любой тип, у которого есть метод Read с такой сигнатурой»</blockquote>
+<hr>
+<h2>Неявная реализация</h2>
+<p>В Go <b>не нужно явно объявлять</b>, что тип реализует интерфейс.</p>
+<pre><code class="language-go">type File struct {}
+
+func (f File) Read(p []byte) (int, error) {
+	return 0, nil
+}</code></pre>
+<p><code>File</code> <b>уже реализует</b> <code>Reader</code>.<br>
+    Никакого <code>implements</code>, <code>extends</code> — <b>утка-подход</b> 🦆:</p>
+<blockquote class="note">If it walks like a duck and quacks like a duck…</blockquote>
+<hr>
+<h2>Использование интерфейса</h2>
+<pre><code class="language-go">func Process(r Reader) {
+	buf := make([]byte, 10)
+	r.Read(buf)
+}</code></pre>
+<pre><code class="language-go">var f File
+Process(f) // OK</code></pre>
+<p>📌 <b>Функции принимают интерфейсы, а не конкретные типы</b> — это основа гибкости в Go.</p>
+<hr>
+<h2>Интерфейс ≠ класс</h2>
+<p>В Go:</p>
+<ul>
+    <li>❌ интерфейс не содержит данных</li>
+    <li>❌ нет наследования</li>
+    <li>✅ интерфейс — только поведение</li>
+</ul>
+<pre><code class="language-go">type UserService interface {
+	CreateUser(name string) error
+}</code></pre>
+<p>Реализация:</p>
+<pre><code class="language-go">type userService struct {
+	repo UserRepo
+}
+
+func (s *userService) CreateUser(name string) error {
+	return s.repo.Save(name)
+}</code></pre>
+<p>👉 Классической иерархии нет — <b>композиция</b> > <b>наследование</b></p>
+<hr>
+
+<h2>Пустой интерфейс (interface{} / any)</h2>
+<pre><code class="language-go">var v interface{}
+v = 10
+v = "hello"</code></pre>
+<p>В Go 1.18+:</p>
+<pre><code class="language-go">var v any</code></pre>
+<p>⚠️ Минус: теряется типобезопасность</p>
+<p>Чтобы получить значение:</p>
+<pre><code class="language-go">s := v.(string)        // panic если не string
+s, ok := v.(string)   // безопасно</code></pre>
+<hr>
+<h2>Type assertion и type switch</h2>
+<h3>Проверка типа</h3>
+<pre><code class="language-go">func Print(v any) {
+	switch t := v.(type) {
+	case int:
+		fmt.Println("int:", t)
+	case string:
+		fmt.Println("string:", t)
+	default:
+		fmt.Println("unknown")
+	}
+}</code></pre>
+<p>📌 Часто используется при работе с:</p>
+<ul>
+    <li>error</li>
+    <li>JSON</li>
+    <li>middleware</li>
+    <li>generic API</li>
+</ul>
+<hr>
+<h2>Интерфейсы и nil</h2>
+<pre><code class="language-go">var err *MyError = nil
+var e error = err
+
+fmt.Println(e == nil) // false 😱</code></pre>
+<p>Интерфейс = (<b>type, value</b>)</p>
+<pre><code class="language-go">(type = *MyError, value = nil)</code></pre>
+<p><b>📌 Интерфейс равен nil только если и type, и value — nil</b></p>
+<hr>
+<h2>Маленькие интерфейсы — идиоматично</h2>
+<p>Go любит <b>минимальные интерфейсы</b>:</p>
+<pre><code class="language-go">type Stringer interface {
+	String() string
+}</code></pre>
+<p>В стандартной библиотеке:</p>
+<ul>
+    <li>io.Reader</li>
+    <li>io.Writer</li>
+    <li>context.Context</li>
+    <li>http.Handler</li>
+</ul>
+<p>📌 Принцип:</p>
+<blockquote class="note">Accept interfaces, return structs</blockquote>
+<hr>
+<h2>Интерфейсы vs Generics</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Когда интерфейс</th>
+        <th>Когда generics</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Разное поведение</td>
+        <td>Одинаковое поведение</td>
+    </tr>
+    <tr>
+        <td>Полиморфизм</td>
+        <td>Типобезопасность</td>
+    </tr>
+    <tr>
+        <td>API / архитектура</td>
+        <td>Алгоритмы / коллекции</td>
+    </tr>
+    <tr>
+        <td>Mock / DI</td>
+        <td>Утилиты</td>
+    </tr>
+    </tbody>
+</table>
+<p>📌 Они <b>не конкурируют</b>, а дополняют друг друга.</p>
+<hr>
+<h2>Встраивание</h2>
+<p>В Go можно <b>встраивать типы без имени поля</b>:</p>
+<pre><code class="language-go">type A struct {
+	ID int
+}
+
+type B struct {
+	A
+	Name string
+}</code></pre>
+<p>Теперь:</p>
+<pre><code class="language-go">b := B{}
+b.ID    // ← пришло из A
+b.A.ID  // тоже работает</code></pre>
+<p>👉 Это <b>композиция с продвижением методов и полей</b>.</p>
+<h3>Встраивание структур + интерфейсы</h3>
+<p>Если у встроенного типа есть методы — они <b>автоматически продвигаются наружу</b>.</p>
+<pre><code class="language-go">type Logger struct{}
+
+func (l Logger) Log(msg string) {}
+
+type Service struct {
+	Logger
+}</code></pre>
+<p>Теперь <code>Service</code> имеет метод <code>Log</code>:</p>
+<pre><code class="language-go">var s Service
+s.Log("hello")</code></pre>
+<p>📌 <b>Service реализует любой интерфейс</b>, который требует <code>Log(string)</code>.</p>
+<h3>Встраивание интерфейсов в интерфейсы</h3>
+<p>Это суперважно 🔥</p>
+<pre><code class="language-go">type Reader interface {
+	Read(p []byte) (int, error)
+}
+
+type Closer interface {
+	Close() error
+}
+
+type ReadCloser interface {
+	Reader
+	Closer
+}</code></pre>
+<p>Эквивалентно:</p>
+<pre><code class="language-go">type ReadCloser interface {
+	Read([]byte) (int, error)
+	Close() error
+}</code></pre>
+<p>👉 <b>ReadCloser = композиция интерфейсов</b></p>
+<h3>Реализация составного интерфейса</h3>
+<pre><code class="language-go">type File struct{}
+
+func (f File) Read(p []byte) (int, error) { return 0, nil }
+func (f File) Close() error               { return nil }
+
+var rc ReadCloser = File{} // OK</code></pre>
+<p>📌 Тип <b>не знает</b>, что он реализует <code>ReadCloser</code>.</p>
+<h3>Встраивание интерфейса в структуру</h3>
+<p>Очень мощный, но тонкий момент ⚠️</p>
+<pre><code class="language-go">type Service struct {
+	Reader
+}</code></pre>
+<p>Что это значит?</p>
+<ul>
+    <li>Service <b>НЕ реализует</b> <code>Reader</code></li>
+    <li>Service <b>ДЕЛЕГИРУЕТ</b> вызовы встроенному интерфейсу</li>
+</ul>
+<pre><code class="language-go">s := Service{
+	Reader: someReader,
+}
+
+s.Read(buf) // вызывает someReader.Read</code></pre>
+<p>Но если <code>Reader == nil</code> → panic при вызове метода.</p>
+<h3>Частая ловушка ❌</h3>
+<pre><code class="language-go">type Service struct {
+	io.Reader
+}
+
+var s Service
+s.Read(buf) // 💥 panic: nil pointer</code></pre>
+<p>Почему?</p>
+<ul>
+    <li>Встроенный интерфейс <code>io.Reader</code> = nil</li>
+    <li>Метод вызывается через nil-интерфейс</li>
+</ul>
+<p>📌 Нужно инициализировать:</p>
+<pre><code class="language-go">s := Service{Reader: os.Stdin}</code></pre>
+<h3>Embedding ≠ наследование</h3>
+<table>
+    <thead>
+    <tr>
+        <th>Наследование</th>
+        <th>Embedding</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>IS-A</td>
+        <td>HAS-A</td>
+    </tr>
+    <tr>
+        <td>Жёсткая иерархия</td>
+        <td>Гибкая композиция</td>
+    </tr>
+    <tr>
+        <td>Виртуальные методы</td>
+        <td>Продвижение методов</td>
+    </tr>
+    <tr>
+        <td>Переопределение</td>
+        <td>Теневое перекрытие</td>
+    </tr>
+    </tbody>
+</table>
+<pre><code class="language-go">type A struct{}
+func (A) Foo() {}
+
+type B struct {
+	A
+}
+
+func (B) Foo() {} // не override, а shadowing</code></pre>
+<h3>Когда embedding — это хорошо, а когда нет</h3>
+<p>✅ Хорошо</p>
+<ul>
+    <li>Декораторы</li>
+    <li>Middleware</li>
+    <li>Адаптеры</li>
+    <li>Расширение поведения</li>
+</ul>
+<p>❌ Плохо</p>
+<ul>
+    <li>Для “просто удобства”</li>
+    <li>Если скрывает зависимости</li>
+    <li>Если усложняет инициализацию</li>
+</ul>
+
+
+
+<hr>
+
+
+
+<h2>Частые ошибки новичков</h2>
+<p>
+    ❌ Делать интерфейсы «на будущее»<br>
+    ❌ Делать большие интерфейсы<br>
+    ❌ Возвращать интерфейсы из конструктора<br>
+    ❌ Использовать interface{} вместо generics<br>
+    ❌ Сравнивать интерфейс с nil не понимая внутренностей<br>
+</p>
+<hr>
+<h2>Золотые правила</h2>
+<ul>
+    <li>Интерфейсы объявляй <b>там, где используешь</b></li>
+    <li>Делай их <b>маленькими</b></li>
+    <li>Используй для <b>границ системы</b></li>
+    <li>Предпочитай <b>композицию</b></li>
+    <li>Понимай, что интерфейс — это <code>(type, value)</code></li>
+</ul>
+
+
+
+
+
+{{ end }}

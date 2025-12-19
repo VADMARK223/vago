@@ -2692,5 +2692,412 @@
         "text": "Потому что канал буферизирован"
       }
     ]
+  },
+  {
+    "topic_id": 6,
+    "text": "Что такое интерфейс в Go?",
+    "explanation": "Интерфейс в Go описывает только поведение — набор методов, без данных.",
+    "answers": [
+      {
+        "text": "Структура с виртуальными методами"
+      },
+      {
+        "text": "Контейнер для данных и методов"
+      },
+      {
+        "text": "Набор сигнатур методов",
+        "correct": true
+      },
+      {
+        "text": "Способ наследования структур"
+      }
+    ]
+  },
+  {
+    "topic_id": 6,
+    "text": "Как тип в Go реализует интерфейс?",
+    "explanation": "Реализация интерфейса в Go всегда неявная.",
+    "answers": [
+      {
+        "text": "Через ключевое слово implements"
+      },
+      {
+        "text": "Через embedding интерфейса"
+      },
+      {
+        "text": "Неявно, если реализует все методы",
+        "correct": true
+      },
+      {
+        "text": "Через наследование"
+      }
+    ]
+  },
+  {
+    "topic_id": 6,
+    "text": "Что выведет код?",
+    "code": "var p *MyError = nil\r\nvar err error = p\r\nfmt.Println(err == nil)",
+    "explanation": "Интерфейс содержит тип (*MyError) и значение (nil), поэтому он не равен nil.",
+    "answers": [
+      {
+        "text": "true"
+      },
+      {
+        "text": "false",
+        "correct": true
+      },
+      {
+        "text": "panic"
+      },
+      {
+        "text": "Не скомпилируется"
+      }
+    ]
+  },
+  {
+    "topic_id": 6,
+    "text": "Когда интерфейс в Go считается nil?",
+    "explanation": "Интерфейс — это пара (type, value)",
+    "answers": [
+      {
+        "text": "Когда значение внутри равно nil"
+      },
+      {
+        "text": "Когда тип внутри равен nil"
+      },
+      {
+        "text": "Когда тип и значение равны nil",
+        "correct": true
+      },
+      {
+        "text": "Всегда, если присвоен nil"
+      }
+    ]
+  },
+  {
+    "topic_id": 6,
+    "text": "Что означает var v any?",
+    "explanation": "any — алиас для interface{}",
+    "answers": [
+      {
+        "text": "v может быть только ссылочным типом"
+      },
+      {
+        "text": "v — это пустой интерфейс",
+        "correct": true
+      },
+      {
+        "text": "v — это generic тип"
+      },
+      {
+        "text": "v — это unsafe тип"
+      }
+    ]
+  },
+  {
+    "topic_id": 6,
+    "text": "Как безопасно получить конкретный тип из интерфейса?",
+    "explanation": "Вариант с ok предотвращает panic",
+    "answers": [
+      {
+        "text": "v.(T)"
+      },
+      {
+        "text": "T(v)"
+      },
+      {
+        "text": "v as T"
+      },
+      {
+        "text": "v.(T), ok",
+        "correct": true
+      }
+    ]
+  },
+  {
+    "topic_id": 6,
+    "text": "Почему в Go принято делать маленькие интерфейсы?",
+    "explanation": "Маленькие интерфейсы легче реализовывать и мокать",
+    "answers": [
+      {
+        "text": "Так быстрее компилируется код"
+      },
+      {
+        "text": "Это ограничение языка"
+      },
+      {
+        "text": "Это упрощает реализацию и тестирование",
+        "correct": true
+      },
+      {
+        "text": "Большие интерфейсы запрещены"
+      }
+    ]
+  },
+  {
+    "topic_id": 6,
+    "text": "Что значит принцип “Accept interfaces, return structs”?",
+    "explanation": "Это повышает гибкость API и избегает потери конкретного типа",
+    "answers": [
+      {
+        "text": "Всегда возвращать интерфейсы"
+      },
+      {
+        "text": "Всегда принимать структуры"
+      },
+      {
+        "text": "Принимать интерфейсы, возвращать конкретные типы",
+        "correct": true
+      },
+      {
+        "text": "Использовать generics вместо интерфейсов"
+      }
+    ]
+  },
+  {
+    "topic_id": 6,
+    "text": "Когда интерфейсы подходят лучше, чем generics?",
+    "explanation": "Интерфейсы нужны, когда важна разная реализация поведения.",
+    "answers": [
+      {
+        "text": "Для алгоритмов сортировки"
+      },
+      {
+        "text": "Для хранения данных"
+      },
+      {
+        "text": "Для полиморфного поведения",
+        "correct": true
+      },
+      {
+        "text": "Для математических вычислений"
+      }
+    ]
+  },
+  {
+    "topic_id": 6,
+    "text": "Какая из практик считается плохой?",
+    "explanation": "Интерфейсы должны появляться из реальных потребностей, а не “про запас”.",
+    "answers": [
+      {
+        "text": "Объявлять интерфейсы рядом с кодом использования"
+      },
+      {
+        "text": "Использовать интерфейсы для внешних границ системы"
+      },
+      {
+        "text": "Делать интерфейсы «на будущее» без реальных реализаций",
+        "correct": true
+      },
+      {
+        "text": "Использовать интерфейсы для моков в тестах"
+      }
+    ]
+  },
+  {
+    "topic_id": 5,
+    "text": "Что выведет код?",
+    "code": "func main() {\r\n\tfmt.Println(sum(2, 3))\r\n}\r\n\r\nfunc sum(a, b int) (result int) {\r\n\tresult = a + b\r\n\treturn\r\n}",
+    "explanation": "result — именованное возвращаемое значение. Оно присваивается и возвращается неявно.",
+    "answers": [
+      {
+        "text": "0"
+      },
+      {
+        "text": "5",
+        "correct": true
+      },
+      {
+        "text": "panic"
+      },
+      {
+        "text": "ошибка компиляции"
+      }
+    ]
+  },
+  {
+    "topic_id": 5,
+    "text": "2️⃣ Когда выполняется defer?",
+    "explanation": "defer выполняется после вычисления return, но до выхода из функции.",
+    "answers": [
+      {
+        "text": "Сразу после объявления"
+      },
+      {
+        "text": "Перед return"
+      },
+      {
+        "text": "После return, но до выхода из функции",
+        "correct": true
+      },
+      {
+        "text": "В отдельной горутине"
+      }
+    ]
+  },
+  {
+    "topic_id": 5,
+    "text": "Что выведет код?",
+    "code": "func main() {\r\n\tdefer fmt.Println(calc())\r\n\tfmt.Println(\"end\")\r\n}\r\n\r\nfunc calc() int {\r\n\treturn 42\r\n}",
+    "explanation": "Аргументы defer вычисляются сразу, но выполняется он позже.",
+    "answers": [
+      {
+        "text": "end → 42",
+        "correct": true
+      },
+      {
+        "text": "42 → end"
+      },
+      {
+        "text": "end"
+      },
+      {
+        "text": "panic"
+      }
+    ]
+  },
+  {
+    "topic_id": 5,
+    "text": "Какое объявление variadic-функции корректно?",
+    "explanation": "...int — переменное число аргументов типа int.",
+    "answers": [
+      {
+        "text": "func f(...int) int"
+      },
+      {
+        "text": "func f(nums ...int) int",
+        "correct": true
+      },
+      {
+        "text": "func f(nums []int...) int"
+      },
+      {
+        "text": "func f(nums ...[]int) int"
+      }
+    ]
+  },
+  {
+    "topic_id": 5,
+    "text": "Что произойдёт?",
+    "code": "func main() {\r\n\tf := func() {\r\n\t\tfmt.Println(\"hi\")\r\n\t}\r\n\tf()\r\n}",
+    "explanation": "Анонимная функция — обычное значение, её можно вызвать.",
+    "answers": [
+      {
+        "text": "panic"
+      },
+      {
+        "text": "ошибка компиляции"
+      },
+      {
+        "text": "ничего не выведет"
+      },
+      {
+        "text": "hi",
+        "correct": true
+      }
+    ]
+  },
+  {
+    "topic_id": 5,
+    "text": "Что выведет код?",
+    "code": "func main() {\r\n\tx := 10\r\n\tchange(x)\r\n\tfmt.Println(x)\r\n}\r\n\r\nfunc change(x int) {\r\n\tx = 20\r\n}",
+    "explanation": "Аргументы передаются по значению.",
+    "answers": [
+      {
+        "text": "10",
+        "correct": true
+      },
+      {
+        "text": "20"
+      },
+      {
+        "text": "panic"
+      },
+      {
+        "text": "ошибка компиляции"
+      }
+    ]
+  },
+  {
+    "topic_id": 5,
+    "text": "Что выведет код?",
+    "code": "func main() {\r\n\tfmt.Println(test())\r\n}\r\n\r\nfunc test() (x int) {\r\n\tdefer func() {\r\n\t\tx = 10\r\n\t}()\r\n\treturn 5\r\n}",
+    "explanation": "defer изменяет именованное возвращаемое значение перед выходом из функции.",
+    "answers": [
+      {
+        "text": "5"
+      },
+      {
+        "text": "10",
+        "correct": true
+      },
+      {
+        "text": "0"
+      },
+      {
+        "text": "panic"
+      }
+    ]
+  },
+  {
+    "topic_id": 5,
+    "text": "Где корректно использовать recover?  A)",
+    "explanation": "recover работает только внутри defer.",
+    "answers": [
+      {
+        "text": "В любой функции"
+      },
+      {
+        "text": "В main"
+      },
+      {
+        "text": "Только внутри defer",
+        "correct": true
+      },
+      {
+        "text": "В отдельной горутине"
+      }
+    ]
+  },
+  {
+    "topic_id": 5,
+    "text": "Как правильно передавать context.Context?",
+    "explanation": "Это официальная конвенция Go.",
+    "answers": [
+      {
+        "text": "Хранить в структуре"
+      },
+      {
+        "text": "Передавать последним аргументом"
+      },
+      {
+        "text": "Передавать первым аргументом",
+        "correct": true
+      },
+      {
+        "text": "Можно передавать nil"
+      }
+    ]
+  },
+  {
+    "topic_id": 5,
+    "text": "Что выведет код?",
+    "code": "func main() {\r\n\tfunc() {\r\n\t\tfmt.Println(\"A\")\r\n\t}()\r\n\tfmt.Println(\"B\")\r\n}",
+    "explanation": "Анонимная функция вызывается сразу.",
+    "answers": [
+      {
+        "text": "B → A"
+      },
+      {
+        "text": "A → B",
+        "correct": true
+      },
+      {
+        "text": "только B"
+      },
+      {
+        "text": "panic"
+      }
+    ]
   }
 ]
