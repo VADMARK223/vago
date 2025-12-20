@@ -6,5 +6,13 @@
 
 .chapter h1 {
     /*1em = размер шрифта текущего элемента*/
-    font-size: 1.8em;
+    font-size: 1.7em;
+}
+
+.chapter h2 {
+    font-size: 1.4em;
+}
+
+.chapter h3 {
+    font-size: 1.2em;
 }

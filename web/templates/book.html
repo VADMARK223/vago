@@ -69,6 +69,10 @@
                 {{ template "book.generics" . }}
                 {{ else if eq .chapter_id 19 }}
                 {{ template "book.select" . }}
+                {{ else if eq .chapter_id 20 }}
+                {{ template "book.testing" . }}
+                {{ else if eq .chapter_id 21 }}
+                {{ template "book.ci_cd" . }}
                 {{ else if eq .chapter_id 100 }}
                 {{ template "book.cheat" . }}
 

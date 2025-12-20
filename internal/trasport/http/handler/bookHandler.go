@@ -34,6 +34,8 @@ func ShowBook(c *gin.Context) {
 		{ID: 17, Name: "Строки (Strings)"},
 		{ID: 18, Name: "Обобщения (Generics)"},
 		{ID: 19, Name: "Мультиплексор событий Select"},
+		{ID: 20, Name: "Тестирование (Testing)"},
+		{ID: 21, Name: "CI/CD"},
 	}
 
 	bookTasks := []bookChapter{

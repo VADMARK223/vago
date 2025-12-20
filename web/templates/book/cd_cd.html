@@ -1,0 +1,94 @@
+{{ define "book.ci_cd" }}
+<h1>CI/CD</h1>
+<p>CI/CD — это <b>практика автоматизации пути от кода до продакшена</b>.</p>
+<hr>
+<h2>Что такое CI и CD</h2>
+<h3>🔁 CI — Continuous Integration (непрерывная интеграция)</h3>
+<p>Каждый коммит:</p>
+<ul>
+    <li>собирается</li>
+    <li>тестируется</li>
+    <li>проверяется линнерами<br>→ <b>раннее обнаружение ошибок</b></li>
+</ul>
+<h3>🚀 CD — Continuous Delivery / Deployment</h3>
+<p>После успешного CI:</p>
+<ul>
+    <li><b>Delivery</b> — код <i>готов</i> к выкладке (кнопка «Deploy»)</li>
+    <li><b>Deployment</b> — код <i>автоматически</i> выкладывается в прод</li>
+</ul>
+
+<hr>
+<h2>Общая схема CI/CD пайплайна</h2>
+<p>Типичный поток:</p>
+<pre><code class="language-go">git push
+  ↓
+CI: build → test → lint
+  ↓
+CD: docker build → push → deploy
+</code></pre>
+
+<hr>
+<h2>Что обычно делают в CI (для Go)</h2>
+<h3>1️⃣ Сборка</h3>
+<pre><code class="language-go">go build ./...</code></pre>
+<h3>2️⃣ Тесты</h3>
+<pre><code class="language-go">go test ./... -race</code></pre>
+<h3>3️⃣ Линтеры</h3>
+<pre><code class="language-go">golangci-lint run</code></pre>
+<h3>4️⃣ Проверки качества</h3>
+<ul>
+    <li>coverage</li>
+    <li>форматирование (<code>gofmt</code>)</li>
+    <li><code>staticcheck</code></li>
+</ul>
+<hr>
+<h2>Что обычно делают в CD</h2>
+<ul>
+    <li>сбор Docker-образа</li>
+    <li>push в registry</li>
+    <li>деплой на сервер / Kubernetes / VPS</li>
+    <li>graceful restart сервиса</li>
+</ul>
+
+<hr>
+<h2>Пример CI для Go (GitHub Actions)</h2>
+<pre><code class="language-go">name: Go CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+
+    - run: go mod download
+    - run: go test ./... -race
+    - run: go build ./...
+</code></pre>
+
+<hr>
+<h2>CI/CD в production-подходе (как на собесе)</h2>
+<p>Что <b>очень любят</b> спрашивать:</p>
+<ul>
+    <li>✔️ чем CI отличается от CD</li>
+    <li>✔️ где хранить секреты (GitHub Secrets, Vault)</li>
+    <li>✔️ rollback стратегия</li>
+    <li>✔️ blue-green / canary деплой</li>
+    <li>✔️ что делать, если тесты флапают</li>
+    <li>✔️ почему -race нельзя в prod, но можно в CI</li>
+</ul>
+
+
+
+
+
+{{ end }}

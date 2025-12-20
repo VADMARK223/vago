@@ -1,115 +1,66 @@
-# gRPC
+# Vago
 
-Генерация из `.proto` файла
+**Vago** - учебный портал для изучения Golang, включающий:
+- теоретические материалы
+- систему квизов
+- realtime-чат
+- персональный трекер задач
 
-```shell
-protoc --go_out=./ --go-grpc_out=./ api/proto/hello.proto
-```
-## gRPC-curl
-```shell
-grpcurl -plaintext -import-path ./api/proto -proto auth.proto -d '{"username": "1", "password": "1"}' localhost:50051 AuthService/Login
-grpcurl -plaintext -import-path ./api/proto -proto ping.proto localhost:50051 PingService/Ping
-````
+Проект реализован как **production-style backend-приложение** с REST и gRPC (streaming), PostgreSQL и деплоем в Docker на VDS.
 
-# Linux
+🌐 Demo: http://vadmark.duckdns.org/
 
-Прибить порт
-```shell
-sudo lsof -i:8080
-sudo kill -9 PID
-```
-# Docker
-## Postgres
+---
 
-Зайти в контейнер
-```shell
-docker exec -it vago_postgres bash
-```
+## Ключевые возможности
 
-## psql
-Зайти в `psql`
-```shell
-psql -U vadmark -d vagodb
-```
-Список таблиц
-```shell
-\dt
-```
-Структура таблицы
-```shell
-\d tasks
-```
-Удаление volume, чтобы база создалась заново
-```shell
-docker volume rm vago-server_postgres-data
-```
+- ✅ REST API (Gin)
+- ✅ gRPC + gRPC-Web (realtime chat streaming)
+- ✅ JWT аутентификация (access + refresh, auto-refresh)
+- ✅ PostgreSQL + SQL-миграции
+- ✅ Docker / Docker Compose
+- ✅ Graceful shutdown (context, WaitGroup)
+- ✅ Server-side rendered web UI
+- ✅ Kafka (опционально, через feature flag)
 
-# Golang
+---
 
-Инициализация проекта
-```shell
-go mod init vago_server
-```
-Чистит зависимости (добавляет/удаляет лишние)
-```shell
-go mod tidy
-```
-Обновить все зависимости:
-```shell
-go get -u ./...
-go mod tidy
+## Технологии
 
-```
+- **Go**
+- **Gin** (HTTP)
+- **gRPC / gRPC-Web**
+- **PostgreSQL**
+- **GORM**
+- **JWT**
+- **Docker / Docker Compose**
+- **Zap logger**
+- **Kafka (optional)**
 
-Показывает, почему модуль был добавлен
-```shell
-go mod why <package>
-```
+---
 
-Установка `zap`
-```shell
-go get -u go.uber.org/zap
-```
+## Архитектура
 
-Показывает все модули
-```shell
-go list -m all
-```
+Проект построен по слоистой архитектуре с разделением ответственности:
 
-Запуск проекта
-```shell
-go run ./cmd/ping/main.go
-```
+- `cmd/` - точки входа приложения
+- `internal/domain` - доменные модели и интерфейсы
+- `internal/application` - бизнес-логика (services)
+- `internal/infra` - инфраструктура (DB, JWT, Kafka, logger)
+- `internal/transport`
+    - `http` - REST API (Gin)
+    - `grpc` - gRPC сервер
+    - `ws` - WebSocket hub
+- `db/` - SQL-миграции
+- `web/` - HTML templates и static assets
 
-# nGinx
+---
 
-Активация
-```shell
-sudo ln -s /etc/nginx/sites-available/vago.local /etc/nginx/sites-enabled/
-sudo nginx -t   # проверка синтаксиса
-sudo systemctl reload nginx
-```
-Права
-```shell
-sudo chmod o+x /home/vadmark
-sudo chmod o+x /home/vadmark/GolandProjects
-sudo chmod o+x /home/vadmark/GolandProjects/vago
-sudo chmod o+x /home/vadmark/GolandProjects/vago/web
-sudo chmod -R o+x /home/vadmark/GolandProjects/vago/web/static
-```
+## Быстрый старт (Docker)
 
-# Stack
-- gRPC
-- gRPC Web
-- Postgres
-- Zap
-- Gin
-- Gorm
-- JWT (access + refresh)
+```bash
+git clone https://github.com/VADMARK223/vago.git
+cd vago
 
-### TODO: 
-
-- Выпилить из refresh token лишнюю информацию
-- На странице логина и регистрации фокус сразу на первое поле
-- Запоминать на какой странице пользователь был
-- golang-migrate
+cp .env.prod .env.local
+make up

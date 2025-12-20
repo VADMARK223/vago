@@ -1,0 +1,206 @@
+{{ define "book.testing" }}
+<h1>Тестирование</h1>
+<h2>Базовое тестирование (<code>testing</code>)</h2>
+<p>В Go <b>встроенный</b> фреймворк тестирования — пакет <code>testing</code>.</p>
+<p>📌 <b>Правила</b></p>
+<ul>
+    <li>Файлы: <code>*_test.go</code></li>
+    <li>Тесты: <code>func TestXxx(t *testing.T)</code></li>
+    <li>
+        Пакет:
+        <ul>
+            <li><code>package foo</code> — white-box</li>
+            <li><code>package foo_test</code> — black-box (часто ценится выше, потому что проверяется только публичный API пакета.)</li>
+        </ul>
+    </li>
+</ul>
+<pre><code class="language-go">func TestSum(t *testing.T) {
+    res := Sum(2, 3)
+    if res != 5 {
+        t.Fatalf("expected 5, got %d", res)
+    }
+}</code></pre>
+<p>Запуск (весь проект):</p>
+<pre><code class="language-go">go test ./...</code></pre>
+<p>Запуск (конкретную папку):</p>
+<p>Флаг <code>-v</code> выводит подробную информацию</p>
+<p>Флаг <code>-cover</code> процент покрытия кода тестами</p>
+<pre><code class="language-go">go test ./cmd/folder...</code></pre>
+<hr>
+<h2>Table-driven tests</h2>
+<p>Канонический пример</p>
+<pre><code class="language-go">func TestAbs(t *testing.T) {
+    testTable := []struct {
+        name string // Название теста
+        in   int
+        want int
+    }{
+        {"positive", 5, 5},
+        {"negative", -5, 5},
+        {"zero", 0, 0},
+    }
+
+    for _, tt := range testTable {
+        t.Run(tt.name, func(t *testing.T) {
+            if got := Abs(tt.in); got != tt.want {
+                t.Errorf("Abs(%d) = %d, want %d", tt.in, got, tt.want)
+            }
+        })
+    }
+}</code></pre>
+<p>⚠️ Важно:
+    До Go 1.22 был баг с захватом <code>tt</code>, сейчас исправлено, но <code>tt := tt</code> всё ещё встречается в коде.</p>
+
+<hr>
+<h2>Subtests (<code>r.Run</code>)</h2>
+<p>Используется для:</p>
+<ul>
+    <li>логической группировки</li>
+    <li>параллельных тестов</li>
+    <li>читаемых отчётов</li>
+</ul>
+<pre><code class="language-go">func TestService(t *testing.T) {
+    t.Run("success", func(t *testing.T) {})
+    t.Run("not_found", func(t *testing.T) {})
+}</code></pre>
+
+<hr>
+<h2>Параллельные тесты</h2>
+<pre><code class="language-go">func TestParallel(t *testing.T) {
+    t.Parallel()
+    time.Sleep(time.Second)
+}</code></pre>
+<p>📌 Нельзя <code>t.Parallel()</code>:</p>
+<ul>
+    <li>при shared state</li>
+    <li>при работе с env</li>
+    <li>при использовании одной БД / одного файла</li>
+</ul>
+
+<hr>
+<h2>Setup / Teardown</h2>
+<p>В Go <b>нет beforeEach/afterEach</b>, всё делается руками:</p>
+<pre><code class="language-go">func TestMain(m *testing.M) {
+    setup()
+    code := m.Run()
+    teardown()
+    os.Exit(code)
+}</code></pre>
+<p>Используется редко, но очень <b>важно знать</b>.</p>
+
+<hr>
+<h2>Проверки ошибок (правильно!)</h2>
+<p>❌ Плохо:</p>
+<pre><code class="language-go">if err != nil {
+    t.Fatal(err)
+}</code></pre>
+<p>✅ Хорошо:</p>
+<pre><code class="language-go">if err != nil {
+    t.Fatal("expected error, got nil")
+}</code></pre>
+<p>Или:</p>
+<pre><code class="language-go">if !errors.Is(err, ErrNotFound) {
+    t.Fatalf("expected ErrNotFound, got %v", err)
+}</code></pre>
+
+<hr>
+<h2>Mock’и в Go</h2>
+<p>В Go нет встроенных <b>mock’ов</b>, всё через интерфейсы.</p>
+<h3>Ручной mock</h3>
+<pre><code class="language-go">type mockRepo struct {
+    data map[int]string
+}
+
+func (m *mockRepo) Get(id int) (string, error) {
+    v, ok := m.data[id]
+    if !ok {
+        return "", ErrNotFound
+    }
+    return v, nil
+}</code></pre>
+<p>Ручные mock'и:</p>
+<ul>
+    <li>проще</li>
+    <li>меньше магии</li>
+    <li>типобезопасно</li>
+    <li>читаемо</li>
+</ul>
+
+<hr>
+<h2>Тестирование HTTP (Gin / net/http)</h2>
+<pre><code class="language-go">req := httptest.NewRequest(http.MethodGet, "/ping", nil)
+w := httptest.NewRecorder()
+
+router.ServeHTTP(w, req)
+
+if w.Code != http.StatusOK {
+    t.Fatalf("expected 200, got %d", w.Code)
+}</code></pre>
+
+<hr>
+<h2>Тестирование concurrency</h2>
+<h3>Проверка дедлоков</h3>
+<pre><code class="language-go">done := make(chan struct{})
+go func() {
+    work()
+    close(done)
+}()
+
+select {
+case <-done:
+case <-time.After(time.Second):
+    t.Fatal("deadlock")
+}</code></pre>
+<code>-race</code>
+<pre><code class="language-go">go test -race ./...</code></pre>
+
+<hr>
+<h2>Benchmark’и</h2>
+<pre><code class="language-go">func BenchmarkSum(b *testing.B) {
+    for i := 0; i < b.N; i++ {
+        Sum(2, 3)
+    }
+}</code></pre>
+<p>Запуск:</p>
+<pre><code class="language-go">go test -bench=. -benchmem</code></pre>
+<blockquote class="note">Логи в benchmark писать нельзя. (Логи ломают измерения производительности.)</blockquote>
+
+<hr>
+<h2>Fuzz-тестирование (Go ≥ 1.18)</h2>
+<pre><code class="language-go">func FuzzReverse(f *testing.F) {
+    f.Add("hello")
+
+    f.Fuzz(func(t *testing.T, s string) {
+        r := Reverse(s)
+        if Reverse(r) != s {
+            t.Fatalf("broken")
+        }
+    })
+}</code></pre>
+
+<hr>
+<h2>Что обязательно спросят на собесе</h2>
+<p>Чеклист:</p>
+<ul>
+    <li>✅ table-driven tests</li>
+    <li>✅ t.Parallel</li>
+    <li>✅ TestMain</li>
+    <li>✅ mock через интерфейсы</li>
+    <li>✅ go test -race</li>
+    <li>✅ black-box vs white-box</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{{ end }}
