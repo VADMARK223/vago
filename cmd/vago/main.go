@@ -16,8 +16,8 @@ import (
 	"vago/internal/infra/kafka"
 	"vago/internal/infra/logger"
 	"vago/internal/infra/token"
-	"vago/internal/trasport/grpc"
-	"vago/internal/trasport/http"
+	"vago/internal/transport/grpc"
+	"vago/internal/transport/http"
 	"vago/pkg/timex"
 
 	"github.com/joho/godotenv"

@@ -23,7 +23,10 @@ func NewService(repo domain.UserRepository, tokens domain.TokenProvider) *Servic
 }
 
 func (s *Service) CreateUser(dto domain.DTO) error {
-	hash, _ := bcrypt.GenerateFromPassword([]byte(dto.Password), bcrypt.DefaultCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(dto.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return fmt.Errorf("failed to hash password: %w", err)
+	}
 	user := domain.New(dto.Login, string(hash), dto.Email, dto.Username, dto.Color, dto.Role)
 	return s.repo.CreateUser(user)
 }

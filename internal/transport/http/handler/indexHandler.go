@@ -6,12 +6,12 @@ import (
 	"time"
 	"vago/internal/config/code"
 	"vago/internal/infra/token"
-	"vago/internal/trasport/http/middleware"
+	"vago/internal/transport/http/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
-const version = "0.7.2"
+const version = "0.7.4"
 
 func ShowIndex(provider *token.JWTProvider) gin.HandlerFunc {
 	return func(c *gin.Context) {

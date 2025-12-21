@@ -33,6 +33,8 @@ create table if not exists tasks
             ON DELETE CASCADE
 );
 comment on table tasks is 'Таблица задач';
+CREATE INDEX idx_tasks_user_id ON tasks(user_id);
+CREATE INDEX idx_tasks_completed ON tasks(completed);
 
 CREATE TABLE IF NOT EXISTS messages
 (
@@ -42,6 +44,6 @@ CREATE TABLE IF NOT EXISTS messages
     message_type VARCHAR(30) NOT NULL     DEFAULT 'text',
     created_at   TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
-
+comment on table messages is 'Таблица сообщений';
 CREATE INDEX idx_messages_user_id ON messages (user_id);
 CREATE INDEX idx_messages_messages_type ON messages (message_type);

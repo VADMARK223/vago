@@ -15,9 +15,9 @@ import (
 	"vago/internal/config/route"
 	"vago/internal/infra/persistence/gorm"
 	"vago/internal/infra/token"
-	"vago/internal/trasport/http/handler"
-	"vago/internal/trasport/http/middleware"
-	"vago/internal/trasport/ws"
+	"vago/internal/transport/http/handler"
+	"vago/internal/transport/http/middleware"
+	"vago/internal/transport/ws"
 
 	"github.com/gin-gonic/gin"
 )

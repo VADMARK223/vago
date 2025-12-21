@@ -9,7 +9,7 @@ import (
 	"vago/internal/config/code"
 	"vago/internal/infra/token"
 
-	"vago/internal/trasport/ws"
+	"vago/internal/transport/ws"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
