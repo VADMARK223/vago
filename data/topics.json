@@ -10,14 +10,14 @@
   {"id": 9, "name": "Каналы (Channels)"},
   {"id": 10, "name": "Синхронизация (Sync)"},
   {"id": 11, "name": "Ошибки и паники (Error and panics)"},
-  {"id": 12, "name": "Defer"},
+  {"id": 12, "name": "Отложенный вызов (Defer)"},
   {"id": 13, "name": "Стек и куча (Stack and heap)"},
   {"id": 14, "name": "Указатели (Pointers)"},
-  {"id": 15, "name": "Garbage collector"},
+  {"id": 15, "name": "Сборщик мусора (Garbage collector)"},
   {"id": 16, "name": "Контекст (Context)"},
   {"id": 17, "name": "Строки (Strings)"},
   {"id": 18, "name": "Обобщения (Generics)"},
   {"id": 19, "name": "Мультиплексор событий (Select)"},
-  {"id": 20, "name": "Тесты (Tests)"},
-  {"id": 21, "name": "CI/CD"}
+  {"id": 20, "name": "Тестирование (Testing)"},
+  {"id": 21, "name": "Методология CI/CD"}
 ]

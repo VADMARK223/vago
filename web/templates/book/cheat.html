@@ -117,6 +117,9 @@ num, err := strconv.Atoi("100") // 100
 s := string(bytes) // Срез байтов к строке
 bytes := []byte(s) // Строка к срезу байт</code></pre>
 
+<h2>Общее</h2>
+<blockquote class="note">Каждый <code>fmt.Sprintf</code> = минимум 1 heap-аллокация</blockquote>
+
 <h2>Generics</h2>
 <pre><code class="language-go">func Filter[T any](in []T, f func(T) bool) []T {
     var result []T

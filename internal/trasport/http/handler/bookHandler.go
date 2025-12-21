@@ -25,17 +25,20 @@ func ShowBook(c *gin.Context) {
 		{ID: 5, Name: "Функции и методы (Functions and methods)"},
 		{ID: 6, Name: "Интерфейсы (Interfaces)"},
 		{ID: 7, Name: "Горутины (Goroutines)"},
+		{ID: 8, Name: "Планировщик (Scheduler)"},
 		{ID: 9, Name: "Каналы (Channels)"},
 		{ID: 10, Name: "Синхронизация (Sync)"},
 		{ID: 11, Name: "Ошибки и паники (Error and panics)"},
-		{ID: 12, Name: "Defer"},
+		{ID: 12, Name: "Отложенный вызов (Defer)"},
+		{ID: 13, Name: "Стек и куча (Stack and heap)"},
 		{ID: 14, Name: "Указатели (Pointers)"},
+		{ID: 15, Name: "Сборщик мусора (Garbage collector)"},
 		{ID: 16, Name: "Контекст (Context)"},
 		{ID: 17, Name: "Строки (Strings)"},
 		{ID: 18, Name: "Обобщения (Generics)"},
-		{ID: 19, Name: "Мультиплексор событий Select"},
+		{ID: 19, Name: "Мультиплексор событий (Select)"},
 		{ID: 20, Name: "Тестирование (Testing)"},
-		{ID: 21, Name: "CI/CD"},
+		{ID: 21, Name: "Методология CI/CD"},
 	}
 
 	bookTasks := []bookChapter{

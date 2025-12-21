@@ -261,3 +261,13 @@ currentUser := c.MustGet(code.CurrentUser)
 - **Russian language**: User-facing content, comments, and README are in Russian
 - **Database migrations**: Manual SQL files, not a migration tool
 - **Environment switching**: Controlled by `APP_ENV` env var, loads `.env.local` only in local mode
+ 
+## Доработки
+- При регистрации просить повторить пароль
+- При логине и регистрации фокус сразу кидать на поле ввода логина
+- Отловить 503 в quiz
+- В книге продумать и реализовать адекватную навигацию
+- Снять ограничения в длине сообщений в чате
+- Длинное описание задач ломают верстку
+- Одно название викторина или quiz
+- Синхронизировать порядок в меню и на главной странице
