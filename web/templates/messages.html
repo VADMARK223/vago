@@ -28,32 +28,36 @@
             </div>
         </div>
         <hr>
-        <div class="scrollable-content">
-            <div class="list">
-                {{range .messages}}
-                <div class="item" id="message-{{.ID}}">
-                    <div class="item-info">
-                        <p>Идентификатор сообщения: {{.ID}}</p>
-                        <p>Идентификатор автора: {{.AuthorID}}</p>
-                        <p>Никнейм: {{.Username}}</p>
-                        <p>Содержание: {{.Body}}</p>
-                        <p>Тип: {{.MessageType}}</p>
-                        <p>Отправлено: {{.SentAt}}</p>
+        <div class="scrollable-wrapper">
+            <div class="scrollable-content" id="scrollable">
+                <div class="list">
+                    {{range .messages}}
+                    <div class="item" id="message-{{.ID}}">
+                        <div class="item-info">
+                            <p>Идентификатор сообщения: {{.ID}}</p>
+                            <p>Идентификатор автора: {{.AuthorID}}</p>
+                            <p>Никнейм: {{.Username}}</p>
+                            <p>Содержание: {{.Body}}</p>
+                            <p>Тип: {{.MessageType}}</p>
+                            <p>Отправлено: {{.SentAt}}</p>
+                        </div>
+                        <div>
+                            <button class="btn btn-small btn-danger" onclick="deleteMessage('{{.ID}}')"><i
+                                    class="fa-solid fa-trash"></i></button>
+                        </div>
                     </div>
-                    <div>
-                        <button class="btn btn-small btn-danger" onclick="deleteMessage('{{.ID}}')"><i
-                                class="fa-solid fa-trash"></i></button>
-                    </div>
+                    {{else}}
+                    <p class="empty">Сообщений нет</p>
+                    {{end}}
                 </div>
-                {{else}}
-                <p class="empty">Сообщений нет</p>
-                {{end}}
             </div>
+            <button class="scroll-top-btn" id="scrollTopBtn" title="Наверх">↑</button>
         </div>
     </div>
 </main>
 
 {{ template "footer" . }}
+<script type="module" src="/static/js/bundle.js"></script>
 <script>
     async function deleteMessage(id) {
         if (!confirm('Удалить сообщение?')) return;

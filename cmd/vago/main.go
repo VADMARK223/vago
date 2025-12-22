@@ -189,7 +189,7 @@ func initDB(appCtx *ctx.Context) *gorm.DB {
 // startHTTPServer запускает Gin и корректно останавливает его при ctx.Done()
 func startHTTPServer(ctx context.Context, appCtx *ctx.Context, wg *sync.WaitGroup, tokenProvider *token.JWTProvider) *netHttp.Server {
 	defer wg.Done()
-	router := http.SetupRouter(appCtx, tokenProvider)
+	router := http.SetupRouter(ctx, appCtx, tokenProvider)
 	srv := &netHttp.Server{
 		Addr:    ":" + appCtx.Cfg.Port,
 		Handler: router,

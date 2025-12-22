@@ -1,6 +1,7 @@
 package http
 
 import (
+	"context"
 	"fmt"
 	"html/template"
 	"os"
@@ -22,10 +23,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine {
+func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine {
 	// WS
 	hub := ws.NewHub(ctx.Log)
-	go hub.Run()
+	go hub.Run(goCtx)
 	// Сервисы
 	taskSvc := task.NewService(gorm.NewTaskRepo(ctx.DB))
 	messageRepo := gorm.NewMessageRepo(ctx.DB)
