@@ -27,39 +27,43 @@
             </label>
         </form>
 
-        <div class="scrollable-content">
-            {{range .questions}}
-            <div class="panel" id="message-{{.ID}}">
-                <div>
-                    <p>{{.ID}}: <b>{{.Text}}</b></p>
+        <div class="scrollable-wrapper">
+            <div class="scrollable-content" id="scrollable">
+                {{range .questions}}
+                <div class="panel" id="message-{{.ID}}">
+                    <div>
+                        <p>{{.ID}}: <b>{{.Text}}</b></p>
 
-                    {{if .Code}}
-                    <pre><code class="language-go">{{.Code}}</code></pre>
-                    {{end}}
-
-                    {{range .Answers}}
-                    <div style="font-size: small">
-                        <span>{{.ID}}) {{.Text}}</span>
-                        {{if .IsCorrect}}
-                        <span class="correct">✔</span>
+                        {{if .Code}}
+                        <pre><code class="language-go">{{.Code}}</code></pre>
                         {{end}}
-                    </div>
-                    {{else}}
-                    <div class="empty">Ответов пока нет</div>
-                    {{end}}
-                    <div style="padding:4px; color: white; background: #2e6230 !important; border-color: #3fa34d;">
-                        {{.Explanation}}
+
+                        {{range .Answers}}
+                        <div style="font-size: small">
+                            <span>{{.ID}}) {{.Text}}</span>
+                            {{if .IsCorrect}}
+                            <span class="correct">✔</span>
+                            {{end}}
+                        </div>
+                        {{else}}
+                        <div class="empty">Ответов пока нет</div>
+                        {{end}}
+                        <div style="padding:4px; color: white; background: #2e6230 !important; border-color: #3fa34d;">
+                            {{.Explanation}}
+                        </div>
                     </div>
                 </div>
+                {{else}}
+                <p class="empty">Вопросов нет</p>
+                {{end}}
             </div>
-            {{else}}
-            <p class="empty">Вопросов нет</p>
-            {{end}}
+            <button class="scroll-top-btn" id="scrollTopBtn" title="Наверх">↑</button>
         </div>
     </div>
 </main>
 
 {{ template "footer" . }}
 <script>hljs.highlightAll();</script>
+<script type="module" src="/static/js/bundle.js"></script>
 </body>
 </html>

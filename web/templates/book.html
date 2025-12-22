@@ -25,67 +25,72 @@
                 </select>
             </label>
         </form>
-        <div class="scrollable-content">
-            <div class="chapter">
-                {{ if eq .chapter_id 1 }}
-                {{ template "book.common" . }}
-                {{ else if eq .chapter_id 2 }}
-                {{ template "book.slices" . }}
-                {{ else if eq .chapter_id 3 }}
-                {{ template "book.arrays" . }}
-                {{ else if eq .chapter_id 4 }}
-                {{ template "book.maps" . }}
-                {{ else if eq .chapter_id 5 }}
-                {{ template "book.functions" . }}
-                {{ else if eq .chapter_id 6 }}
-                {{ template "book.interfaces" . }}
-                {{ else if eq .chapter_id 7 }}
-                {{ template "book.goroutines" . }}
-                {{ else if eq .chapter_id 8 }}
-                {{ template "book.scheduler" . }}
-                {{ else if eq .chapter_id 9 }}
-                {{ template "book.channels" . }}
-                {{ else if eq .chapter_id 10 }}
-                {{ template "book.sync" . }}
-                {{ else if eq .chapter_id 11 }}
-                {{ template "book.errors" . }}
-                {{ else if eq .chapter_id 12 }}
-                {{ template "book.defer" . }}
-                {{ else if eq .chapter_id 13 }}
-                {{ template "book.stack_heap" . }}
-                {{ else if eq .chapter_id 14 }}
-                {{ template "book.pointers" . }}
-                {{ else if eq .chapter_id 15 }}
-                {{ template "book.gc" . }}
-                {{ else if eq .chapter_id 16 }}
-                {{ template "book.context" . }}
-                {{ else if eq .chapter_id 17 }}
-                {{ template "book.strings" . }}
-                {{ else if eq .chapter_id 18 }}
-                {{ template "book.generics" . }}
-                {{ else if eq .chapter_id 19 }}
-                {{ template "book.select" . }}
-                {{ else if eq .chapter_id 20 }}
-                {{ template "book.testing" . }}
-                {{ else if eq .chapter_id 21 }}
-                {{ template "book.ci_cd" . }}
-                {{ else if eq .chapter_id 100 }}
-                {{ template "book.cheat" . }}
-                {{ else if eq .chapter_id 101 }}
-                {{ template "task.practice" . }}
-                {{ else }}
-                <div>
-                    {{ range .chapters }}
-                    <a href="/book?chapter_id={{ .ID }}">{{ if not .HideID }}{{ .ID }}. {{ end }} {{ .Name }}</a><br>
+
+        <div class="scrollable-wrapper">
+            <div class="scrollable-content" id="scrollable">
+                <div class="chapter">
+                    {{ if eq .chapter_id 1 }}
+                    {{ template "book.common" . }}
+                    {{ else if eq .chapter_id 2 }}
+                    {{ template "book.slices" . }}
+                    {{ else if eq .chapter_id 3 }}
+                    {{ template "book.arrays" . }}
+                    {{ else if eq .chapter_id 4 }}
+                    {{ template "book.maps" . }}
+                    {{ else if eq .chapter_id 5 }}
+                    {{ template "book.functions" . }}
+                    {{ else if eq .chapter_id 6 }}
+                    {{ template "book.interfaces" . }}
+                    {{ else if eq .chapter_id 7 }}
+                    {{ template "book.goroutines" . }}
+                    {{ else if eq .chapter_id 8 }}
+                    {{ template "book.scheduler" . }}
+                    {{ else if eq .chapter_id 9 }}
+                    {{ template "book.channels" . }}
+                    {{ else if eq .chapter_id 10 }}
+                    {{ template "book.sync" . }}
+                    {{ else if eq .chapter_id 11 }}
+                    {{ template "book.errors" . }}
+                    {{ else if eq .chapter_id 12 }}
+                    {{ template "book.defer" . }}
+                    {{ else if eq .chapter_id 13 }}
+                    {{ template "book.stack_heap" . }}
+                    {{ else if eq .chapter_id 14 }}
+                    {{ template "book.pointers" . }}
+                    {{ else if eq .chapter_id 15 }}
+                    {{ template "book.gc" . }}
+                    {{ else if eq .chapter_id 16 }}
+                    {{ template "book.context" . }}
+                    {{ else if eq .chapter_id 17 }}
+                    {{ template "book.strings" . }}
+                    {{ else if eq .chapter_id 18 }}
+                    {{ template "book.generics" . }}
+                    {{ else if eq .chapter_id 19 }}
+                    {{ template "book.select" . }}
+                    {{ else if eq .chapter_id 20 }}
+                    {{ template "book.testing" . }}
+                    {{ else if eq .chapter_id 21 }}
+                    {{ template "book.ci_cd" . }}
+                    {{ else if eq .chapter_id 100 }}
+                    {{ template "book.cheat" . }}
+                    {{ else if eq .chapter_id 101 }}
+                    {{ template "task.practice" . }}
+                    {{ else }}
+                    <div>
+                        {{ range .chapters }}
+                        <a href="/book?chapter_id={{ .ID }}">{{ if not .HideID }}{{ .ID }}. {{ end }} {{ .Name }}</a><br>
+                        {{ end }}
+                    </div>
                     {{ end }}
                 </div>
-                {{ end }}
             </div>
+            <button class="scroll-top-btn" id="scrollTopBtn" title="Наверх">↑</button>
         </div>
     </div>
 </main>
 
 {{ template "footer" . }}
 <script>hljs.highlightAll();</script>
+<script type="module" src="/static/js/bundle.js"></script>
 </body>
 </html>
