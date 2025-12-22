@@ -69,7 +69,6 @@ func NewServer(ctx *app.Context, grpcPort, grpcWebPort string, provider *token.J
 	httpServer := &http.Server{
 		Addr: ":" + grpcWebPort,
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			s.log.Infow("HTTP request", "method", r.Method, "path", r.URL.Path, "headers", r.Header)
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
 			corsAllowedOrigins := ctx.Cfg.CorsAllowedOrigins()
 			origin := r.Header.Get("Origin")
