@@ -1,3 +1,12 @@
+.toc {
+    display: flex;
+    flex-direction: column;
+}
+
+.toc a.sub {
+    padding-left: 24px;
+}
+
 .chapter {
     display: flex;
     flex-direction: column;

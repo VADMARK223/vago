@@ -1,0 +1,315 @@
+{{ define "task.practice" }}
+<h1>Практика</h1>
+<nav class="toc">
+    <a href="#channels"><b>1. Каналы</b></a>
+    <a href="#channels_fan_out" class="sub">1.1. Fan-out</a>
+    <a href="#channels_fan_in" class="sub">1.2. Fan-in</a>
+    <a href="#channels_pipeline" class="sub">1.3. Pipeline (Fan-in + Fan-out)</a>
+    <a href="#channels_others" class="sub">1.4. Прочее</a>
+
+    <a href="#slices">2. Срезы</a>
+    <a href="#strings">3. Строки</a>
+</nav>
+
+<hr>
+
+<h2 id="channels">1. Каналы</h2>
+<h3 id="channels_fan_out">1.1. Fan-out</h3>
+<h4>Определение</h4>
+<p>Это паттерн конкурентности, при котором данные из одного входного канала распределяются между несколькими горутинами для параллельной обработки.</p>
+<h4>Смысл</h4>
+<ul>
+    <li>один источник данных</li>
+    <li>несколько обработчиков</li>
+    <li>каждое значение обрабатывается <b>ровно одним</b> worker’ом</li>
+</ul>
+<pre><code class="language-go">// Схема
+       ┌─→ worker 1
+in ──●─┼─→ worker 2
+       └─→ worker 3
+</code></pre>
+
+<h4>Пример</h4>
+<pre><code class="language-go">func main() {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second) // Контекст для сигнала остановки
+	defer cancel()                                                           // В конце обязательно отменяем контекст
+
+	in := make(chan int) // Входной канал, который надо распараллелить
+
+	go func() { // Имитируем медленную запись во входной канал
+		for i := 2; i <= 5; i++ {
+			time.Sleep(1 * time.Second)
+			in <- i
+		}
+
+		close(in) // Когда все записали, закрываем его
+	}()
+
+	out := fanOut(ctx, in, workerCount)
+	for result := range out { // Блокирующе читаем результаты
+		fmt.Println("Result:", result)
+	}
+}
+
+func fanOut(ctx context.Context, in <-chan int, count int) <-chan int {
+	out := make(chan int) // Выходной канал результатов
+	var wg sync.WaitGroup
+	wg.Add(count) // Ожидаем завершение всех workers
+
+	for i := 0; i < count; i++ { // В цикле создаем по одной горутине на worker
+		go func() {
+			defer wg.Done() // Уменьшаем счетчик по завершению горутины
+
+			for {
+				select {
+				case <-ctx.Done(): // Контекст дал сигнал на остановку
+					return // Выходим из цикла
+				case val, ok := <-in: // Блокирующе ждем данных из входного канала
+					if !ok { // Канал закрыт
+						return // Выходим из цикла
+					}
+
+					select {
+					case <-ctx.Done():
+					case out <- val * val: // В выходной канал складываем вычисления
+					}
+				}
+			}
+		}()
+	}
+
+	go func() {
+		wg.Wait()  // Ожидаем завершения всех workers
+		close(out) // Закрываем канал с результатами
+	}()
+
+	return out
+}</code></pre>
+
+<h3 id="channels_fan_in">1.2. Fan-in</h3>
+<h4>Определение</h4>
+<p>Это паттерн конкурентности, при котором данные из нескольких каналов объединяются в один выходной канал.</p>
+<h4>Смысл</h4>
+<ul>
+    <li>несколько источников</li>
+    <li>один получатель</li>
+    <li>результаты «схлопываются» в общий поток</li>
+</ul>
+<pre><code class="language-go">// Схема
+сh1 ──┐
+сh2 ──├─→ out
+сh3 ──┘
+</code></pre>
+
+<h4>Пример</h4>
+<pre><code class="language-go">func main() {
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+
+    ch1 := make(chan int)
+    go func() {
+        defer close(ch1)
+        for i := 0; i < 3; i++ {
+            select {
+            case ch1 <- i:
+            case <-ctx.Done():
+                return
+            }
+        }
+    }()
+
+    ch2 := make(chan int)
+    go func() {
+        defer close(ch2)
+        for i := 4; i < 6; i++ {
+            select {
+            case ch2 <- i:
+            case <-ctx.Done():
+                return
+            }
+        }
+    }()
+
+    out := fanIn(ctx, ch1, ch2)
+
+    sum := 0
+    for v := range out { sum += v }
+    fmt.Println("result:", sum)
+}
+
+func fanIn(ctx context.Context, channels ...<-chan int) <-chan int {
+    out := make(chan int) // Создаем выходной канал (небуферизированный)
+    wg := sync.WaitGroup{}
+    wg.Add(len(channels)) // Группа будет ждать все входящие каналы
+
+    for _, ch := range channels { // Проходимся по всем входным каналам циклом
+        go func(c <-chan int) { // Запускаем отдельную горутину для КАЖДОГО входного канала. После 1.22+ аргумент передавать не обязательно.
+            defer wg.Done() // Гарантируем, что при любом выходе из горутины счётчик WaitGroup будет уменьшен ровно один раз.
+			for { // Бесконечный цикл — выходим только по return: 1) входной канал закрыт 2) контекст отменён
+				select {
+                case <-ctx.Done(): // Контекст отменён во время ожидания данных из входного канала. Немедленно завершаем горутину, предотвращая утечку.
+					return
+				}
+				case v, ok := <-c:
+					// Пытаемся получить значение из входного канала.
+					// Горутина блокируется здесь, пока:
+					// - не придёт значение
+					// - или канал не закроется
+					// - или не сработает ctx.Done() (см. ниже)
+					if !ok { // Если канал закрыт — корректно завершаем горутину.
+						return
+					}
+
+					select { // Значение успешно получено из входного канала, теперь нужно отправить его в общий выходной канал.
+					case out <- v: // Если out небуферизированный — здесь возможна блокировка, пока consumer (main) не выполнит чтение.
+					case <-ctx.Done(): // Контекст отменён во время попытки отправки в out. Чтобы не зависнуть на send — выходим из горутины.
+						return
+					}
+			}
+		}(ch)
+	}
+
+	go func() { // Ждем в отдельной горутине, чтобы не блокировать возврат выходного канала из функции
+		wg.Wait() // Все входящие каналы прочитаны
+		close(out) // Закрываем выходящий канал, чтобы остановить range в main
+	}()
+
+	return out
+}</code></pre>
+<blockquote class="note"></blockquote>
+<hr>
+<h3 id="channels_pipeline">1.3. Pipeline (Fan-in + Fan-out)</h3>
+<h4>Определение</h4>
+<p>Fan-out и fan-in вместе образуют pipeline, позволяющий распараллеливать обработку данных и затем собирать результаты.</p>
+<pre><code class="language-go">// Схема
+producer
+   │
+   ↓
+  in
+   │
+   ├──→ worker 1 ─┐
+   ├──→ worker 2 ─┼──→ out
+   └──→ worker 3 ─┘
+</code></pre>
+<hr>
+<h3 id="channels_others">1.4. Прочее</h3>
+<h4>Задача 1</h4>
+<span>Имеется некая функция <code>getText()</code> которая выполняется неизвестное кол-во времени и возвращает <code>string</code>,
+    необходимо это контролировать, саму функцию менять нельзя.</span>
+<pre><code class="language-go">const workTime = 2 * time.Second
+ch := make(chan string, 1)
+ctx, cancel := context.WithTimeout(context.Background(), waitTime)
+defer cancel()
+
+go func(readCh chan<- string) {
+    fmt.Println("Стартуем горутину.")
+    result := getText()
+    select {
+    case readCh <- result:
+        fmt.Println("Получен результат в горутине:", result)
+    // Защита от блокировки на отправку, если главный поток уже вышел по cxt.Done()
+    case <-ctx.Done():
+        fmt.Println("Контекст выполнился, завершаем горутину.")
+    }
+}(ch)
+
+select {
+case msg := <-ch:
+    fmt.Println("Результат получен в главном потоке:", msg)
+case <-ctx.Done():
+    fmt.Println("Контекст завершился: ", ctx.Err())
+}
+
+fmt.Println("Выходим из главного потока.")</code></pre>
+
+<hr>
+
+<h2 id="slices">2. Срезы</h2>
+<p>Написать программу, которая возвращает слайс с заданным количеством случайных уникальных чисел</p>
+<pre><code class="language-go">func main() {
+	fmt.Println(uniqRandom(10, 11))
+}
+
+func uniqRandom(n, max int) []int {
+	if n > max {
+		panic("n > max будет бесконечный цикл")
+	}
+    // Результирующий срез (резервируем емкость, чтобы избежать аллокаций базового массива)
+	result := make([]int, 0, n)
+    // Срез для кеширования чисел
+	memory := make(map[int]struct{}, n)
+
+	for len(result) < n {
+		val := rand.IntN(max)
+		if _, ok := memory[val]; ok {
+			continue
+		} else {
+			memory[val] = struct{}{}
+			result = append(result, val)
+		}
+	}
+
+	return result
+}</code></pre>
+
+<hr>
+
+<h2 id="strings">3. Строки</h2>
+<h3>Задача 1</h3>
+<p>Написать функцию, которая разворачивает строку.<code>func reverse(s string) string</code></p>
+<pre><code class="language-go">func main() {
+	fmt.Println("result:", reverse("вадим"))
+}
+
+func reverse(s string) string {
+	runes := []rune(s)
+	fmt.Println("Кол-во байтов в строке: ", len(s))     // 10
+	fmt.Println("Кол-во rune (символов): ", len(runes)) // 5
+
+	// Понятный вариант:
+	var result = make([]rune, 0, len(runes))
+	for i := len(runes) - 1; i >= 0; i-- {
+		result = append(result, runes[i])
+	}
+
+	// Можно короче:
+	/*var result = make([]rune, len(runes))
+	for i := range runes {
+		result[len(runes)-1-i] = runes[i]
+	}*/
+
+	return string(result)
+}</code></pre>
+<p>Более компактный</p>
+<pre><code class="language-go">func reverse(s string) string {
+	r := []rune(s)
+	for i, j := 0, len(r)-1; i < j; i, j = i+1, j-1 {
+		r[i], r[j] = r[j], r[i]
+	}
+	return string(r)
+}
+</code></pre>
+<h3>Задача 2</h3>
+<p>Удалить все повторяющиеся символы из строки, сохранив порядок.<code>func unique(s string) string </code></p>
+<pre><code class="language-go">func main() {
+	fmt.Println("result:", unique("вваааддиииммм"))
+}
+
+func unique(s string) string {
+	runes := []rune(s)
+	seen := make(map[rune]struct{}, len(runes))
+	var result strings.Builder
+	result.Grow(len(runes)) // Необязательная оптимизация
+
+	for _, r := range runes { // Можно идти и по s
+		_, ok := seen[r]
+		if !ok {
+			seen[r] = struct{}{}
+			result.WriteRune(r)
+		}
+	}
+
+	return result.String() // вадим
+}</code></pre>
+
+{{ end }}

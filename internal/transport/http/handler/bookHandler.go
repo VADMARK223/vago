@@ -18,6 +18,7 @@ func ShowBook(c *gin.Context) {
 
 	bookChapters := []bookChapter{
 		{ID: 100, HideID: true, Name: "Шпаргалка"},
+		{ID: 101, HideID: true, Name: "Практика"},
 		{ID: 1, Name: "Общие вопросы"},
 		{ID: 2, Name: "Срезы (Slices)"},
 		{ID: 3, Name: "Массивы (Array)"},
@@ -41,12 +42,6 @@ func ShowBook(c *gin.Context) {
 		{ID: 21, Name: "Методология CI/CD"},
 	}
 
-	bookTasks := []bookChapter{
-		{ID: -1, Name: "Песочница"},
-		{ID: -2, Name: "Fan-out / Fan-in"},
-		{ID: -3, Name: "Контроль долго выполняющейся функции"},
-	}
-
 	var (
 		chapterID int64
 		err       error
@@ -63,6 +58,5 @@ func ShowBook(c *gin.Context) {
 	data := tplWithCapture(c, "Книга по Golang")
 	data["chapter_id"] = chapterID
 	data["chapters"] = bookChapters
-	data["tasks"] = bookTasks
 	c.HTML(http.StatusOK, "book.html", data)
 }

@@ -21,4 +21,17 @@
 <span>Это <b>кооперативная отмена</b>.</span>
 {{ template "book.common.context" . }}
 
+
+<blockquote class="note">❗ Контекст создаёт тот, кто управляет жизненным циклом</blockquote>
+<pre><code class="language-go">main func() {
+    ctx, cancel := context.WithCancel(context.Background())
+    defer cancel()
+    ...
+    out := fanin(ctx, ch1, ch2)
+}</code></pre>
+<ul>
+    <li><code>main</code> → владелец контекста</li>
+    <li><code>fanin</code> → уважает контекст (реагирует на <code>ctx.Done()</code> и корректно завершает работу, когда контекст отменен)</li>
+</ul>
+
 {{ end }}

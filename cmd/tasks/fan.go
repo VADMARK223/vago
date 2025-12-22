@@ -150,6 +150,7 @@ func runFan() {
 	}
 	fmt.Println("result:", sum)
 }
+
 func fanIn(ctx context.Context, channels ...<-chan int) <-chan int {
 	out := make(chan int)
 	wg := sync.WaitGroup{}
