@@ -38,3 +38,20 @@ jobs:
           tags: |
             ghcr.io/vadmark223/vago:latest
             ghcr.io/vadmark223/vago:${{ github.sha }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to VDS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VDS_HOST }}
+          username: ${{ secrets.VDS_USER }}
+          key: ${{ secrets.VDS_SSH_KEY }}
+          script: |
+            cd ~/vago
+            docker compose pull
+            docker compose up -d --remove-orphans
+            docker image prune -f
