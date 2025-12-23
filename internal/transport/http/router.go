@@ -91,7 +91,7 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 		auth.GET("/grpc-test", handler.Grpc)
 
 		auth.GET("/ws", handler.ServeSW(hub, ctx.Log, tokenProvider, chatSvc))
-		auth.GET("/chat", handler.ShowChat(ctx.Cfg.Port, chatSvc, userSvc))
+		auth.GET("/chat", handler.ShowChat(ctx.Cfg.Port, chatSvc))
 
 		messagesHandler := handler.NewMessageHandler(chatSvc, userSvc)
 		auth.GET("/messages", messagesHandler.ShowMessages())

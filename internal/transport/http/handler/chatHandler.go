@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"vago/internal/application/chat"
-	"vago/internal/application/user"
 	"vago/internal/config/code"
 	"vago/internal/infra/token"
 
@@ -16,7 +15,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func ShowChat(port string, chatSvc *chat.Service, userSvc *user.Service) gin.HandlerFunc {
+func ShowChat(port string, chatSvc *chat.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		all, err := chatSvc.MessagesDTO(context.Background())
 		if err != nil {

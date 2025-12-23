@@ -16,15 +16,10 @@ ifneq (,$(wildcard .env.prod))
     include .env.prod
     export $(shell sed -n 's/^\([^#[:space:]]\+\)=.*/\1/p' .env.prod)
 endif
-ifeq ($(KAFKA_ENABLE), true)
-	KAFKA_YML = -f docker-compose.kafka.yml
-else
-    KAFKA_YML =
-endif
 
 PROJECT_NAME = vago
 COMPOSE = docker compose -p $(PROJECT_NAME)
-COMPOSE_FULL = $(COMPOSE) -f docker-compose.yml $(KAFKA_YML)
+COMPOSE_FULL = $(COMPOSE) -f docker-compose.yml
 
 PROTO_DIR = api/proto
 PROTO_FILES := $(wildcard $(PROTO_DIR)/*.proto)
@@ -40,7 +35,7 @@ pull:
 	docker pull ghcr.io/vadmark223/vago:latest
 
 up:
-	docker compose -p $(PROJECT_NAME) -f docker-compose.yml $(KAFKA_YML) up -d
+	docker compose -p $(PROJECT_NAME) -f docker-compose.yml
 
 down:
 	docker compose -p $(PROJECT_NAME) down
@@ -110,12 +105,6 @@ proto-js-all: ## 🚀 Full pipeline: clean → generate → bundle
 	@$(MAKE) proto-js || { echo "$(ORANGE)❌ Stage failed: proto-ts$(RESET)"; exit 1; }
 	@$(MAKE) bundle || { echo "$(ORANGE)❌ Stage failed: bundle$(RESET)"; exit 1; }
 	@echo "$(GREEN)✅ All stages completed successfully!$(RESET)"
-
-kafka-up:
-	$(COMPOSE) $(KAFKA_YML) up -d
-
-kafka-down:
-	$(COMPOSE) $(KAFKA_YML) down
 
 help:
 	@echo "$(YELLOW)🧩 Available Make targets:$(RESET)"

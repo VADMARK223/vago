@@ -2,25 +2,11 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"sync"
-	"time"
 )
 
-const d = 300 * time.Millisecond
-
 func main() {
-	fmt.Printf("➡️ \033[93m%s\033[0m\n", "Собираю твой гавнокод. Подожди...")
-	time.Sleep(d)
-	fmt.Printf("➡️ \033[93m%s\033[0m\n", "Я видел говнокод, но это - событие")
-	time.Sleep(d)
-	fmt.Printf("➡️ \033[93m%s\033[0m\n", "Ты это писал трезвым?")
-	time.Sleep(d)
-	fmt.Printf("➡️ \033[93m%s\033[0m\n", "Такой хуйни я давно не компилил")
-	time.Sleep(d)
-	fmt.Printf("➡️ \033[93m%s\033[0m\n", "Даже если это заработает - тебе нельзя этим гордиться")
-	time.Sleep(d)
-	panic("Опять ошибка: автор кода - долбоёб!!!")
+
 }
 
 func fanOut(ctx context.Context, in <-chan int, count int) <-chan int {
