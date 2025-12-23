@@ -71,6 +71,9 @@
                     {{ template "book.testing" . }}
                     {{ else if eq .chapter_id 21 }}
                     {{ template "book.ci_cd" . }}
+                    {{ else if eq .chapter_id 22 }}
+                    {{ template "book.memory" . }}
+
                     {{ else if eq .chapter_id 100 }}
                     {{ template "book.cheat" . }}
                     {{ else if eq .chapter_id 101 }}

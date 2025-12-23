@@ -40,6 +40,7 @@ func ShowBook(c *gin.Context) {
 		{ID: 19, Name: "Мультиплексор событий (Select)"},
 		{ID: 20, Name: "Тестирование (Testing)"},
 		{ID: 21, Name: "Методология CI/CD"},
+		{ID: 22, Name: "Модель памяти и гонки данных (Memory model & Data races)"},
 	}
 
 	var (

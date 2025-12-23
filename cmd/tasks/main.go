@@ -7,25 +7,20 @@ import (
 	"time"
 )
 
+const d = 300 * time.Millisecond
+
 func main() {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second) // Контекст для сигнала остановки
-	defer cancel()                                                           // В конце обязательно отменяем контекст
-
-	in := make(chan int) // Входной канал, который надо распараллелить
-
-	go func() { // Имитируем медленную запись во входной канал
-		for i := 2; i <= 5; i++ {
-			time.Sleep(1 * time.Second)
-			in <- i
-		}
-
-		close(in) // Когда все записали, закрываем его
-	}()
-
-	out := fanOut(ctx, in, workerCount)
-	for result := range out { // Блокирующе читаем результаты
-		fmt.Println("Result:", result)
-	}
+	fmt.Printf("➡️ \033[93m%s\033[0m\n", "Собираю твой гавнокод. Подожди...")
+	time.Sleep(d)
+	fmt.Printf("➡️ \033[93m%s\033[0m\n", "Я видел говнокод, но это - событие")
+	time.Sleep(d)
+	fmt.Printf("➡️ \033[93m%s\033[0m\n", "Ты это писал трезвым?")
+	time.Sleep(d)
+	fmt.Printf("➡️ \033[93m%s\033[0m\n", "Такой хуйни я давно не компилил")
+	time.Sleep(d)
+	fmt.Printf("➡️ \033[93m%s\033[0m\n", "Даже если это заработает - тебе нельзя этим гордиться")
+	time.Sleep(d)
+	panic("Опять ошибка: автор кода - долбоёб!!!")
 }
 
 func fanOut(ctx context.Context, in <-chan int, count int) <-chan int {

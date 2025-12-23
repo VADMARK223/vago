@@ -1,0 +1,242 @@
+{{ define "book.memory" }}
+<h1>Модель памяти и гонки данных</h1>
+
+<a href="#happens_before">Happens-before</a>
+<a href="#data_race">Гонка данных (Data Race)</a>
+
+<hr>
+
+<i>(Memory Model & Data Races)</i>
+<h2>Зачем вообще это нужно</h2>
+<p>В Go очень легко написать конкурентный код…<br>
+    и <b>очень легко написать неверный конкурентный код</b>, который:</p>
+<ul>
+    <li>работает «на моём компьютере»</li>
+    <li>ломается под нагрузкой</li>
+    <li>ведёт себя по-разному на разных машинах</li>
+</ul>
+<p>Причина почти всегда одна — <b>нарушение модели памяти</b> и <b>гонки данных</b>.</p>
+<hr>
+
+<h2>Что такое модель памяти Go</h2>
+<p><b>Go Memory Model</b> описывает <b>гарантии порядка видимости операций между горутинами</b>.</p>
+<p>Ключевая идея:</p>
+<blockquote class="note">Если между двумя операциями нет отношения <b>happens-before</b>,
+    Go <b>не гарантирует порядок их выполнения и видимость данных</b>.
+</blockquote>
+<p>Компилятор, рантайм и CPU имеют право:</p>
+<ul>
+    <li>переупорядочивать инструкции</li>
+    <li>кэшировать значения</li>
+    <li>выполнять код не так, как он написан текстуально</li>
+</ul>
+<hr>
+
+<h2 id="happens_before">Happens-before</h2>
+<p><b>Happens-before</b> — это отношение, при котором:</p>
+<ul>
+    <li>если A happens-before B</li>
+    <li>то все изменения памяти из A <b>гарантированно видны</b> в B</li>
+</ul>
+<h3>Что создаёт happens-before в Go</h3>
+<p>Гарантированные точки синхронизации:</p>
+<h4>1. Отправка в канал happens-before приём из канала</h4>
+<pre><code class="language-go">ch <- x   // happens-before
+v := <-ch</code></pre>
+
+<h4>2. Закрытие канала happens-before чтение zero-value</h4>
+<pre><code class="language-go">close(ch) // happens-before
+v, ok := <-ch</code></pre>
+
+<h4>3. Unlock happens-before Lock того же mutex</h4>
+<pre><code class="language-go">mu.Unlock() // happens-before
+mu.Lock()</code></pre>
+
+<h4>4. WaitGroup</h4>
+<pre><code class="language-go">wg.Done()  // happens-before
+wg.Wait()</code></pre>
+
+<h4>5. atomic операции</h4>
+<pre><code class="language-go">atomic.StoreInt32(&x, 1) // happens-before
+atomic.LoadInt32(&x)</code></pre>
+<p>❗ <b>Обычное чтение/запись переменной — НЕ синхронизация</b></p>
+<hr>
+
+
+<h2 id="data_race">Гонка данных (Data Race)</h2>
+<p><b>Data race</b> — это ситуация, когда:</p>
+<ul>
+    <li>две или более горутины</li>
+    <li>одновременно обращаются к одной области памяти</li>
+    <li>хотя бы одна из операций — запись</li>
+    <li>и <b>нет happens-before</b></li>
+</ul>
+<p>Пример гонки:</p>
+<pre><code class="language-go">var x int
+
+go func() {
+x = 1
+}()
+
+fmt.Println(x)</code></pre>
+<p>❗ Даже если ты «уверен», что сначала выполнится запись — <b>это ложное чувство</b>.</p>
+<hr>
+
+<h2>Важное правило Go</h2>
+<blockquote class="note"><b>Программа с гонкой данных — некорректна по спецификации Go.</b></blockquote>
+<p>Это означает:</p>
+<ul>
+    <li>результат не определён</li>
+    <li>компилятор имеет право делать что угодно</li>
+    <li>даже «логически правильный» результат — случайность</li>
+</ul>
+<hr>
+
+<h2>Почему time.Sleep — не синхронизация</h2>
+<pre><code class="language-go">go func() {
+x = 1
+}()
+
+time.Sleep(time.Second)
+fmt.Println(x)</code></pre>
+<p>❌ Sleep <b>НЕ создаёт happens-before</b></p>
+<p>✔️ он лишь замедляет текущую горутину</p>
+<p>Такой код <b>всё ещё содержит гонку</b>, даже если «всегда работает».</p>
+<hr>
+
+<h2>Mutex vs Atomic</h2>
+<h3>Mutex</h3>
+<p>Используется, когда:</p>
+<ul>
+    <li>есть инварианты</li>
+    <li>несколько полей</li>
+    <li>сложная логика</li>
+</ul>
+
+<pre><code class="language-go">mu.Lock()
+x++
+y++
+mu.Unlock()</code></pre>
+
+<p>Гарантирует:</p>
+<ul>
+    <li>взаимное исключение</li>
+    <li>happens-before</li>
+    <li>читаемость</li>
+</ul>
+<hr>
+<h3>Atomic</h3>
+<p>Используется, когда:</p>
+<ul>
+    <li>одно значение</li>
+    <li>простой счётчик</li>
+    <li>флаги</li>
+</ul>
+<pre><code class="language-go">atomic.AddInt64(&counter, 1)</code></pre>
+
+<p>⚠️ Опасности:</p>
+<ul>
+    <li>легко нарушить инварианты</li>
+    <li>атомик ≠ mutex</li>
+    <li>несколько atomic операций не атомарны вместе</li>
+</ul>
+
+<hr>
+<h2>Каналы как синхронизация</h2>
+<p>Каналы — это <b>не просто транспорт</b>, а механизм синхронизации памяти.</p>
+<pre><code class="language-go">done := make(chan struct{})
+
+go func() {
+	data = 42
+	close(done)
+}()
+
+<-done
+fmt.Println(data) // безопасно</code></pre>
+<p>Почему безопасно:</p>
+<ul>
+    <li><code>close(done)</code> happens-before <code><-done</code></li>
+</ul>
+
+<hr>
+<h2>Read-only данные</h2>
+<p>Безопасно:</p>
+<pre><code class="language-go">var cfg = loadConfig()
+
+go use(cfg)
+go use(cfg)</code></pre>
+<p>Пока:</p>
+<ul>
+    <li>объект <b>полностью инициализирован</b></li>
+    <li>после инициализации <b>не изменяется</b></li>
+</ul>
+<p>❗ Изменяемые структуры без синхронизации — всегда риск.</p>
+
+<hr>
+<h2>Race Detector</h2>
+<p>Запуск:</p>
+<pre><code class="language-go">go test -race
+go run -race</code></pre>
+<p>Что делает:</p>
+<ul>
+    <li>отслеживает конкурентный доступ к памяти</li>
+    <li>ловит большинство гонок</li>
+</ul>
+<p>Ограничения:</p>
+<ul>
+    <li>замедляет выполнение</li>
+    <li>не ловит 100% кейсов</li>
+    <li>не доказывает отсутствие гонок</li>
+</ul>
+<p>Но:</p>
+<blockquote class="note">Если race detector нашёл гонку — она реальная.</blockquote>
+<hr>
+<h2>Типичные ошибки</h2>
+<ol>
+    <li>«Я просто читаю, без записи»<br>
+        ❌ Если <b>кто-то пишет</b> — уже гонка</li>
+    <li>«int читается атомарно»<br>
+        ❌ Атомарность ≠ happens-before</li>
+    <li>«Я использую sleep»<br>
+        ❌ Не синхронизация</li>
+    <li>«Работает годами»<br>
+        ❌ До первого изменения компилятора / нагрузки</li>
+</ol>
+<hr>
+<h2>Главное правило конкурентного Go</h2>
+<blockquote class="note"><b>Не дели память — передавай сообщения.</b><br>
+    <b>Если делишь память — синхронизируй доступ.</b></blockquote>
+<p>Это философия Go, а не просто слоган.</p>
+<hr>
+<h2>Краткое резюме</h2>
+<ul>
+    <li>Go не гарантирует порядок без happens-before</li>
+    <li>Data race = undefined behavior</li>
+    <li>Mutex / channels / atomic создают happens-before</li>
+    <li>Sleep, print, логика — не синхронизация</li>
+    <li>Race detector — обязательный инструмент</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{{ end }}
