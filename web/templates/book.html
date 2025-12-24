@@ -13,10 +13,10 @@
 <main>
     <div class="container">
         <div style="display: flex; align-items: center;  justify-content: flex-start;  gap: 8px;  width: 100%; margin-bottom: var(--space-2)">
-            <a href="#" class="btn" data-back>← Назад</a>
+            <a href="#" class="btn disabled" data-back>← Назад</a>
             <a href="/book" class="btn">Оглавление</a>
             <span>Меню:</span>
-            <form method="get" action="/book" style="flex: 1; display: flex; align-items: center;">
+            <form method="get" action="/book" style="flex: 1;">
                 <label>
                     <select name="chapter_id" onchange="this.form.submit()">
                         <option value="0" {{ if eq $.chapter_id .ID }}selected{{ end }}>Оглавление</option>
@@ -101,69 +101,103 @@
 {{ template "footer" . }}
 <script>hljs.highlightAll();</script>
 <script type="module" src="/static/js/bundle.js"></script>
-<!--<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const backBtn = document.querySelector('[data-back]');
-        if (!backBtn) return;
-
-        const referrer = document.referrer;
-        const inBook = referrer.includes('/book');
-        const canGoBack = window.history.length > 1;
-        console.log("window.history.length: ", window.history.length)
-
-        if (!inBook || !canGoBack) {
-            backBtn.classList.add('disabled');
-            backBtn.setAttribute('aria-disabled', 'true');
-            return;
-        }
-
-        backBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            history.back();
-        });
-    });
-</script>-->
-
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    (() => {
+        const STORAGE_KEY = 'bookHistory';
         const backBtn = document.querySelector('[data-back]');
+
         if (!backBtn) return;
 
-        const BOOK_PREFIX = '/book';
-        const path = location.pathname;
-        const currentPage = location.pathname + location.search;
-        const referrer = document.referrer;
+        const isBookPage = (url = location.pathname) =>
+            url.startsWith('/book');
 
-        // если мы не в книге — кнопка не нужна
-        if (!path.startsWith(BOOK_PREFIX)) {
-            backBtn.classList.add('disabled');
-            return;
-        }
+        const normalizeUrl = () =>
+            location.pathname + location.search; // БЕЗ hash
 
-        // новый заход в книгу извне — сбрасываем историю
-        const cameFromBook = referrer.includes(BOOK_PREFIX);
-        if (!cameFromBook) {
-            sessionStorage.removeItem('book:lastPage');
-        }
+        const loadHistory = () =>
+            JSON.parse(sessionStorage.getItem(STORAGE_KEY) || '[]');
 
-        const lastPage = sessionStorage.getItem('book:lastPage');
+        const saveHistory = (history) =>
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(history));
 
-        if (lastPage && lastPage !== currentPage) {
-            backBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                location.href = lastPage;
-            });
-        } else {
-            backBtn.classList.add('disabled');
-        }
+        const updateBackButton = () => {
+            const history = loadHistory();
+            if (history.length <= 1) {
+                backBtn.classList.add('disabled');
+            } else {
+                backBtn.classList.remove('disabled');
+            }
+        };
 
-        // сохраняем страницу ТОЛЬКО если это не якорь
-        if (!location.hash) {
-            sessionStorage.setItem('book:lastPage', currentPage);
-        }
-    });
+        const pushToHistory = () => {
+            if (!isBookPage()) {
+                sessionStorage.removeItem(STORAGE_KEY);
+                return;
+            }
+
+            const history = loadHistory();
+            const current = normalizeUrl();
+
+            if (history[history.length - 1] !== current) {
+                history.push(current);
+                saveHistory(history);
+            }
+
+            updateBackButton();
+        };
+
+        // Клик по кнопке Назад
+        backBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (backBtn.classList.contains('disabled')) return;
+
+            const history = loadHistory();
+            history.pop(); // текущая
+            const prev = history[history.length - 1];
+
+            saveHistory(history);
+            updateBackButton();
+
+            if (prev) {
+                location.href = prev;
+            }
+        });
+
+        // Игнорируем переходы только по якорям
+        window.addEventListener('hashchange', () => {
+            updateBackButton();
+        });
+
+        // Навигация браузерной кнопкой
+        window.addEventListener('popstate', () => {
+            pushToHistory();
+        });
+
+        // Первый заход / переход
+        document.addEventListener('DOMContentLoaded', () => {
+            pushToHistory();
+        });
+
+        // Сброс истории при уходе из книги
+        document.addEventListener('click', (e) => {
+            const link = e.target.closest('a[href]');
+            if (!link) return;
+
+            const href = link.getAttribute('href');
+            if (!href || href.startsWith('#')) return;
+
+            // абсолютный URL
+            const url = new URL(href, location.origin);
+
+            // уходим НЕ в /book
+            if (!url.pathname.startsWith('/book')) {
+                sessionStorage.removeItem(STORAGE_KEY);
+            }
+        });
+    })();
 </script>
+
 
 </body>
 </html>
