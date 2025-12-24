@@ -12,19 +12,24 @@
 
 <main>
     <div class="container">
-        <form method="get" action="/book">
-            <label>
-                <select name="chapter_id" onchange="this.form.submit()" style="margin-bottom: var(--space-2)">
-                    <option value="0" {{ if eq $.chapter_id .ID }}selected{{ end }}>Оглавление </option>
-                    {{ range .chapters }}
-                    <option value="{{ .ID }}"
-                            {{ if eq $.chapter_id .ID }}selected{{ end }}
-                    >{{ if not .HideID }}{{ .ID }}. {{ end }} {{ .Name }}
-                    </option>
-                    {{ end }}
-                </select>
-            </label>
-        </form>
+        <div style="display: flex; align-items: center;  justify-content: flex-start;  gap: 8px;  width: 100%; margin-bottom: var(--space-2)">
+            <a href="#" class="btn" data-back>← Назад</a>
+            <a href="/book" class="btn">Оглавление</a>
+            <span>Меню:</span>
+            <form method="get" action="/book" style="flex: 1; display: flex; align-items: center;">
+                <label>
+                    <select name="chapter_id" onchange="this.form.submit()">
+                        <option value="0" {{ if eq $.chapter_id .ID }}selected{{ end }}>Оглавление</option>
+                        {{ range .chapters }}
+                        <option value="{{ .ID }}"
+                                {{ if eq $.chapter_id .ID }}selected{{ end }}
+                        >{{ if not .HideID }}{{ .ID }}. {{ end }} {{ .Name }}
+                        </option>
+                        {{ end }}
+                    </select>
+                </label>
+            </form>
+        </div>
 
         <div class="scrollable-wrapper">
             <div class="scrollable-content" id="scrollable">
@@ -81,7 +86,8 @@
                     {{ else }}
                     <div>
                         {{ range .chapters }}
-                        <a href="/book?chapter_id={{ .ID }}">{{ if not .HideID }}{{ .ID }}. {{ end }} {{ .Name }}</a><br>
+                        <a href="/book?chapter_id={{ .ID }}">{{ if not .HideID }}{{ .ID }}. {{ end }} {{ .Name
+                            }}</a><br>
                         {{ end }}
                     </div>
                     {{ end }}
@@ -95,5 +101,69 @@
 {{ template "footer" . }}
 <script>hljs.highlightAll();</script>
 <script type="module" src="/static/js/bundle.js"></script>
+<!--<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const backBtn = document.querySelector('[data-back]');
+        if (!backBtn) return;
+
+        const referrer = document.referrer;
+        const inBook = referrer.includes('/book');
+        const canGoBack = window.history.length > 1;
+        console.log("window.history.length: ", window.history.length)
+
+        if (!inBook || !canGoBack) {
+            backBtn.classList.add('disabled');
+            backBtn.setAttribute('aria-disabled', 'true');
+            return;
+        }
+
+        backBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            history.back();
+        });
+    });
+</script>-->
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const backBtn = document.querySelector('[data-back]');
+        if (!backBtn) return;
+
+        const BOOK_PREFIX = '/book';
+        const path = location.pathname;
+        const currentPage = location.pathname + location.search;
+        const referrer = document.referrer;
+
+        // если мы не в книге — кнопка не нужна
+        if (!path.startsWith(BOOK_PREFIX)) {
+            backBtn.classList.add('disabled');
+            return;
+        }
+
+        // новый заход в книгу извне — сбрасываем историю
+        const cameFromBook = referrer.includes(BOOK_PREFIX);
+        if (!cameFromBook) {
+            sessionStorage.removeItem('book:lastPage');
+        }
+
+        const lastPage = sessionStorage.getItem('book:lastPage');
+
+        if (lastPage && lastPage !== currentPage) {
+            backBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                location.href = lastPage;
+            });
+        } else {
+            backBtn.classList.add('disabled');
+        }
+
+        // сохраняем страницу ТОЛЬКО если это не якорь
+        if (!location.hash) {
+            sessionStorage.setItem('book:lastPage', currentPage);
+        }
+    });
+</script>
+
 </body>
 </html>

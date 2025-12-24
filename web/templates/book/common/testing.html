@@ -1,6 +1,10 @@
 {{ define "book.testing" }}
 <h1>Тестирование</h1>
-<h2>Базовое тестирование (<code>testing</code>)</h2>
+<a href="#theory">Теория</a>
+<a href="#unit-test">Unit-тест (Пример)</a>
+<hr>
+
+<h2 id="theory">Базовое тестирование (<code>testing</code>)</h2>
 <p>В Go <b>встроенный</b> фреймворк тестирования — пакет <code>testing</code>.</p>
 <p>📌 <b>Правила</b></p>
 <ul>
@@ -191,6 +195,230 @@ case <-time.After(time.Second):
 </ul>
 
 
+<hr>
+<h2 id="unit-test">Unit-тест (пример)</h2>
+<p>Проверяет один изолированный юнит логики, зависимости замоканы, проверяется только бизнес-логика метода.</p>
+<p>В тесте:</p>
+<ul>
+    <li>❌ нет реальной БД</li>
+    <li>❌ нет реального репозитория</li>
+    <li>❌ нет HTTP / gRPC</li>
+    <li>❌ нет Docker / Postgres</li>
+    <li>✅ репозиторий замокан</li>
+    <li>✅ тестируется только логика сервиса</li>
+</ul>
+<hr>
+<h3>Тест бизнес логики сервиса</h3>
+<h4>Мокируем репозиторий</h4>
+<p>Доменный репозиторий:</p>
+<pre><code class="language-go">package domain
+
+type UserRepository interface {
+	CreateUser(user User) error
+	DeleteUser(id uint) error
+	GetByLogin(login string) (User, error)
+	GetByID(id uint) (User, error)
+	GetByIDs(ids []uint) ([]User, error)
+	GetAll() ([]User, error)
+}</code></pre>
+<p>Mock репозитория:</p>
+<pre><code class="language-go">package mocks
+
+import (
+	"vago/internal/domain"
+
+	"github.com/stretchr/testify/mock"
+)
+
+// UserRepo - мок для domain.UserRepository
+type UserRepo struct {
+	mock.Mock
+}
+
+func (m *UserRepo) CreateUser(user domain.User) error {
+	args := m.Called(user)
+	return args.Error(0)
+}
+
+func (m *UserRepo) DeleteUser(id uint) error {
+	args := m.Called(id)
+	return args.Error(0)
+}
+
+func (m *UserRepo) GetByLogin(login string) (domain.User, error) {
+	args := m.Called(login)
+	return args.Get(0).(domain.User), args.Error(1)
+}
+
+func (m *UserRepo) GetByID(id uint) (domain.User, error) {
+	args := m.Called(id)
+	return args.Get(0).(domain.User), args.Error(1)
+}
+
+func (m *UserRepo) GetByIDs(ids []uint) ([]domain.User, error) {
+	args := m.Called(ids)
+	return args.Get(0).([]domain.User), args.Error(1)
+}
+
+func (m *UserRepo) GetAll() ([]domain.User, error) {
+	args := m.Called()
+	return args.Get(0).([]domain.User), args.Error(1)
+}</code></pre>
+<p>Mock сервиса:</p>
+<pre><code class="language-go">package user
+
+import (
+	"errors"
+	"testing"
+	"vago/internal/application/user/mocks"
+	"vago/internal/domain"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"golang.org/x/crypto/bcrypt"
+)
+
+// Test_Service_CreateUser_Success проверяет успешное создание пользователя
+func Test_Service_CreateUser_Success(t *testing.T) {
+	// Arrange (подготовка)
+	repo := new(mocks.UserRepo)
+	svc := NewService(repo, nil)
+
+	dto := domain.DTO{
+		Login:    "testuser",
+		Password: "securePassword123",
+		Email:    "test@example.com",
+		Username: "Test User",
+		Role:     domain.RoleUser,
+		Color:    "#FF5733",
+	}
+
+	// Настраиваем мок: CreateUser должен быть вызван с любым User (пароль будет захеширован)
+	repo.On("CreateUser", mock.MatchedBy(func(user domain.User) bool {
+		// Проверяем, что пароль захеширован
+		err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(dto.Password))
+		return err == nil &&
+			user.Login == dto.Login &&
+			user.Email == dto.Email &&
+			user.Username == dto.Username &&
+			user.Role == dto.Role &&
+			user.Color == dto.Color
+	})).Return(nil)
+
+	// Act (действие)
+	err := svc.CreateUser(dto)
+
+	// Assert (проверка)
+	assert.NoError(t, err)
+	repo.AssertExpectations(t)
+}
+
+// Test_Service_CreateUser_RepositoryError проверяет обработку ошибки репозитория
+func Test_Service_CreateUser_RepositoryError(t *testing.T) {
+	// Arrange
+	repo := new(mocks.UserRepo)
+	svc := NewService(repo, nil)
+
+	dto := domain.DTO{
+		Login:    "testuser",
+		Password: "password123",
+		Email:    "test@example.com",
+		Username: "Test User",
+		Role:     domain.RoleUser,
+		Color:    "#FF5733",
+	}
+
+	expectedErr := errors.New("пользователь с таким логином уже существует")
+	repo.On("CreateUser", mock.Anything).Return(expectedErr)
+
+	// Act
+	err := svc.CreateUser(dto)
+
+	// Assert
+	assert.Error(t, err)
+	assert.Equal(t, expectedErr, err)
+	repo.AssertExpectations(t)
+}
+
+// Test_Service_CreateUser_PasswordHashing проверяет, что пароль действительно хешируется
+func Test_Service_CreateUser_PasswordHashing(t *testing.T) {
+	// Arrange
+	repo := new(mocks.UserRepo)
+	svc := NewService(repo, nil)
+
+	plainPassword := "mySecretPassword123"
+	dto := domain.DTO{
+		Login:    "testuser",
+		Password: plainPassword,
+		Email:    "test@example.com",
+		Username: "Test User",
+		Role:     domain.RoleUser,
+		Color:    "#FF5733",
+	}
+
+	var capturedUser domain.User
+	repo.On("CreateUser", mock.Anything).Run(func(args mock.Arguments) {
+		capturedUser = args.Get(0).(domain.User)
+	}).Return(nil)
+
+	// Act
+	err := svc.CreateUser(dto)
+
+	// Assert
+	assert.NoError(t, err)
+
+	// Проверяем, что пароль НЕ остался в открытом виде
+	assert.NotEqual(t, plainPassword, capturedUser.Password, "Пароль должен быть захеширован")
+
+	// Проверяем, что хеш можно верифицировать
+	err = bcrypt.CompareHashAndPassword([]byte(capturedUser.Password), []byte(plainPassword))
+	assert.NoError(t, err, "Хеш пароля должен совпадать с исходным паролем")
+
+	repo.AssertExpectations(t)
+}
+
+// Test_Service_CreateUser_DifferentRoles тестирует создание пользователей с разными ролями
+func Test_Service_CreateUser_DifferentRoles(t *testing.T) {
+	tests := []struct {
+		name string
+		role domain.Role
+	}{
+		{"User role", domain.RoleUser},
+		{"Moderator role", domain.RoleModerator},
+		{"Admin role", domain.RoleAdmin},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			repo := new(mocks.UserRepo)
+			svc := NewService(repo, nil)
+
+			dto := domain.DTO{
+				Login:    "testuser",
+				Password: "password123",
+				Email:    "test@example.com",
+				Username: "Test User",
+				Role:     tt.role,
+				Color:    "#FF5733",
+			}
+
+			var capturedUser domain.User
+			repo.On("CreateUser", mock.Anything).Run(func(args mock.Arguments) {
+				capturedUser = args.Get(0).(domain.User)
+			}).Return(nil)
+
+			// Act
+			err := svc.CreateUser(dto)
+
+			// Assert
+			assert.NoError(t, err)
+			assert.Equal(t, tt.role, capturedUser.Role)
+			repo.AssertExpectations(t)
+		})
+	}
+}
+</code></pre>
 
 
 
