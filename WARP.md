@@ -270,6 +270,16 @@ psql -h localhost -p 5432 -U vadmark -d vagodb
 \i db/01_init.sql
 \i db/02_quiz.sql
 ```
+#### VDS
+```postgresql
+UPDATE users
+SET
+    role = 'admin',
+    username = 'Vadmark'
+WHERE id = 1;
+```
+
+
 ### Перенос
 ```shell
 scp -P 2499 -i ~/.ssh/id_vado .env.prod vadmark@159.255.33.142:~/vago/.env.prod

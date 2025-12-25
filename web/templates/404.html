@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>404 - страница не найдена</title>
+    <link rel="stylesheet" href="/static/css/index.css">
+</head>
+<body>
+{{ template "header" . }}
+
+<main class="error-page">
+    <div class="error-box">
+        <div class="error-code">404</div>
+        <h1 class="error-title">Страница потерялась</h1>
+        <p class="error-text">
+            Кажется, вы перешли по битой ссылке<br>
+            или страница больше не существует.
+        </p>
+
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">На главную</a>
+            <a href="javascript:history.back()" class="btn btn-secondary">Назад</a>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>
