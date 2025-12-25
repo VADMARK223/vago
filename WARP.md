@@ -263,11 +263,16 @@ currentUser := c.MustGet(code.CurrentUser)
 - **Environment switching**: Controlled by `APP_ENV` env var, loads `.env.local` only in local mode
 
 ## Шпаргалка
-### Локально
+### Postgres
+#### Локально
 ```shell
 psql -h localhost -p 5432 -U vadmark -d vagodb
 \i db/01_init.sql
 \i db/02_quiz.sql
+```
+### Перенос
+```shell
+scp -P 2499 -i ~/.ssh/id_vado .env.prod vadmark@159.255.33.142:~/vago/.env.prod
 ```
  
 ## Доработки

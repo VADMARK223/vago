@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const version = "0.12.2"
+const version = "0.12.3"
 
 func ShowIndex(provider *token.JWTProvider) gin.HandlerFunc {
 	return func(c *gin.Context) {
