@@ -47,7 +47,7 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	r := gin.New()
 	r.Use(gin.Logger(), gin.Recovery())
 	// Шаблоны
-	r.SetHTMLTemplate(loadTemplates())
+	r.SetHTMLTemplate(loadTemplates("web/templates"))
 	_ = r.SetTrustedProxies(nil)
 	// Статика и шаблоны
 	r.Static("/static", "/app/web/static")
@@ -64,7 +64,7 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	r.Use(middleware.TemplateContext)
 
 	// Публичные маршруты
-	r.GET(route.Index, handler.ShowIndex(tokenProvider))
+	r.GET(route.Index, handler.ShowIndex())
 	r.GET(route.Book, handler.ShowBook)
 	r.GET(route.Login, handler.ShowLogin)
 	r.POST(route.Login, authH.Login)
@@ -82,19 +82,17 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	auth := r.Group("/")
 	auth.Use(middleware.CheckAuthAndRedirect())
 	{
+		auth.GET(route.Admin, handler.AdminHandler(tokenProvider, userSvc, chatSvc))
 		auth.GET(route.Tasks, handler.Tasks(taskSvc))
 		auth.POST(route.Tasks, handler.AddTask(ctx))
 		auth.DELETE("/tasks/:id", handler.DeleteTask(ctx))
 		auth.PUT("/tasks/:id", handler.UpdateTask(ctx, taskSvc))
-		auth.GET(route.Users, handler.ShowUsers(userSvc))
 		auth.DELETE("/users/:id", handler.DeleteUser(userSvc))
-		auth.GET("/grpc-test", handler.Grpc)
 
 		auth.GET("/ws", handler.ServeSW(hub, ctx.Log, tokenProvider, chatSvc))
 		auth.GET("/chat", handler.ShowChat(ctx.Cfg.Port, chatSvc))
 
 		messagesHandler := handler.NewMessageHandler(chatSvc, userSvc)
-		auth.GET("/messages", messagesHandler.ShowMessages())
 		auth.POST("/messages", messagesHandler.AddMessage())
 		auth.POST("/messagesDeleteAll", messagesHandler.DeleteAll())
 		auth.DELETE("/messages/:id", messagesHandler.Delete())
@@ -111,26 +109,43 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	return r
 }
 
-func loadTemplates() *template.Template {
+func loadTemplates(root string) *template.Template {
 	tmpl := template.New("").Funcs(template.FuncMap{
 		"dict": dict,
 	})
 
-	err := filepath.Walk("web/templates", func(path string, info os.FileInfo, err error) error {
+	walkErr := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 
-		if !info.IsDir() && (strings.HasSuffix(path, ".html") || strings.HasSuffix(path, ".gohtml")) {
-			_, err = tmpl.ParseFiles(path)
+		if info.IsDir() {
+			return nil
+		}
+
+		if strings.HasSuffix(path, ".html") || strings.HasSuffix(path, ".gohtml") {
+			relPath, err := filepath.Rel(root, path)
 			if err != nil {
-				return fmt.Errorf("parse error in %s: %w", path, err)
+				return err
+			}
+
+			relPath = filepath.ToSlash(relPath)
+
+			content, err := os.ReadFile(path)
+			if err != nil {
+				return err
+			}
+
+			_, err = tmpl.New(relPath).Parse(string(content))
+			if err != nil {
+				return err
 			}
 		}
 		return nil
 	})
-	if err != nil {
-		panic(err)
+
+	if walkErr != nil {
+		panic(walkErr)
 	}
 
 	return tmpl

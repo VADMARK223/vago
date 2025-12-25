@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"vago/internal/application/chat"
 	"vago/internal/application/user"
-	"vago/internal/config/code"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,22 +17,6 @@ type MessageHandler struct {
 
 func NewMessageHandler(chatSvc *chat.Service, userSvc *user.Service) *MessageHandler {
 	return &MessageHandler{chatSvc: chatSvc, userSvc: userSvc}
-}
-
-func (h *MessageHandler) ShowMessages() func(c *gin.Context) {
-	return func(c *gin.Context) {
-		all, err := h.chatSvc.MessagesDTO(context.Background())
-		if err != nil {
-			ShowError(c, "Ошибка получения списка сообщений", err.Error())
-			return
-		}
-
-		data := tplWithCapture(c, "Сообщения")
-		data[code.Messages] = all
-		data[code.MessagesCount] = len(all)
-
-		c.HTML(http.StatusOK, "messages.html", data)
-	}
 }
 
 func (h *MessageHandler) Delete() func(c *gin.Context) {
@@ -51,7 +34,7 @@ func (h *MessageHandler) Delete() func(c *gin.Context) {
 			return
 		}
 
-		c.Redirect(http.StatusSeeOther, "/messages")
+		c.Redirect(http.StatusSeeOther, "/admin")
 	}
 }
 
@@ -61,7 +44,7 @@ func (h *MessageHandler) DeleteAll() func(c *gin.Context) {
 		if err != nil {
 			ShowError(c, "Ошибка удаления всех", err.Error())
 		}
-		c.Redirect(http.StatusSeeOther, "/messages")
+		c.Redirect(http.StatusSeeOther, "/admin")
 	}
 }
 
@@ -74,6 +57,6 @@ func (h *MessageHandler) AddMessage() gin.HandlerFunc {
 			return
 		}
 
-		c.Redirect(http.StatusSeeOther, "/messages")
+		c.Redirect(http.StatusSeeOther, "/admin")
 	}
 }

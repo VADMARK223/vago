@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Админка</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+
+{{ template "header" . }}
+
+<main>
+    <div class="container">
+        <div class="scrollable-wrapper">
+            <div class="scrollable-content" id="scrollable">
+                <h2>Пользователь</h2>
+                <div class="list">
+                    <div class="panel">
+                        <div>
+                            <h3>Пользователь</h3>
+                            <div>Никнейм: {{.username}}</div>
+                            <div>Роль: {{.role}}</div>
+                            <div>E-mail: {{.email}}</div>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div>
+                            <h3>Токен</h3>
+                            <div>Статус: {{.token_status}}</div>
+                            <div>Истекает: {{.token_expire_at}}</div>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div>
+                            <h3>Токен обновления</h3>
+                            <div>Статус: {{.refresh_token_status}}</div>
+                            <div>Истекает: {{.refresh_token_expire_at}}</div>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h2>Пользователи</h2>
+                    <div class="list">
+                        {{range .Users}}
+                        <div class="item" id="user-{{.ID}}">
+                            <div class="item-info">
+                                <h3>{{.Login}} (ID {{.ID}})</h3>
+                                <p>Username: {{.Username}}</p>
+                                <p>Role: {{.Role}}</p>
+                                <p>E-mail: {{.Email}}</p>
+                            </div>
+                            <div>
+                                <button class="btn btn-danger btn-sm" onclick="deleteUser('{{.ID}}')"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                        {{else}}
+                        <p class="empty">Нет пользователей</p>
+                        {{end}}
+                    </div>
+
+                    <hr>
+                    <h2>Сообщения чата</h2>
+                    <div class="list">
+                        <div class="item">
+                            <div class="messages-control">
+                                <form class="form-add" action="/messages" method="POST">
+                                    <div>
+                                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i>Создать сообщение</button>
+                                    </div>
+                                </form>
+                                <form class="form-add" action="/messagesDeleteAll" method="POST">
+                                    <div>
+                                        <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i>Удалить все сообщения</button>
+                                    </div>
+                                </form>
+                                <span>Сообщений: {{.messages_count}}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="list">
+                        {{range .messages}}
+                        <div class="item" id="message-{{.ID}}">
+                            <div class="item-info">
+                                <p>Идентификатор сообщения: {{.ID}}</p>
+                                <p>Идентификатор автора: {{.AuthorID}}</p>
+                                <p>Никнейм: {{.Username}}</p>
+                                <p>Содержание: {{.Body}}</p>
+                                <p>Тип: {{.MessageType}}</p>
+                                <p>Отправлено: {{.SentAt}}</p>
+                            </div>
+                            <div>
+                                <button class="btn btn-danger btn-sm" onclick="deleteMessage('{{.ID}}')"><i
+                                        class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                        {{else}}
+                        <p class="empty">Сообщений нет</p>
+                        {{end}}
+                    </div>
+
+                    <hr>
+                    <h2>Проверка gRPC</h2>
+                    <div>
+                        <button id="sayHelloBtn" class="btn btn-primary">SayHello</button>
+                        <button id="pingHelloBtn" class="btn btn-primary">PingHello</button>
+                        <span id="result"></span>
+                    </div>
+                </div>
+            </div>
+            <button class="scroll-top-btn" id="scrollTopBtn" title="Наверх">↑</button>
+        </div>
+    </div>
+</main>
+
+<script>
+    async function deleteUser(id) {
+        if (!confirm('Удалить пользователя?')) return;
+
+        const res = await fetch(`/users/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+            document.getElementById(`user-${id}`).remove();
+        } else {
+            const data = await res.json();
+            alert(data.error || 'Error deleting user');
+        }
+    }
+
+    async function deleteMessage(id) {
+        if (!confirm('Удалить сообщение?')) return;
+
+        const res = await fetch(`/messages/${id}`, {method: 'DELETE'});
+        if (res.ok) {
+            document.getElementById(`message-${id}`).remove();
+        } else {
+            const data = await res.json();
+            alert(data.error || 'Error deleting message');
+        }
+    }
+</script>
+
+<script type="module">
+    import {sayHello, ping, getCookie} from '/static/js/bundle.js';
+
+    const resultBox = document.getElementById('result');
+    const sayHelloBtn = document.getElementById('sayHelloBtn');
+    const pingBtn = document.getElementById('pingHelloBtn');
+    const token = getCookie("vago_token");
+
+    function setStatus(message, isError = false) {
+        resultBox.textContent = (isError ? '❌ ' : '✅ ') + message + '\n';
+    }
+
+    sayHelloBtn.addEventListener('click', async () => {
+        sayHello("Вадим", token)
+            .then((resp) => {
+                setStatus("Response: " + resp.getMessage());
+            })
+            .catch((err) => {
+                setStatus("Error, " + err, true);
+            });
+    })
+
+    pingBtn.addEventListener('click', async () => {
+        ping()
+            .then((resp) => {
+                setStatus("Response: " + resp.getRun());
+            })
+            .catch((err) => {
+                setStatus("Error, " + err, true);
+            });
+    })
+</script>
+</body>
+</html>

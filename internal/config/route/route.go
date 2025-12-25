@@ -8,4 +8,5 @@ const (
 	Register = "/register"
 	Tasks    = "/tasks"
 	Users    = "/users"
+	Admin    = "/admin"
 )

@@ -1,36 +1,12 @@
 package handler
 
 import (
-	"net/http"
 	"strconv"
 	"vago/internal/application/user"
 	"vago/internal/config/code"
 
 	"github.com/gin-gonic/gin"
 )
-
-func ShowUsers(service *user.Service) func(c *gin.Context) {
-	return func(c *gin.Context) {
-		renderUsersPage(c, service, "")
-	}
-}
-
-func renderUsersPage(c *gin.Context, service *user.Service, errorMsg string) {
-	users, err := service.GetAll()
-	if err != nil {
-		ShowError(c, "Ошибка загрузки пользователя", err.Error())
-		return
-	}
-
-	data := tplWithCapture(c, "Users list")
-	data["Users"] = users
-
-	if errorMsg != "" {
-		data["Error"] = errorMsg
-	}
-
-	c.HTML(http.StatusOK, "users.html", data)
-}
 
 func DeleteUser(service *user.Service) func(c *gin.Context) {
 	return func(c *gin.Context) {

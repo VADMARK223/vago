@@ -19,35 +19,6 @@
         {{ end }}
         <div class="scrollable-wrapper">
             <div class="scrollable-content" id="scrollable">
-                {{if .user_id}}
-                <div class="list">
-                    <div class="panel">
-                        <div>
-                            <h3>Пользователь</h3>
-                            <div>Никнейм: {{.username}}</div>
-                            <div>Роль: {{.role}}</div>
-                            <div>E-mail: {{.email}}</div>
-                        </div>
-                    </div>
-
-                    <div class="panel">
-                        <div>
-                            <h3>Токен</h3>
-                            <div>Статус: {{.token_status}}</div>
-                            <div>Истекает: {{.token_expire_at}}</div>
-                        </div>
-                    </div>
-
-                    <div class="panel">
-                        <div>
-                            <h3>Токен обновления</h3>
-                            <div>Статус: {{.refresh_token_status}}</div>
-                            <div>Истекает: {{.refresh_token_expire_at}}</div>
-                        </div>
-                    </div>
-                </div>
-                {{end}}
-
                 <div class="list">
                     <div>
                         <h3>О проекте</h3>
