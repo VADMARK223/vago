@@ -2,10 +2,13 @@ package seed
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"gorm.io/driver/postgres"
@@ -82,9 +85,9 @@ func SyncQuestions(ctx context.Context, dsn string) error {
 		return err
 	}
 
-	if err := truncateTables(db); err != nil {
+	/*if err := truncateTables(db); err != nil {
 		return err
-	}
+	}*/
 
 	for i := 0; i < len(questions); i += batchSize {
 		fmt.Printf("➡️ \033[93m%s: \033[92m%v\033[0m\n", "Batch", i)
@@ -102,7 +105,7 @@ func SyncQuestions(ctx context.Context, dsn string) error {
 	return nil
 }
 
-func truncateTables(db *gorm.DB) error {
+/*func truncateTables(db *gorm.DB) error {
 	if err := db.Exec(
 		"TRUNCATE TABLE answers RESTART IDENTITY CASCADE",
 	).Error; err != nil {
@@ -116,7 +119,14 @@ func truncateTables(db *gorm.DB) error {
 	}
 
 	return nil
+}*/
+
+type upsertResult struct {
+	ID       int
+	Inserted bool
 }
+
+var res upsertResult
 
 func insertBatch(ctx context.Context, db *gorm.DB, batch []Question) error {
 	tx := db.Begin()
@@ -138,20 +148,27 @@ func insertBatch(ctx context.Context, db *gorm.DB, batch []Question) error {
 			return err
 		}
 
-		var questionID int
+		var upsertRes upsertResult
 		if err := tx.Raw(
-			`INSERT INTO questions (topic_id, text, code, explanation)
-			 VALUES (?, ?, ?, ?) RETURNING id`,
-			q.TopicID, q.Text, q.Code, q.Explanation,
-		).Scan(&questionID).Error; err != nil {
+			`INSERT INTO questions (topic_id, text, code, explanation, content_hash)
+			 VALUES (?, ?, ?, ?, ?)
+			 ON CONFLICT (content_hash) DO UPDATE
+			 SET explanation = EXCLUDED.explanation
+			 RETURNING id, (xmax = 0) AS inserted`,
+			q.TopicID, q.Text, q.Code, q.Explanation, questionHash(q.TopicID, q.Text, q.Code),
+		).Scan(&upsertRes).Error; err != nil {
 			return err
+		}
+
+		if !upsertRes.Inserted {
+			continue
 		}
 
 		for _, a := range q.Answers {
 			if err := tx.Exec(
 				`INSERT INTO answers (question_id, text, is_correct)
 				 VALUES (?, ?, ?)`,
-				questionID, a.Text, a.Correct,
+				upsertRes.ID, a.Text, a.Correct,
 			).Error; err != nil {
 				return err
 			}
@@ -193,4 +210,16 @@ func Topics(dsn string) error {
 	elapsed := time.Since(start)
 	log.Println("Topics seeding complete: ", elapsed)
 	return nil
+}
+
+func questionHash(topicID int, text, code string) string {
+	h := sha256.New()
+
+	h.Write([]byte(strconv.Itoa(topicID)))
+	h.Write([]byte{'|'})
+	h.Write([]byte(text))
+	h.Write([]byte{'|'})
+	h.Write([]byte(code))
+
+	return hex.EncodeToString(h.Sum(nil))
 }

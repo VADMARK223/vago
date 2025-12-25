@@ -261,6 +261,14 @@ currentUser := c.MustGet(code.CurrentUser)
 - **Russian language**: User-facing content, comments, and README are in Russian
 - **Database migrations**: Manual SQL files, not a migration tool
 - **Environment switching**: Controlled by `APP_ENV` env var, loads `.env.local` only in local mode
+
+## Шпаргалка
+### Локально
+```shell
+psql -h localhost -p 5432 -U vadmark -d vagodb
+\i db/01_init.sql
+\i db/02_quiz.sql
+```
  
 ## Доработки
 - При регистрации просить повторить пароль

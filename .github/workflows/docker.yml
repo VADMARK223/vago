@@ -3,8 +3,8 @@ name: Build & Push Docker
 on:
   push:
     branches:
-      - main
-      - master
+      - main_temp
+      - master_temp
 
 permissions:
   contents: read
