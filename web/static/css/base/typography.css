@@ -1,5 +1,6 @@
 h1, h2, h3, h4 {
-    color: var(--color-primary-hover);
+    color:  #d7dde4;
+    font-weight: 600;
 }
 
 ul {

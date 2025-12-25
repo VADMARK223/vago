@@ -18,7 +18,7 @@ body {
 main {
     flex: 1;
     display: flex;
-    min-height: 0; /* 🔥 КЛЮЧЕВО */
+    min-height: 0;
 }
 
 header {

@@ -8,18 +8,21 @@
 <body>
 {{ template "header" . }}
 
-<main class="error-page">
-    <div class="error-box">
-        <div class="error-code">404</div>
-        <h1 class="error-title">Страница потерялась</h1>
-        <p class="error-text">
-            Кажется, вы перешли по битой ссылке<br>
-            или страница больше не существует.
-        </p>
-
-        <div class="error-actions">
-            <a href="/" class="btn btn-primary">На главную</a>
-            <a href="javascript:history.back()" class="btn btn-default">Назад</a>
+<main>
+    <div class="error-page">
+        <div class="error-box">
+            <div class="error-emoji" aria-hidden="true">🧭</div>
+            <div class="error-code">404</div>
+<!--            <div class="error-emoji">👻</div>-->
+            <h1 class="error-title">Страница потерялась</h1>
+            <p class="error-text">
+                Кажется, вы перешли по битой ссылке<br>
+                или страница больше не существует.
+            </p>
+            <div class="error-actions">
+                <a href="/" class="btn btn-primary">На главную</a>
+                <a href="javascript:history.back()" class="btn btn-default">Назад</a>
+            </div>
         </div>
     </div>
 </main>
