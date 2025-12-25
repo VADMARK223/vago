@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"vago/internal/application/chat"
 	"vago/internal/application/user"
+	"vago/internal/config/route"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,7 +35,7 @@ func (h *MessageHandler) Delete() func(c *gin.Context) {
 			return
 		}
 
-		c.Redirect(http.StatusSeeOther, "/admin")
+		c.Redirect(http.StatusSeeOther, route.Admin+route.Messages)
 	}
 }
 
@@ -44,7 +45,7 @@ func (h *MessageHandler) DeleteAll() func(c *gin.Context) {
 		if err != nil {
 			ShowError(c, "Ошибка удаления всех", err.Error())
 		}
-		c.Redirect(http.StatusSeeOther, "/admin")
+		c.Redirect(http.StatusSeeOther, route.Admin+route.Messages)
 	}
 }
 
@@ -57,6 +58,6 @@ func (h *MessageHandler) AddMessage() gin.HandlerFunc {
 			return
 		}
 
-		c.Redirect(http.StatusSeeOther, "/admin")
+		c.Redirect(http.StatusSeeOther, route.Admin+route.Messages)
 	}
 }

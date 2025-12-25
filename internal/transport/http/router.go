@@ -42,6 +42,7 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	topicSvc := topic.NewService(topicRepo)
 	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret, ctx.Cfg.RefreshTTLInt(), ctx.Log)
 	quizHandler := handler.NewQuizHandler(questionSvc, topicSvc, ctx.Cfg.PostgresDsn)
+	adminHandler := handler.NewAdminHandler(tokenProvider, userSvc, chatSvc)
 
 	gin.SetMode(ctx.Cfg.GinMode)
 	r := gin.New()
@@ -82,7 +83,14 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	auth := r.Group("/")
 	auth.Use(middleware.CheckAuthAndRedirect())
 	{
-		auth.GET(route.Admin, handler.AdminHandler(tokenProvider, userSvc, chatSvc))
+		admin := auth.Group(route.Admin)
+		{
+			admin.GET(route.User, adminHandler.ShowUser)
+			admin.GET(route.Users, adminHandler.ShowUsers)
+			admin.GET(route.Messages, adminHandler.ShowMessages)
+			admin.GET(route.Grpc, adminHandler.ShowGrpc)
+		}
+
 		auth.GET(route.Tasks, handler.Tasks(taskSvc))
 		auth.POST(route.Tasks, handler.AddTask(ctx))
 		auth.DELETE("/tasks/:id", handler.DeleteTask(ctx))

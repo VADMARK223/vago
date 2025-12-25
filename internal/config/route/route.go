@@ -7,6 +7,10 @@ const (
 	Logout   = "/logout"
 	Register = "/register"
 	Tasks    = "/tasks"
-	Users    = "/users"
+
 	Admin    = "/admin"
+	User     = "/user"
+	Users    = "/users"
+	Messages = "/messages"
+	Grpc     = "/grpc"
 )

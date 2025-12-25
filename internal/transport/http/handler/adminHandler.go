@@ -14,28 +14,60 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AdminHandler(provider *token.JWTProvider, userSvc *user.Service, chatSvc *chat.Service) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		users, err := userSvc.GetAll()
-		if err != nil {
-			ShowError(c, "Ошибка загрузки пользователя", err.Error())
-			return
-		}
+type AdminHandler struct {
+	provider *token.JWTProvider
+	userSvc  *user.Service
+	chatSvc  *chat.Service
+}
 
-		all, err := chatSvc.MessagesDTO(context.Background())
-		if err != nil {
-			ShowError(c, "Ошибка получения списка сообщений", err.Error())
-			return
-		}
-
-		data := tplWithCapture(c, "Админка")
-		updateTokenInfo(c, data)
-		updateRefreshTokenInfo(c, data, provider)
-		data["Users"] = users
-		data[code.Messages] = all
-		data[code.MessagesCount] = len(all)
-		c.HTML(http.StatusOK, "admin/admin.html", data)
+func NewAdminHandler(provider *token.JWTProvider, userSvc *user.Service, chatSvc *chat.Service) *AdminHandler {
+	return &AdminHandler{
+		provider: provider,
+		userSvc:  userSvc,
+		chatSvc:  chatSvc,
 	}
+}
+
+func (h *AdminHandler) ShowUser(c *gin.Context) {
+	data := baseAdminData(c, "Пользователь")
+	updateTokenInfo(c, data)
+	updateRefreshTokenInfo(c, data, h.provider)
+	c.HTML(http.StatusOK, "admin/admin_user.html", data)
+}
+
+func (h *AdminHandler) ShowUsers(c *gin.Context) {
+	users, err := h.userSvc.GetAll()
+	if err != nil {
+		ShowError(c, "Ошибка загрузки пользователя", err.Error())
+		return
+	}
+
+	data := baseAdminData(c, "Пользователи")
+	data["Users"] = users
+	c.HTML(http.StatusOK, "admin/admin_users.html", data)
+}
+
+func (h *AdminHandler) ShowMessages(c *gin.Context) {
+	all, err := h.chatSvc.MessagesDTO(context.Background())
+	if err != nil {
+		ShowError(c, "Ошибка получения списка сообщений", err.Error())
+		return
+	}
+
+	data := baseAdminData(c, "Сообщения")
+	data[code.Messages] = all
+	data[code.MessagesCount] = len(all)
+	c.HTML(http.StatusOK, "admin/admin_messages.html", data)
+}
+
+func (h *AdminHandler) ShowGrpc(c *gin.Context) {
+	data := baseAdminData(c, "Тест gRPC")
+	c.HTML(http.StatusOK, "admin/admin_grpc.html", data)
+}
+
+func baseAdminData(c *gin.Context, name string) gin.H {
+	data := tplWithCapture(c, "Админка ("+name+")")
+	return data
 }
 
 func updateTokenInfo(c *gin.Context, data gin.H) {
