@@ -3,11 +3,14 @@
 @import url("/static/css/base/reset.css");
 @import url("/static/css/base/globals.css");
 @import url("/static/css/base/typography.css");
+
 @import url("/static/css/ui/panels.css");
 @import url("/static/css/ui/buttons.css");
 @import url("/static/css/ui/forms.css");
 @import url("/static/css/ui/scroll.css");
 @import url("/static/css/ui/404.css");
+@import url("/static/css/ui/index.css");
+
 @import url("/static/css/components/book.css");
 @import url("/static/css/components/quiz.css");
 
@@ -24,12 +27,12 @@
 }
 
 a, .link {
-    color: var(--accent-strong);
+    color: var(--color-primary);
     text-decoration: none;
 }
 
 a:not(.btn):not(.btn-small):not(.btn-danger):hover {
-    color: var(--orange);
+    color: var(--color-warning);
 }
 
 a.btn.disabled {
@@ -40,7 +43,7 @@ a.btn.disabled {
 }
 
 .error-msg {
-    color: var(--error);
+    color: var(--color-error);
     font-weight: 600;
     margin-top: 8px;
 }
@@ -130,7 +133,7 @@ a.btn.disabled {
     border-radius: var(--radius-sm);
     font-size: 12px;
     text-align: center;
-    color: var(--accent);
+    color: var(--color-primary-hover);
     border: var(--border-1);
 }
 
@@ -190,7 +193,7 @@ a.btn.disabled {
 
 /* Ваши сообщения (справа) */
 .chat-messages > div.chat-my-message {
-    background: var(--accent-strong);
+    background: var(--color-primary);
     color: white;
     align-self: flex-end;
     text-align: left;

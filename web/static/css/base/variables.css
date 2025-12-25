@@ -1,20 +1,25 @@
 :root {
+    /* Backgrounds */
     --bg-main: #1e1f22;
-    --bg-item: #313335;
-    --bg-item-hover: #3a3d41;
     --bg-panel: #2b2d30;
     --bg-entry: #1e1f22;
+    --bg-item: #313335;
+    --bg-item-hover: #3a3d41;
     --bg-border: #4b4e50;
 
-    --text: #a9b7c6;
-    --accent: #6897bb;
-    --accent-strong: #4e94ce;
-    --orange: #ffb347;
-    --error: #d9534f;
-    --danger: #c94f4f;
+    /* Brand / accent */
+    --color-primary: #4e94ce;
+    --color-primary-hover: #6897bb;
 
-    --green: #4CAF50;
-    --red: #F44336;
+    /* Text */
+    --text: #a9b7c6;
+
+    /* States */
+    --color-danger: #c94f4f;
+    --color-error: #F44336;
+    --color-warning: #ffb347;
+    --color-success: #4CAF50;
+    --color-disabled: #888;
 
     --layout-min-width: 320px;
     --layout-max-width: 870px;

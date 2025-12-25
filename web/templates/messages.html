@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Сообщения</title>
-    <link rel="stylesheet" href="/static/css/index.css">
+    <link rel="stylesheet" href="/static/css/main.css">
 </head>
 <body>
 {{ template "header" . }}
@@ -15,7 +15,7 @@
                 <div class="messages-control">
                     <form class="form-add" action="/messages" method="POST">
                         <div>
-                            <button type="submit" class="btn"><i class="fa-solid fa-plus"></i>Создать сообщение</button>
+                            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i>Создать сообщение</button>
                         </div>
                     </form>
                     <form class="form-add" action="/messagesDeleteAll" method="POST">
@@ -42,7 +42,7 @@
                             <p>Отправлено: {{.SentAt}}</p>
                         </div>
                         <div>
-                            <button class="btn btn-small btn-danger" onclick="deleteMessage('{{.ID}}')"><i
+                            <button class="btn btn-danger btn-sm" onclick="deleteMessage('{{.ID}}')"><i
                                     class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>

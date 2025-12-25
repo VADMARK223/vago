@@ -42,13 +42,13 @@
 
             {{if .user_id}}
             {{if .is_admin}}
-            <a href="/add_questions" class="btn"><i class="fa-solid fa-plus"></i></a>
+            <a href="/add_questions" class="btn btn-primary"><i class="fa-solid fa-plus"></i></a>
 
-            <a href="/admin" class="btn"><i class="fa-solid fa-screwdriver-wrench"></i></a>
+            <a href="/admin" class="btn btn-primary"><i class="fa-solid fa-screwdriver-wrench"></i></a>
 
-            <a href="/messages" class="btn"><i class="fa-solid fa-comment"></i></a>
-            <a href="/users" class="btn"><i class="fa-solid fa-users"></i></a>
-            <a href="/grpc-test" class="btn"><i class="fa-solid fa-j"></i></a>
+            <a href="/messages" class="btn btn-primary"><i class="fa-solid fa-comment"></i></a>
+            <a href="/users" class="btn btn-primary"><i class="fa-solid fa-users"></i></a>
+            <a href="/grpc-test" class="btn btn-primary"><i class="fa-solid fa-j"></i></a>
             {{end}}
             {{end}}
         </div>
@@ -57,13 +57,13 @@
             <span class="greetings">{{.username}}!</span>
             {{if .user_id}}
             <form action="/logout" method="POST" style="display:inline;">
-                <button class="btn" id="logBtn">
+                <button class="btn btn-primary" id="logBtn">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 </button>
             </form>
             {{else}}
             <form action="/login" method="GET" style="display:inline;">
-                <button class="btn">
+                <button class="btn btn-primary">
                     <i class="fa-solid fa-arrow-right-to-bracket"></i>
                 </button>
             </form>

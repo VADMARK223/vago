@@ -23,7 +23,7 @@
     border-radius: 50%;
     border: none;
 
-    background: var(--accent, #4f46e5);
+    background: var(--color-primary-hover, #4f46e5);
     color: #fff;
     font-size: 18px;
     cursor: pointer;

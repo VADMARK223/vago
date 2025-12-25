@@ -26,11 +26,11 @@
 }
 
 #result.ok {
-    color: var(--green);
+    color: var(--color-success);
 }
 
 #result.bad {
-    color: var(--red);
+    color: var(--color-error);
 }
 
 .hidden {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Пользователи</title>
-    <link rel="stylesheet" href="/static/css/index.css">
+    <link rel="stylesheet" href="/static/css/main.css">
 </head>
 <body>
 {{ template "header" . }}
@@ -21,7 +21,7 @@
                         <p>E-mail: {{.Email}}</p>
                     </div>
                     <div>
-                        <button class="btn btn-small btn-danger" onclick="deleteUser('{{.ID}}')"><i class="fa-solid fa-trash"></i></button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteUser('{{.ID}}')"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 </div>
                 {{else}}

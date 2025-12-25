@@ -1,5 +1,5 @@
 h1, h2, h3, h4 {
-    color: var(--accent);
+    color: var(--color-primary-hover);
 }
 
 ul {
@@ -45,20 +45,20 @@ hr {
 }
 
 blockquote.note {
-    border-left: 4px solid var(--orange);
+    border-left: 4px solid var(--color-warning);
     padding-left: 12px;
     margin-left: 0;
     font-style: italic;
 }
 
 .orange {
-    color: var(--orange);
+    color: var(--color-warning);
 }
 
 .green {
-    color: var(--green);
+    color: var(--color-success);
 }
 
 .red {
-    color: var(--red);
+    color: var(--color-error);
 }

@@ -1,0 +1,10 @@
+.auth-actions {
+    display: flex;
+    flex-direction: row;
+    gap: var(--space-4);
+    justify-content: center;
+}
+
+.auth-actions .btn {
+    width: 200px;
+}

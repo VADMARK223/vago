@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Sign Up</title>
-    <link rel="stylesheet" href="/static/css/index.css">
+    <link rel="stylesheet" href="/static/css/main.css">
 </head>
 <body>
 {{ template "header" . }}
@@ -47,7 +47,7 @@
                 <label><input name="color" placeholder="Color" value="#FF5733" readonly></label>
 
                 {{if .error}}<span class="error-msg">{{.error}}</span>{{end}}
-                <button id="submitBtn" class="btn" type="submit">Создать аккаунт</button>
+                <button id="submitBtn" class="btn btn-primary" type="submit">Создать аккаунт</button>
 
                 <span>
                 <a href="/login">Вход</a>
