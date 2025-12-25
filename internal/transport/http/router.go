@@ -50,7 +50,7 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	r.SetHTMLTemplate(loadTemplates())
 	_ = r.SetTrustedProxies(nil)
 	// Статика и шаблоны
-	r.Static("/static", "./web/static")
+	r.Static("/static", "/app/web/static")
 	// Favicon: отдаём напрямую, чтобы не было 404
 	r.GET("/favicon.ico", func(c *gin.Context) {
 		c.File("web/static/favicon.ico")
