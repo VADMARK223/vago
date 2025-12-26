@@ -122,6 +122,12 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 func loadTemplates(root string) *template.Template {
 	tmpl := template.New("").Funcs(template.FuncMap{
 		"dict": dict,
+		"menuActive": func(path, href string) bool {
+			if href == "/" {
+				return path == "/"
+			}
+			return strings.HasPrefix(path, href)
+		},
 	})
 
 	walkErr := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {

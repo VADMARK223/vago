@@ -31,5 +31,6 @@ const (
 	QuestionsCount       = "questions_count"
 	Questions            = "questions"
 	Question             = "question"
+	Path                 = "Path"
 	Topics               = "topics"
 )

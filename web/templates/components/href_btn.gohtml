@@ -1,5 +1,6 @@
 {{ define "component.href_btn" }}
-    <a class="btn btn-primary"
+{{ $isActive := menuActive .Path .Href }}
+    <a class="btn btn-primary {{ if $isActive }}active{{ end }}"
             {{ if .Disabled}}
                 aria-disabled="true"
                 tabindex="-1"

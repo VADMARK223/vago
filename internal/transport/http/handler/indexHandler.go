@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const version = "0.15.2"
+const version = "0.16.0"
 
 func ShowIndex() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -14,7 +14,7 @@ func ShowIndex() gin.HandlerFunc {
 		if gin.Mode() == gin.DebugMode {
 			capture += " (debug)"
 		}
-		data := tplWithCapture(c, capture)
+		data := tplWithMetaData(c, capture)
 		data["version"] = version
 		c.HTML(http.StatusOK, "index.html", data)
 	}

@@ -62,7 +62,7 @@ func (h *QuizHandler) ShowQuizByID() func(c *gin.Context) {
 }
 
 func renderQuiz(c *gin.Context, q quiz.QuestionPublic) {
-	data := tplWithCapture(c, "Викторина")
+	data := tplWithMetaData(c, "Викторина")
 	data[code.Question] = q
 
 	c.HTML(http.StatusOK, "quiz.html", data)
@@ -87,7 +87,7 @@ func (h *QuizHandler) ShowAddQuestion() func(c *gin.Context) {
 
 		questions, _ := h.quizSvc.AllQuestions()
 
-		data := tplWithCapture(c, "Добавление вопроса")
+		data := tplWithMetaData(c, "Добавление вопроса")
 		data[code.Topics] = topics
 		data[code.QuestionsCount] = len(questions)
 
@@ -122,7 +122,7 @@ func (h *QuizHandler) ShowQuestions(c *gin.Context) {
 		return
 	}
 
-	data := tplWithCapture(c, "Редактор вопросов")
+	data := tplWithMetaData(c, "Редактор вопросов")
 	data[code.Topics] = topics
 	data["topic_id"] = topicID
 	data[code.Questions] = questions

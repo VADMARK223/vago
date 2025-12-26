@@ -6,24 +6,28 @@
             {{ template "component.href_btn" dict
             "Href" "/"
             "Icon" "fa-solid fa-house"
+            "Path" .Path
             }}
 
             {{ template "component.href_btn" dict
             "Href" "/book"
             "Name" "Книга"
             "Icon" "fa-solid fa-book"
+            "Path" .Path
             }}
 
             {{ template "component.href_btn" dict
             "Href" "/quiz"
             "Name" "Quiz"
             "Icon" "fa-solid fa-check-double"
+            "Path" .Path
             }}
 
             {{ template "component.href_btn" dict
             "Href" "/questions"
             "Name" "Вопросы"
             "Icon" "fa-solid fa-circle-question"
+            "Path" .Path
             }}
 
             {{ template "component.href_btn" dict
@@ -31,6 +35,7 @@
             "Name" "Задачи"
             "Icon" "fa-solid fa-list-check"
             "Disabled" (not .user_id)
+            "Path" .Path
             }}
 
             {{ template "component.href_btn" dict
@@ -38,12 +43,25 @@
             "Name" "Чат"
             "Icon" "fa-solid fa-comment"
             "Disabled" (not .user_id)
+            "Path" .Path
             }}
 
             {{if .user_id}}
             {{if .is_admin}}
-            <a href="/add_questions" class="btn btn-primary"><i class="fa-solid fa-plus"></i></a>
-            <a href="/admin" class="btn btn-primary"><i class="fa-solid fa-screwdriver-wrench"></i></a>
+            <span>
+                {{ template "component.href_btn" dict
+                "Href" "/add_questions"
+                "Icon" "fa-solid fa-plus"
+                "Path" .Path
+                }}
+
+                {{ template "component.href_btn" dict
+                "Href" "/admin"
+                "Icon" "fa-solid fa-screwdriver-wrench"
+                "Path" .Path
+                }}
+            </span>
+
             {{end}}
             {{end}}
         </div>
