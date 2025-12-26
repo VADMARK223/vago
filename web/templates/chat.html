@@ -4,6 +4,7 @@
     <title>Чат</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/static/css/main.css">
+    <script src="/static/js/common/ui.js" defer></script>
 </head>
 <body>
 {{ template "header" . }}
@@ -29,8 +30,6 @@
 
 <script type="module">
     import {parseAndAddMessage, initChat, getCookie} from "/static/js/bundle.js"
-    // import {parseAndAddMessage, initChat} from "/static/js/chat.js"
-    // import {getCookie} from "/static/js/common.js"
 
     const myUserId = "{{ .user_id }}";
     const token = getCookie("vago_token");

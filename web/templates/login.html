@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Вход</title>
     <link rel="stylesheet" href="/static/css/main.css">
+    <script src="/static/js/common/ui.js" defer></script>
+    <script src="/static/js/components/login.js" defer></script>
 </head>
 <body>
 {{ template "header" . }}
@@ -36,28 +38,6 @@
             </form>
         </div>
     </div>
-    <script>
-        const loginInput = document.querySelector('input[name="login"]');
-        const passwordInput = document.querySelector('input[name="password"]');
-        const submitBtn = document.getElementById("submitBtn")
-
-        loginInput.addEventListener("input", updateState);
-        passwordInput.addEventListener("input", updateState);
-
-        function updateState() {
-            const login = loginInput.value.trim();
-            const password = passwordInput.value.trim();
-            setDisabledSubmitBtn(login, password);
-        }
-
-        function setDisabledSubmitBtn(login, password) {
-            submitBtn.disabled = login === "" || password === "";
-        }
-
-        updateState();
-    </script>
 </main>
-
-<script type="module" src="/static/js/bundle.js"></script>
 </body>
 </html>

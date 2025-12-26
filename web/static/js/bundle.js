@@ -8329,41 +8329,6 @@ function addMessage(messagesDiv2, username, text, isMine, sentAt, author) {
   messagesDiv2.appendChild(wrapper);
   messagesDiv2.scrollTop = messagesDiv2.scrollHeight;
 }
-
-// web/static/js/ui.js
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".clear-btn[data-clear]").forEach((btn2) => {
-    btn2.addEventListener("click", () => {
-      const inp = btn2.closest(".input-wrap").querySelector("input");
-      inp.value = "";
-      inp.dispatchEvent(new Event("input", { bubbles: true }));
-    });
-  });
-  document.querySelectorAll("input[data-required='true']").forEach((input) => {
-    input.required = true;
-  });
-  const container = document.getElementById("scrollable");
-  const btn = document.getElementById("scrollTopBtn");
-  console.log("scrollable container", container);
-  console.log("scrollable btn", btn);
-  function updateScrollButton() {
-    const hasScroll = container.scrollHeight > container.clientHeight;
-    const scrolled = container.scrollTop > 50;
-    if (hasScroll && scrolled) {
-      btn.classList.add("visible");
-    } else {
-      btn.classList.remove("visible");
-    }
-  }
-  container.addEventListener("scroll", updateScrollButton);
-  btn.addEventListener("click", () => {
-    container.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
-  });
-  updateScrollButton();
-});
 export {
   getCookie,
   initChat,

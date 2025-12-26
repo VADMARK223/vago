@@ -3,6 +3,7 @@
     flex-direction: row;
     gap: var(--space-4);
     justify-content: center;
+    margin-bottom: var(--space-2);
 }
 
 .auth-actions .btn {

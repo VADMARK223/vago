@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Sign Up</title>
     <link rel="stylesheet" href="/static/css/main.css">
+    <script src="/static/js/common/ui.js" defer></script>
+    <script src="/static/js/components/register.js" defer></script>
 </head>
 <body>
 {{ template "header" . }}
@@ -56,46 +58,5 @@
         </div>
     </div>
 </main>
-
-<script type="module" src="/static/js/bundle.js"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const loginInput = document.querySelector('input[name="login"]')
-        const passwordInput = document.querySelector('input[name="password"]')
-        const emailInput = document.querySelector('input[name="email"]')
-        const usernameInput = document.querySelector('input[name="username"]')
-        const submitBtn = document.getElementById("submitBtn")
-
-        loginInput.addEventListener("input", () => {
-            const v = loginInput.value.trim();
-
-            if (v) {
-                passwordInput.value = v;
-                emailInput.value = `${v}@mail.ru`;
-                usernameInput.value = `User${v}`.slice(0, 30);
-            }
-
-            updateState()
-        })
-
-        passwordInput.addEventListener("input", updateState);
-        emailInput.addEventListener("input", updateState);
-        usernameInput.addEventListener("input", updateState);
-
-        function updateState() {
-            const login = loginInput.value.trim();
-            const password = passwordInput.value.trim();
-            const email = emailInput.value.trim();
-            const username = usernameInput.value.trim();
-            setDisabledSubmitBtn(login, password, email, username);
-        }
-
-        function setDisabledSubmitBtn(login, password, email, username) {
-            submitBtn.disabled = login === "" || password === "" || email === "" || username === "";
-        }
-
-        updateState();
-    })
-</script>
 </body>
 </html>
