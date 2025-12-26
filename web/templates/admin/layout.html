@@ -1,3 +1,4 @@
+{{ define "admin/layout" }}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,16 +12,27 @@
 
 <main>
     <div class="container">
+        {{ template "admin/nav" . }}
+
         <div class="scrollable-wrapper">
             <div class="scrollable-content" id="scrollable">
-                <hr>
-
+                {{ if eq .Active "user" }}
+                {{ template "admin/user_content" . }}
+                {{ else if eq .Active "users" }}
+                {{ template "admin/users_content" . }}
+                {{ else if eq .Active "messages" }}
+                {{ template "admin/messages_content" . }}
+                {{ else if eq .Active "grpc" }}
+                {{ template "admin/grpc_content" . }}
+                {{ else }}
+                <div>Выбери раздел</div>
+                {{ end }}
             </div>
+            <button class="scroll-top-btn" id="scrollTopBtn" title="Наверх">↑</button>
         </div>
-        <button class="scroll-top-btn" id="scrollTopBtn" title="Наверх">↑</button>
     </div>
 </main>
-
-
+<script type="module" src="/static/js/bundle.js"></script>
 </body>
 </html>
+{{ end }}

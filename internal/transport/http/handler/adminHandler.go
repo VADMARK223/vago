@@ -8,6 +8,7 @@ import (
 	"vago/internal/application/chat"
 	"vago/internal/application/user"
 	"vago/internal/config/code"
+	"vago/internal/config/route"
 	"vago/internal/infra/token"
 	"vago/internal/transport/http/middleware"
 
@@ -28,11 +29,16 @@ func NewAdminHandler(provider *token.JWTProvider, userSvc *user.Service, chatSvc
 	}
 }
 
+func (h *AdminHandler) ShowAdmin(c *gin.Context) {
+	c.Redirect(http.StatusFound, route.Admin+route.Messages)
+}
+
 func (h *AdminHandler) ShowUser(c *gin.Context) {
 	data := baseAdminData(c, "Пользователь")
 	updateTokenInfo(c, data)
 	updateRefreshTokenInfo(c, data, h.provider)
-	c.HTML(http.StatusOK, "admin/admin_user.html", data)
+	data["Active"] = "user"
+	c.HTML(http.StatusOK, "admin/layout", data)
 }
 
 func (h *AdminHandler) ShowUsers(c *gin.Context) {
@@ -44,7 +50,8 @@ func (h *AdminHandler) ShowUsers(c *gin.Context) {
 
 	data := baseAdminData(c, "Пользователи")
 	data["Users"] = users
-	c.HTML(http.StatusOK, "admin/admin_users.html", data)
+	data["Active"] = "users"
+	c.HTML(http.StatusOK, "admin/layout", data)
 }
 
 func (h *AdminHandler) ShowMessages(c *gin.Context) {
@@ -57,12 +64,14 @@ func (h *AdminHandler) ShowMessages(c *gin.Context) {
 	data := baseAdminData(c, "Сообщения")
 	data[code.Messages] = all
 	data[code.MessagesCount] = len(all)
-	c.HTML(http.StatusOK, "admin/admin_messages.html", data)
+	data["Active"] = "messages"
+	c.HTML(http.StatusOK, "admin/layout", data)
 }
 
 func (h *AdminHandler) ShowGrpc(c *gin.Context) {
 	data := baseAdminData(c, "Тест gRPC")
-	c.HTML(http.StatusOK, "admin/admin_grpc.html", data)
+	data["Active"] = "grpc"
+	c.HTML(http.StatusOK, "admin/layout", data)
 }
 
 func baseAdminData(c *gin.Context, name string) gin.H {

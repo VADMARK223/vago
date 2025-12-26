@@ -1,4 +1,4 @@
-/* База */
+/* ---------- База ---------- */
 .btn {
     font-family: "JetBrains Mono", monospace;
     padding: var(--space-2) var(--space-4);
@@ -9,33 +9,39 @@
     display: inline-block;
     text-align: center;
 
+    border: none;
+    user-select: none;
+    white-space: nowrap;
+
+    background: var(--btn-bg);
+    color: var(--btn-color);
+
     transition:
             background 0.15s ease,
             color 0.15s ease,
             transform 0.12s ease;
 }
 
-/* Типы */
+/* ---------- Типы ---------- */
 .btn-primary {
-    background: var(--color-primary);
-    color: #fff;
-
-    transition:
-            background 0.15s ease,
-            transform 0.12s ease;
+    --btn-bg: var(--color-primary);
+    --btn-bg-hover: var(--color-primary-hover);
+    --btn-color: #fff;
 }
 
 .btn-danger {
-    background: var(--color-danger);
-    color: #fff;
+    --btn-bg: var(--color-danger);
+    --btn-bg-hover: var(--color-danger-hover);
+    --btn-color: #fff;
 }
 
 .btn-default {
-    background: var(--bg-item);
-    color: #e5e7eb;
+    --btn-bg: var(--bg-item);
+    --btn-bg-hover: var(--bg-item-hover);
+    --btn-color: #e5e7eb;
 }
 
-/* Размеры */
+/* ---------- Размеры ---------- */
 .btn-sm {
     padding: var(--space-1) var(--space-3);
     font-size: 12px;
@@ -47,21 +53,32 @@
     border-radius: var(--radius-lg);
 }
 
-/* Состояния */
-.btn-primary:hover {
-    background: var(--color-primary-hover);
-    transform: translateY(-1px);
+/* ---------- Наведение ---------- */
+.btn:not(.active):hover {
+    background: var(--btn-bg-hover);
 }
 
-.btn-danger:hover {
-    filter: brightness(0.9);
+.btn-primary:not(.active):hover,
+.btn-danger:not(.active):hover {
     transform: translateY(-1px);
 }
 
 .btn-default:hover {
-    background: var(--bg-item-hover);
+    transform: none;
 }
 
+/* ---------- Active / Current ---------- */
+.btn.active,
+.btn[aria-current="true"] {
+    background: var(--color-primary-active);
+    transform: none;
+    cursor: default;
+
+    box-shadow:
+            inset 0 0 0 2px rgba(255, 255, 255, 0.18);
+}
+
+/* ---------- Блокировка ---------- */
 .btn:disabled,
 .btn[aria-disabled="true"] {
     background: var(--color-disabled);
@@ -71,6 +88,7 @@
     transform: none;
 }
 
+/* ---------- Фокусировка ---------- */
 .btn:focus {
     outline: none;
 }

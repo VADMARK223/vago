@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+{{ define "admin/nav" }}
+<nav style="margin-bottom: var(--space-2)">
+    <a href="/admin/user" class="btn btn-primary btn-sm {{ if eq .Active "user" }}active{{ end }}">Профиль</a>
+    <a href="/admin/users" class="btn btn-primary btn-sm {{ if eq .Active "users" }}active{{ end }}">Пользователи</a>
+    <a href="/admin/messages" class="btn btn-primary btn-sm {{ if eq .Active "messages" }}active{{ end }}">Сообщения</a>
+    <a href="/admin/grpc" class="btn btn-primary btn-sm {{ if eq .Active "grpc" }}active{{ end }}">gRPC</a>
+</nav>
+{{ end }}

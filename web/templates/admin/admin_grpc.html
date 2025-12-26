@@ -1,23 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Админка (Пользователь)</title>
-    <link rel="stylesheet" href="/static/css/main.css">
-</head>
-<body>
-
-{{ template "header" . }}
-
-<main>
-    <div class="container">
-        <div>
-            <button id="sayHelloBtn" class="btn btn-primary">SayHello</button>
-            <button id="pingHelloBtn" class="btn btn-primary">PingHello</button>
-            <span id="result"></span>
-        </div>
-    </div>
-</main>
+{{ define "admin/grpc_content" }}
+<div>
+    <button id="sayHelloBtn" class="btn btn-primary">SayHello</button>
+    <button id="pingHelloBtn" class="btn btn-primary">PingHello</button>
+    <span id="result"></span>
+</div>
 
 <script type="module">
     import {sayHello, ping, getCookie} from '/static/js/bundle.js';
@@ -52,5 +38,4 @@
     })
 </script>
 
-</body>
-</html>
+{{ end }}

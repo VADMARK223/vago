@@ -9,13 +9,15 @@
 
     /* Brand / accent */
     --color-primary: #4e94ce;
-    --color-primary-hover: #6897bb;
+    --color-primary-hover: #6aa7da;
+    --color-primary-active: #3f7fb3;
 
     /* Text */
     --text: #a9b7c6;
 
     /* States */
     --color-danger: #c94f4f;
+    --color-danger-hover: #b74444;
     --color-error: #F44336;
     --color-warning: #ffb347;
     --color-success: #4CAF50;

@@ -1,58 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Админка (Сообщения чата)</title>
-    <link rel="stylesheet" href="/static/css/main.css">
-</head>
-<body>
-
-{{ template "header" . }}
-
-<main>
-    <div class="container">
-        <div class="list">
-            <div class="item">
-                <div class="messages-control">
-                    <form class="form-add" action="/messages" method="POST">
-                        <div>
-                            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i>Создать сообщение</button>
-                        </div>
-                    </form>
-                    <form class="form-add" action="/messagesDeleteAll" method="POST">
-                        <div>
-                            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i>Удалить все сообщения</button>
-                        </div>
-                    </form>
-                    <span>Сообщений: {{.messages_count}}</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="list">
-            {{range .messages}}
-            <div class="item" id="message-{{.ID}}">
-                <div class="item-info">
-                    <p>Идентификатор сообщения: {{.ID}}</p>
-                    <p>Идентификатор автора: {{.AuthorID}}</p>
-                    <p>Никнейм: {{.Username}}</p>
-                    <p>Содержание: {{.Body}}</p>
-                    <p>Тип: {{.MessageType}}</p>
-                    <p>Отправлено: {{.SentAt}}</p>
-                </div>
+{{ define "admin/messages_content" }}
+<div class="list">
+    <div class="item">
+        <div class="messages-control">
+            <form class="form-add" action="/messages" method="POST">
                 <div>
-                    <button class="btn btn-danger btn-sm" onclick="deleteMessage('{{.ID}}')"><i
-                            class="fa-solid fa-trash"></i></button>
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i>Создать сообщение
+                    </button>
                 </div>
-            </div>
-            {{else}}
-            <p class="empty">Сообщений нет</p>
-            {{end}}
+            </form>
+            <form class="form-add" action="/messagesDeleteAll" method="POST">
+                <div>
+                    <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i>Удалить все сообщения
+                    </button>
+                </div>
+            </form>
+            <span>Сообщений: {{.messages_count}}</span>
         </div>
     </div>
-</main>
-<script>
+</div>
 
+<div class="list">
+    {{range .messages}}
+    <div class="item" id="message-{{.ID}}">
+        <div class="item-info">
+            <p>Идентификатор сообщения: {{.ID}}</p>
+            <p>Идентификатор автора: {{.AuthorID}}</p>
+            <p>Никнейм: {{.Username}}</p>
+            <p>Содержание: {{.Body}}</p>
+            <p>Тип: {{.MessageType}}</p>
+            <p>Отправлено: {{.SentAt}}</p>
+        </div>
+        <div>
+            <button class="btn btn-danger btn-sm" onclick="deleteMessage('{{.ID}}')"><i
+                    class="fa-solid fa-trash"></i></button>
+        </div>
+    </div>
+    {{else}}
+    <p class="empty">Сообщений нет</p>
+    {{end}}
+</div>
+
+<script>
     async function deleteMessage(id) {
         if (!confirm('Удалить сообщение?')) return;
 
@@ -65,5 +53,5 @@
         }
     }
 </script>
-</body>
-</html>
+
+{{ end }}

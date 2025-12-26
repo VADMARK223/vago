@@ -85,6 +85,8 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	{
 		admin := auth.Group(route.Admin)
 		{
+			admin.GET("", adminHandler.ShowAdmin)
+
 			admin.GET(route.User, adminHandler.ShowUser)
 			admin.GET(route.Users, adminHandler.ShowUsers)
 			admin.GET(route.Messages, adminHandler.ShowMessages)
