@@ -1,7 +1,7 @@
 package domain
 
 type Answer struct {
-	ID        uint
+	ID        int64
 	Text      string
 	IsCorrect bool
 }

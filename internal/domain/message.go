@@ -4,11 +4,11 @@ import (
 	"time"
 )
 
-type UserID uint
+type UserID int64
 type Body string
 
 type Message struct {
-	ID          uint
+	ID          int64
 	author      UserID
 	body        Body
 	sentAt      time.Time

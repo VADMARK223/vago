@@ -5,8 +5,8 @@ import (
 )
 
 type MessageRepository interface {
-	Save(ctx context.Context, message *Message) (uint, error)
+	Save(ctx context.Context, message *Message) (int64, error)
 	ListAll(ctx context.Context) ([]*Message, error)
-	DeleteMessage(id uint) error
+	DeleteMessage(id int64) error
 	DeleteAll() error
 }

@@ -17,7 +17,7 @@ func Tasks(service *task2.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		data := tplWithMetaData(c, "Задачи пользователя")
 
-		tasks, err := service.GetAllByUser(data[code.UserId].(uint))
+		tasks, err := service.GetAllByUser(data[code.UserId].(int64))
 		if err != nil {
 			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
 				"Message": "Не удалось загрузить задачи",
@@ -55,7 +55,7 @@ func AddTask(appCtx *app.Context) gin.HandlerFunc {
 			Name:        name,
 			Description: desc,
 			Completed:   completed == "on",
-			UserID:      sessionUserID.(uint),
+			UserID:      sessionUserID.(int64),
 		}
 
 		if err := appCtx.DB.Create(&t).Error; err != nil {
@@ -101,9 +101,9 @@ func UpdateTask(appCtx *app.Context, service *task2.Service) gin.HandlerFunc {
 			return
 		}
 
-		userID := c.MustGet(code.UserId).(uint)
+		userID := c.MustGet(code.UserId).(int64)
 
-		errUpdate := service.UpdateCompleted(uint(taskID), userID, body.Completed)
+		errUpdate := service.UpdateCompleted(int64(taskID), userID, body.Completed)
 		if errUpdate != nil {
 			appCtx.Log.Errorw("failed to update task", "error", errUpdate)
 			c.JSON(http.StatusBadRequest, gin.H{"error": errUpdate.Error()})

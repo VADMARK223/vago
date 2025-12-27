@@ -22,7 +22,7 @@ func NewJWTProvider(cfg *config.Config) *JWTProvider {
 	return &JWTProvider{secret: cfg.JwtSecret, accessTTL: cfg.AccessTTLDuration(), refreshTTL: cfg.RefreshTTLDuration()}
 }
 
-func (j *JWTProvider) CreateTokenPair(userID uint, role string) (*domain.TokenPair, error) {
+func (j *JWTProvider) CreateTokenPair(userID int64, role string) (*domain.TokenPair, error) {
 	access, err := j.CreateToken(userID, role, true)
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func (j *JWTProvider) CreateTokenPair(userID uint, role string) (*domain.TokenPa
 	}, nil
 }
 
-func (j *JWTProvider) CreateToken(userID uint, role string, accessToken bool) (string, error) {
+func (j *JWTProvider) CreateToken(userID int64, role string, accessToken bool) (string, error) {
 	now := time.Now()
 
 	var duration time.Duration

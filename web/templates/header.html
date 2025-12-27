@@ -10,25 +10,19 @@
             }}
 
             {{ template "component.href_btn" dict
+            "Href" "/quiz"
+            "Name" "Тест"
+            "Icon" "fa-solid fa-check-double"
+            "Path" .Path
+            }}
+
+            {{ template "component.href_btn" dict
             "Href" "/book"
             "Name" "Книга"
             "Icon" "fa-solid fa-book"
             "Path" .Path
             }}
 
-            {{ template "component.href_btn" dict
-            "Href" "/quiz"
-            "Name" "Quiz"
-            "Icon" "fa-solid fa-check-double"
-            "Path" .Path
-            }}
-
-            {{ template "component.href_btn" dict
-            "Href" "/questions"
-            "Name" "Вопросы"
-            "Icon" "fa-solid fa-circle-question"
-            "Path" .Path
-            }}
 
             {{ template "component.href_btn" dict
             "Href" "/tasks"
@@ -43,6 +37,13 @@
             "Name" "Чат"
             "Icon" "fa-solid fa-comment"
             "Disabled" (not .user_id)
+            "Path" .Path
+            }}
+
+            {{ template "component.href_btn" dict
+            "Href" "/questions"
+            "Name" "Вопросы"
+            "Icon" "fa-solid fa-circle-question"
             "Path" .Path
             }}
 

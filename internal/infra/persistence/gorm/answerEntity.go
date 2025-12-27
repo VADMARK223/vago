@@ -1,8 +1,8 @@
 package gorm
 
 type AnswerEntity struct {
-	ID         uint   `gorm:"primaryKey"`
-	QuestionID uint   `gorm:"column:question_id"`
+	ID         int64  `gorm:"primaryKey"`
+	QuestionID int64  `gorm:"column:question_id"`
 	Text       string `gorm:"column:text"`
 	IsCorrect  bool   `gorm:"column:is_correct"`
 }

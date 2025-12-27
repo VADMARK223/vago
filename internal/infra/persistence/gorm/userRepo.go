@@ -57,7 +57,7 @@ func (r *UserRepository) CreateUser(u domain.User) error {
 	return nil
 }
 
-func (r *UserRepository) DeleteUser(id uint) error {
+func (r *UserRepository) DeleteUser(id int64) error {
 	if err := r.db.Delete(&UserEntity{}, id).Error; err != nil {
 		return fmt.Errorf("failed to delete user: %w", err)
 	}
@@ -74,7 +74,7 @@ func (r *UserRepository) GetByLogin(login string) (domain.User, error) {
 	return toDomain(entity), nil
 }
 
-func (r *UserRepository) GetByID(id uint) (domain.User, error) {
+func (r *UserRepository) GetByID(id int64) (domain.User, error) {
 	var entity UserEntity
 	if err := r.db.First(&entity, id).Error; err != nil {
 		return domain.User{}, err
@@ -83,7 +83,7 @@ func (r *UserRepository) GetByID(id uint) (domain.User, error) {
 	return toDomain(entity), nil
 }
 
-func (r *UserRepository) GetByIDs(ids []uint) ([]domain.User, error) {
+func (r *UserRepository) GetByIDs(ids []int64) ([]domain.User, error) {
 	if len(ids) == 0 {
 		return []domain.User{}, nil
 	}

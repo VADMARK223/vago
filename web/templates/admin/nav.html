@@ -1,8 +1,9 @@
 {{ define "admin/nav" }}
 <nav style="margin-bottom: var(--space-2)">
-    <a href="/admin/user" class="btn btn-primary btn-sm {{ if eq .Active "user" }}active{{ end }}">Профиль</a>
-    <a href="/admin/users" class="btn btn-primary btn-sm {{ if eq .Active "users" }}active{{ end }}">Пользователи</a>
-    <a href="/admin/messages" class="btn btn-primary btn-sm {{ if eq .Active "messages" }}active{{ end }}">Сообщения</a>
-    <a href="/admin/grpc" class="btn btn-primary btn-sm {{ if eq .Active "grpc" }}active{{ end }}">gRPC</a>
+    <a href="/admin/user" class="btn btn-primary btn-sm {{ if eq .Active "user" }}active{{ end }}" onclick="saveAdminSection('/admin/user')">Профиль</a>
+    <a href="/admin/comments" class="btn btn-primary btn-sm {{ if eq .Active "comments" }}active{{ end }}"onclick="saveAdminSection('/admin/comments')">Комментарии</a>
+    <a href="/admin/users" class="btn btn-primary btn-sm {{ if eq .Active "users" }}active{{ end }}" onclick="saveAdminSection('/admin/users')">Пользователи</a>
+    <a href="/admin/messages" class="btn btn-primary btn-sm {{ if eq .Active "messages" }}active{{ end }}" onclick="saveAdminSection('/admin/messages')">Сообщения</a>
+    <a href="/admin/grpc" class="btn btn-primary btn-sm {{ if eq .Active "grpc" }}active{{ end }}" onclick="saveAdminSection('/admin/grpc')">gRPC</a>
 </nav>
 {{ end }}

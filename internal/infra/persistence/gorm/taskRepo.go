@@ -29,7 +29,7 @@ func (r TaskRepo) GetAll() ([]domain.Task, error) {
 	return result, err
 }
 
-func (r TaskRepo) GetAllByUserID(ID uint) ([]domain.Task, error) {
+func (r TaskRepo) GetAllByUserID(ID int64) ([]domain.Task, error) {
 	var entities []TaskEntity
 	err := r.db.Where("user_id = ?", ID).Find(&entities).Error
 
@@ -47,7 +47,7 @@ func (r TaskRepo) GetAllByUserID(ID uint) ([]domain.Task, error) {
 	return result, err
 }
 
-func (r TaskRepo) UpdateCompleted(taskID, userID uint, completed bool) error {
+func (r TaskRepo) UpdateCompleted(taskID, userID int64, completed bool) error {
 	taskEntity := TaskEntity{}
 	if err := r.db.Where("id = ? AND user_id = ?", taskID, userID).First(&taskEntity).Error; err != nil {
 		return err

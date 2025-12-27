@@ -17,9 +17,9 @@ func NewMessageRepo(db *gorm.DB) *MessageRepo {
 	return &MessageRepo{db: db}
 }
 
-func (r *MessageRepo) Save(ctx context.Context, m *domain.Message) (uint, error) {
+func (r *MessageRepo) Save(ctx context.Context, m *domain.Message) (int64, error) {
 	entity := MessageEntity{
-		UserID:    uint(m.Author()),
+		UserID:    int64(m.Author()),
 		Content:   string(m.Body()),
 		Type:      m.MessageType,
 		CreatedAt: time.Now(),
@@ -58,7 +58,7 @@ func (r *MessageRepo) ListAll(ctx context.Context) ([]*domain.Message, error) {
 	return result, nil
 }
 
-func (r *MessageRepo) DeleteMessage(id uint) error {
+func (r *MessageRepo) DeleteMessage(id int64) error {
 	if err := r.db.Delete(&MessageEntity{}, id).Error; err != nil {
 		return fmt.Errorf("failed to delete message: %w", err)
 	}

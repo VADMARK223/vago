@@ -9,6 +9,7 @@ import (
 	"strings"
 	"vago/internal/app"
 	"vago/internal/application/chat"
+	"vago/internal/application/comment"
 	"vago/internal/application/quiz"
 	"vago/internal/application/task"
 	"vago/internal/application/topic"
@@ -40,9 +41,11 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	topicRepo := gorm.NewTopicRepo(ctx.DB)
 	questionSvc := quiz.NewService(gorm.NewQuestionRepo(ctx.DB), topicRepo)
 	topicSvc := topic.NewService(topicRepo)
+	commentSvc := comment.NewService(gorm.NewCommentRepo(ctx.DB))
+
 	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret, ctx.Cfg.RefreshTTLInt(), ctx.Log)
 	quizHandler := handler.NewQuizHandler(questionSvc, topicSvc, ctx.Cfg.PostgresDsn)
-	adminHandler := handler.NewAdminHandler(tokenProvider, userSvc, chatSvc)
+	adminHandler := handler.NewAdminHandler(tokenProvider, userSvc, chatSvc, commentSvc)
 
 	gin.SetMode(ctx.Cfg.GinMode)
 	r := gin.New()
@@ -88,6 +91,7 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 			admin.GET("", adminHandler.ShowAdmin)
 
 			admin.GET(route.User, adminHandler.ShowUser)
+			admin.GET(route.Comments, adminHandler.ShowComments)
 			admin.GET(route.Users, adminHandler.ShowUsers)
 			admin.GET(route.Messages, adminHandler.ShowMessages)
 			admin.GET(route.Grpc, adminHandler.ShowGrpc)

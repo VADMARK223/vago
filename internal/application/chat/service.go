@@ -44,9 +44,9 @@ func (s *Service) MessagesDTO(ctx context.Context) ([]MessageDTO, error) {
 	}
 
 	// collect user ids
-	ids := make([]uint, 0, len(msgs))
+	ids := make([]int64, 0, len(msgs))
 	for _, m := range msgs {
-		ids = append(ids, uint(m.Author()))
+		ids = append(ids, int64(m.Author()))
 	}
 
 	// load users
@@ -55,7 +55,7 @@ func (s *Service) MessagesDTO(ctx context.Context) ([]MessageDTO, error) {
 		return nil, err
 	}
 
-	userMap := map[uint]string{}
+	userMap := map[int64]string{}
 	for _, u := range users {
 		userMap[u.ID] = u.Username
 	}
@@ -63,7 +63,7 @@ func (s *Service) MessagesDTO(ctx context.Context) ([]MessageDTO, error) {
 	// build DTO
 	result := make([]MessageDTO, 0, len(msgs))
 	for _, m := range msgs {
-		uid := uint(m.Author())
+		uid := int64(m.Author())
 		username := userMap[uid]
 		if username == "" {
 			username = "Unknown"
@@ -82,7 +82,7 @@ func (s *Service) MessagesDTO(ctx context.Context) ([]MessageDTO, error) {
 	return result, nil
 }
 
-func (s *Service) DeleteMessage(id uint) error {
+func (s *Service) DeleteMessage(id int64) error {
 	return s.msgRepo.DeleteMessage(id)
 }
 

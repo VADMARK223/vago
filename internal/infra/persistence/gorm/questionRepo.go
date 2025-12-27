@@ -44,7 +44,7 @@ func (q QuestionRepo) All() ([]*domain.Question, error) {
 	return result, nil
 }
 
-func (q QuestionRepo) RandomID() (uint, error) {
+func (q QuestionRepo) RandomID() (int64, error) {
 	var count int64
 	if err := q.db.Model(&QuestionEntity{}).Count(&count).Error; err != nil {
 		return 0, err
@@ -115,7 +115,7 @@ func (q QuestionRepo) FindByTopicID(topicID uint) ([]*domain.Question, error) {
 	return result, nil
 }
 
-func (q QuestionRepo) GetByID(id uint) (*domain.Question, error) {
+func (q QuestionRepo) GetByID(id int64) (*domain.Question, error) {
 	var entity QuestionEntity
 
 	err := q.db.Preload("Answers").

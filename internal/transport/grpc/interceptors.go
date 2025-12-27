@@ -79,14 +79,14 @@ func NewAuthInterceptor(log *zap.SugaredLogger, provider *token.JWTProvider) grp
 
 type AuthContext struct {
 	context.Context
-	userID uint
+	userID int64
 }
 
-func (a *AuthContext) UserID() uint {
+func (a *AuthContext) UserID() int64 {
 	return a.userID
 }
 
-func wrap(ctx context.Context, userID uint) context.Context {
+func wrap(ctx context.Context, userID int64) context.Context {
 	return &AuthContext{
 		Context: ctx,
 		userID:  userID,

@@ -16,10 +16,10 @@ func (s *Service) GetAllTasks() ([]domain.Task, error) {
 	return s.repo.GetAll()
 }
 
-func (s *Service) GetAllByUser(userID uint) ([]domain.Task, error) {
+func (s *Service) GetAllByUser(userID int64) ([]domain.Task, error) {
 	return s.repo.GetAllByUserID(userID)
 }
 
-func (s *Service) UpdateCompleted(taskID, userID uint, completed bool) error {
+func (s *Service) UpdateCompleted(taskID, userID int64, completed bool) error {
 	return s.repo.UpdateCompleted(taskID, userID, completed)
 }

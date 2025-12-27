@@ -22,8 +22,8 @@ type QuizHandler struct {
 }
 
 type CheckRequest struct {
-	QuestionID uint `json:"question_id"`
-	AnswerID   uint `json:"answer_id"`
+	QuestionID int64 `json:"question_id"`
+	AnswerID   int64 `json:"answer_id"`
 }
 
 type CheckResponse struct {
@@ -49,13 +49,13 @@ func (h *QuizHandler) ShowQuizRandom() func(c *gin.Context) {
 func (h *QuizHandler) ShowQuizByID() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		idStr := c.Param("id")
-		id64, err := strconv.ParseUint(idStr, 10, 64)
+		id64, err := strconv.ParseInt(idStr, 10, 64)
 		if err != nil {
 			c.String(400, "invalid id")
 			return
 		}
-		temp := uint(id64)
-		q := h.quizSvc.RandomPublicQuestion(&temp)
+
+		q := h.quizSvc.RandomPublicQuestion(&id64)
 
 		renderQuiz(c, q)
 	}
@@ -65,7 +65,7 @@ func renderQuiz(c *gin.Context, q quiz.QuestionPublic) {
 	data := tplWithMetaData(c, "Викторина")
 	data[code.Question] = q
 
-	c.HTML(http.StatusOK, "quiz.html", data)
+	c.HTML(http.StatusOK, "test.html", data)
 }
 
 func (h *QuizHandler) Check() func(c *gin.Context) {
@@ -101,13 +101,13 @@ func (h *QuizHandler) ShowQuestions(c *gin.Context) {
 	topics, _ := h.topicSvc.AllWithCount()
 
 	var (
-		topicID   uint64
+		topicID   int64
 		questions []*domain.Question
 		err       error
 	)
 
 	if topicIDStr != "" {
-		topicID, err = strconv.ParseUint(topicIDStr, 10, 64)
+		topicID, err = strconv.ParseInt(topicIDStr, 10, 64)
 		if err != nil {
 			ShowError(c, "Ошибка", err.Error())
 			return

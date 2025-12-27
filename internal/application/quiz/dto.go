@@ -1,7 +1,7 @@
 package quiz
 
 type QuestionPublic struct {
-	ID          uint
+	ID          int64
 	Text        string
 	Code        string
 	Explanation string
@@ -10,6 +10,6 @@ type QuestionPublic struct {
 }
 
 type AnswerPublic struct {
-	ID   uint
+	ID   int64
 	Text string
 }

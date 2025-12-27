@@ -25,7 +25,7 @@ func LoadUserContext(svc *user.Service, cache *app.LocalCache) gin.HandlerFunc {
 			return
 		}
 
-		userID := uidVal.(uint)
+		userID := uidVal.(int64)
 
 		if cached, ok := cache.Get(userID); ok {
 			c.Set(code.CurrentUser, cached.(domain.User))

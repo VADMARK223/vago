@@ -10,7 +10,7 @@ import (
 
 func DeleteUser(service *user.Service) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		parseUint, parseUintErr := strconv.ParseUint(c.Param("id"), 10, 32)
+		parseUint, parseUintErr := strconv.ParseInt(c.Param("id"), 10, 32)
 		if parseUintErr != nil {
 			return
 		}
@@ -45,7 +45,7 @@ func DeleteUser(service *user.Service) func(c *gin.Context) {
 			return
 		}
 
-		err := service.DeleteUser(uint(parseUint))
+		err := service.DeleteUser(parseUint)
 		if err != nil {
 			ShowError(c, "Ошибка удаления пользователя", err.Error())
 			return

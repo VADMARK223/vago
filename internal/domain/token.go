@@ -9,7 +9,7 @@ type TokenInfo struct {
 	Remaining   time.Duration `json:"remaining"`
 	IsRefreshed bool          `json:"is_refreshed"`
 	Role        string        `json:"role"`
-	UserID      uint          `json:"user_id"`
+	UserID      int64         `json:"user_id"`
 }
 
 type TokenPair struct {
@@ -18,7 +18,7 @@ type TokenPair struct {
 }
 
 type TokenProvider interface {
-	CreateTokenPair(userID uint, role string) (*TokenPair, error)
-	CreateToken(userID uint, role string, accessToken bool) (string, error)
+	CreateTokenPair(userID int64, role string) (*TokenPair, error)
+	CreateToken(userID int64, role string, accessToken bool) (string, error)
 	ParseToken(token string) (*CustomClaims, error)
 }

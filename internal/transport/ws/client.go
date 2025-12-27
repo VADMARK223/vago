@@ -17,7 +17,7 @@ type Client struct {
 	Hub        *Hub
 	Send       chan []byte
 	log        *zap.SugaredLogger
-	UserID     uint
+	UserID     int64
 	messageSvc *chat.Service
 }
 
@@ -26,7 +26,7 @@ type ClientPacket struct {
 	Text string `json:"text"`
 }
 
-func NewClient(conn *websocket.Conn, hub *Hub, userID uint, log *zap.SugaredLogger, svc *chat.Service) *Client {
+func NewClient(conn *websocket.Conn, hub *Hub, userID int64, log *zap.SugaredLogger, svc *chat.Service) *Client {
 	client := &Client{
 		Conn:       conn,
 		Hub:        hub,

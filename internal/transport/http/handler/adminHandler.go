@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 	"vago/internal/application/chat"
+	"vago/internal/application/comment"
 	"vago/internal/application/user"
 	"vago/internal/config/code"
 	"vago/internal/config/route"
@@ -16,21 +18,23 @@ import (
 )
 
 type AdminHandler struct {
-	provider *token.JWTProvider
-	userSvc  *user.Service
-	chatSvc  *chat.Service
+	provider   *token.JWTProvider
+	userSvc    *user.Service
+	chatSvc    *chat.Service
+	commentSvc *comment.Service
 }
 
-func NewAdminHandler(provider *token.JWTProvider, userSvc *user.Service, chatSvc *chat.Service) *AdminHandler {
+func NewAdminHandler(provider *token.JWTProvider, userSvc *user.Service, chatSvc *chat.Service, commentSvc *comment.Service) *AdminHandler {
 	return &AdminHandler{
-		provider: provider,
-		userSvc:  userSvc,
-		chatSvc:  chatSvc,
+		provider:   provider,
+		userSvc:    userSvc,
+		chatSvc:    chatSvc,
+		commentSvc: commentSvc,
 	}
 }
 
 func (h *AdminHandler) ShowAdmin(c *gin.Context) {
-	c.Redirect(http.StatusFound, route.Admin+route.Messages)
+	c.Redirect(http.StatusFound, route.Admin+route.User)
 }
 
 func (h *AdminHandler) ShowUser(c *gin.Context) {
@@ -38,6 +42,19 @@ func (h *AdminHandler) ShowUser(c *gin.Context) {
 	updateTokenInfo(c, data)
 	updateRefreshTokenInfo(c, data, h.provider)
 	data["Active"] = "user"
+	c.HTML(http.StatusOK, "admin/layout", data)
+}
+
+func (h *AdminHandler) ShowComments(c *gin.Context) {
+	comments, err := h.commentSvc.All()
+	if err != nil {
+		ShowError(c, "Ошибка загрузки комментариев", err.Error())
+		return
+	}
+
+	value := strconv.Itoa(len(comments))
+	data := baseAdminData(c, "Комментарии: "+value)
+	data["Active"] = "comments"
 	c.HTML(http.StatusOK, "admin/layout", data)
 }
 

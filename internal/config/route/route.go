@@ -10,6 +10,7 @@ const (
 
 	Admin    = "/admin"
 	User     = "/user"
+	Comments = "/comments"
 	Users    = "/users"
 	Messages = "/messages"
 	Grpc     = "/grpc"

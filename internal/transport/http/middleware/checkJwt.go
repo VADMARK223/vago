@@ -53,7 +53,7 @@ func tryRefresh(c *gin.Context, refreshTTL int, provider *token.JWTProvider) boo
 	return true
 }
 
-func setAuth(c *gin.Context, id uint, role string, exp time.Time, refreshed bool) {
+func setAuth(c *gin.Context, id int64, role string, exp time.Time, refreshed bool) {
 	c.Set(code.UserId, id)
 	c.Set(code.Role, role)
 

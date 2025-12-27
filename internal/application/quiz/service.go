@@ -28,11 +28,11 @@ func (s *Service) DeleteAll() error {
 	return s.questionRepo.DeleteAll()
 }
 
-func (s *Service) RandomID() (uint, error) {
+func (s *Service) RandomID() (int64, error) {
 	return s.questionRepo.RandomID()
 }
 
-func (s *Service) RandomPublicQuestion(id *uint) QuestionPublic {
+func (s *Service) RandomPublicQuestion(id *int64) QuestionPublic {
 	question, err := s.randomQuestion(id)
 	if err != nil {
 		panic(err)
@@ -45,7 +45,7 @@ func (s *Service) RandomPublicQuestion(id *uint) QuestionPublic {
 	return s.toPublic(question, topic.Name)
 }
 
-func (s *Service) randomQuestion(id *uint) (*domain.Question, error) {
+func (s *Service) randomQuestion(id *int64) (*domain.Question, error) {
 	if id == nil {
 		return s.questionRepo.Random()
 	}
@@ -56,7 +56,7 @@ func (s *Service) randomQuestion(id *uint) (*domain.Question, error) {
 func (s *Service) toPublic(q *domain.Question, topicName string) QuestionPublic {
 	if q == nil {
 		return QuestionPublic{
-			ID:   uint(0),
+			ID:   0,
 			Text: "Ошибка поиска вопроса",
 		}
 	}
@@ -77,7 +77,7 @@ func (s *Service) toPublic(q *domain.Question, topicName string) QuestionPublic 
 	return res
 }
 
-func (s *Service) CheckAnswer(qID, aID uint) (bool, string) {
+func (s *Service) CheckAnswer(qID, aID int64) (bool, string) {
 	q, _ := s.questionRepo.GetByID(qID)
 
 	for _, a := range q.Answers {

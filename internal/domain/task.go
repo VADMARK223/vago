@@ -5,7 +5,7 @@ import (
 )
 
 type Task struct {
-	ID          uint
+	ID          int64
 	Name        string
 	Description string
 	CreatedAt   time.Time

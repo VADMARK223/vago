@@ -31,11 +31,11 @@ func (s *Service) CreateUser(dto domain.DTO) error {
 	return s.repo.CreateUser(user)
 }
 
-func (s *Service) DeleteUser(id uint) error {
+func (s *Service) DeleteUser(id int64) error {
 	return s.repo.DeleteUser(id)
 }
 
-func (s *Service) GetByID(id uint) (domain.User, error) {
+func (s *Service) GetByID(id int64) (domain.User, error) {
 	return s.repo.GetByID(id)
 }
 

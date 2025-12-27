@@ -147,6 +147,7 @@ c.Inc() // Go сам возьмёт &c</code></pre>
 <p>Можно проверить:</p>
 <pre><code class="language-go">go build -gcflags="-m"</code></pre>
 
+<hr>
 <h2>9. Указатели и new</h2>
 <pre><code class="language-go">p := new(int)
 *p = 10
@@ -158,5 +159,41 @@ u := new(User)
 u.Name = "Alice"
 // Но чаще используют:
 u := &User{Name: "Alice"}</code></pre>
+
+<hr>
+<h2>10. Простая ментальная модель</h2>
+<p>Представь:</p>
+<table>
+    <thead>
+    <tr>
+        <th>Вопрос</th>
+        <th>Да</th>
+        <th>Нет</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Есть ID?</td>
+        <td>указатель</td>
+        <td>значение</td>
+    </tr>
+    <tr>
+        <td>Его будут менять?</td>
+        <td>указатель</td>
+        <td>значение</td>
+    </tr>
+    <tr>
+        <td>Он часть дерева?</td>
+        <td>указатель</td>
+        <td>значение</td>
+    </tr>
+    <tr>
+        <td>Это DTO / params?</td>
+        <td>значение</td>
+        <td>-</td>
+    </tr>
+    </tbody>
+</table>
+
 
 {{ end }}
