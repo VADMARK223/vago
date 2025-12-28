@@ -1,4 +1,4 @@
-package quiz
+package test
 
 type QuestionPublic struct {
 	ID          int64

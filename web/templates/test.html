@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="/static/css/main.css">
     <link rel="stylesheet" href="/static/css/github-dark.min.css">
     <script src="/static/js/lib/highlight.min.js"></script>
-    <script src="/static/js/components/quiz.js" defer></script>
+    <script src="/static/js/components/test.js" defer></script>
 </head>
 <body>
 {{ template "header" . }}
@@ -16,7 +16,7 @@
 
     <div class="container">
         <h3>{{.question.ID}}. {{.question.Text}}</h3>
-        <span>Тема: {{.question.TopicName}}</span>
+        <span style="margin-bottom: var(--space-2)">Тема: {{.question.TopicName}}</span>
 
         {{if .question.Code}}
             <pre><code class="language-go">{{.question.Code}}</code></pre>
@@ -31,9 +31,11 @@
         <div class="stack">
             <p id="result" class="hidden"></p>
             <p id="explanation" class="panel hidden" style="width: 100%"></p>
-            <div id="continueBtn" class="btn btn-primary" style="visibility: hidden; text-align: center">
+
+            <button id="continueBtn" class="btn btn-primary" hidden>
                 Продолжить
-            </div>
+            </button>
+
         </div>
     </div>
 </main>

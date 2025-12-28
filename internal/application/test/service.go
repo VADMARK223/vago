@@ -1,4 +1,4 @@
-package quiz
+package test
 
 import (
 	"vago/internal/domain"
@@ -77,15 +77,19 @@ func (s *Service) toPublic(q *domain.Question, topicName string) QuestionPublic 
 	return res
 }
 
-func (s *Service) CheckAnswer(qID, aID int64) (bool, string) {
-	q, _ := s.questionRepo.GetByID(qID)
+func (s *Service) CheckAnswer(qID, aID int64) (bool, string, error) {
+	q, err := s.questionRepo.GetByID(qID)
+
+	if err != nil {
+		return false, "", err
+	}
 
 	for _, a := range q.Answers {
 		if a.ID == aID {
-			return a.IsCorrect, q.Explanation
+			return a.IsCorrect, q.Explanation, nil
 		}
 	}
-	return false, q.Explanation
+	return false, q.Explanation, err
 }
 
 func (s *Service) GetQuestionsByTopic(topicId int64) ([]*domain.Question, error) {

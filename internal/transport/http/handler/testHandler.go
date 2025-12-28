@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-	"vago/internal/application/quiz"
+	"vago/internal/application/test"
 	"vago/internal/application/topic"
 	"vago/internal/config/code"
 	"vago/internal/domain"
@@ -15,8 +15,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type QuizHandler struct {
-	quizSvc  *quiz.Service
+type TestHandler struct {
+	testSvc  *test.Service
 	topicSvc *topic.Service
 	dsn      string
 }
@@ -31,22 +31,22 @@ type CheckResponse struct {
 	Explanation string `json:"explanation"`
 }
 
-func NewQuizHandler(quizSvc *quiz.Service, topicSvc *topic.Service, dsn string) *QuizHandler {
-	return &QuizHandler{quizSvc: quizSvc, topicSvc: topicSvc, dsn: dsn}
+func NewTestHandler(testSvc *test.Service, topicSvc *topic.Service, dsn string) *TestHandler {
+	return &TestHandler{testSvc: testSvc, topicSvc: topicSvc, dsn: dsn}
 }
 
-func (h *QuizHandler) ShowQuizRandom() func(c *gin.Context) {
+func (h *TestHandler) ShowTestRandom() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		id, err := h.quizSvc.RandomID()
+		id, err := h.testSvc.RandomID()
 		if err != nil {
 			ShowError(c, "Ошибка генерации случайного вопроса", err.Error())
 			return
 		}
-		c.Redirect(http.StatusFound, fmt.Sprintf("/quiz/%d", id))
+		c.Redirect(http.StatusFound, fmt.Sprintf("/test/%d", id))
 	}
 }
 
-func (h *QuizHandler) ShowQuizByID() func(c *gin.Context) {
+func (h *TestHandler) ShowTestByID() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		idStr := c.Param("id")
 		id64, err := strconv.ParseInt(idStr, 10, 64)
@@ -55,20 +55,20 @@ func (h *QuizHandler) ShowQuizByID() func(c *gin.Context) {
 			return
 		}
 
-		q := h.quizSvc.RandomPublicQuestion(&id64)
+		q := h.testSvc.RandomPublicQuestion(&id64)
 
 		renderQuiz(c, q)
 	}
 }
 
-func renderQuiz(c *gin.Context, q quiz.QuestionPublic) {
+func renderQuiz(c *gin.Context, q test.QuestionPublic) {
 	data := tplWithMetaData(c, "Викторина")
 	data[code.Question] = q
 
 	c.HTML(http.StatusOK, "test.html", data)
 }
 
-func (h *QuizHandler) Check() func(c *gin.Context) {
+func (h *TestHandler) Check() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var req CheckRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
@@ -76,16 +76,20 @@ func (h *QuizHandler) Check() func(c *gin.Context) {
 			return
 		}
 
-		correct, explanation := h.quizSvc.CheckAnswer(req.QuestionID, req.AnswerID)
+		correct, explanation, err := h.testSvc.CheckAnswer(req.QuestionID, req.AnswerID)
+		if err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(200, CheckResponse{Correct: correct, Explanation: explanation})
 	}
 }
 
-func (h *QuizHandler) ShowAddQuestion() func(c *gin.Context) {
+func (h *TestHandler) ShowAddQuestion() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		topics, _ := h.topicSvc.AllWithCount()
 
-		questions, _ := h.quizSvc.AllQuestions()
+		questions, _ := h.testSvc.AllQuestions()
 
 		data := tplWithMetaData(c, "Добавление вопроса")
 		data[code.Topics] = topics
@@ -95,7 +99,7 @@ func (h *QuizHandler) ShowAddQuestion() func(c *gin.Context) {
 	}
 }
 
-func (h *QuizHandler) ShowQuestions(c *gin.Context) {
+func (h *TestHandler) ShowQuestions(c *gin.Context) {
 	topicIDStr := c.Query("topic_id")
 
 	topics, _ := h.topicSvc.AllWithCount()
@@ -112,9 +116,9 @@ func (h *QuizHandler) ShowQuestions(c *gin.Context) {
 			ShowError(c, "Ошибка", err.Error())
 			return
 		}
-		questions, err = h.quizSvc.GetQuestionsByTopic(topicID)
+		questions, err = h.testSvc.GetQuestionsByTopic(topicID)
 	} else {
-		questions, err = h.quizSvc.AllQuestions()
+		questions, err = h.testSvc.AllQuestions()
 	}
 
 	if err != nil {
@@ -131,7 +135,7 @@ func (h *QuizHandler) ShowQuestions(c *gin.Context) {
 	c.HTML(http.StatusOK, "questions.html", data)
 }
 
-func (h *QuizHandler) AddQuestion() func(c *gin.Context) {
+func (h *TestHandler) AddQuestion() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		text := c.PostForm("text")
 		codeStr := c.PostForm("code")
@@ -177,7 +181,7 @@ func (h *QuizHandler) AddQuestion() func(c *gin.Context) {
 	}
 }
 
-func (h *QuizHandler) RunTopicsSeed() func(c *gin.Context) {
+func (h *TestHandler) RunTopicsSeed() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		err := seed.Topics(h.dsn)
 		if err != nil {
@@ -188,7 +192,7 @@ func (h *QuizHandler) RunTopicsSeed() func(c *gin.Context) {
 	}
 }
 
-func (h *QuizHandler) RunQuestionsSeedNew() func(c *gin.Context) {
+func (h *TestHandler) RunQuestionsSeedNew() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 		defer cancel()
@@ -202,7 +206,7 @@ func (h *QuizHandler) RunQuestionsSeedNew() func(c *gin.Context) {
 	}
 }
 
-func (h *QuizHandler) RunTopicsSeedNew() func(c *gin.Context) {
+func (h *TestHandler) RunTopicsSeedNew() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		//err := seed.SyncQuestionsNew(h.dsn)
 		//if err != nil {

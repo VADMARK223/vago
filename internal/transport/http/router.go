@@ -10,8 +10,8 @@ import (
 	"vago/internal/app"
 	"vago/internal/application/chat"
 	"vago/internal/application/comment"
-	"vago/internal/application/quiz"
 	"vago/internal/application/task"
+	"vago/internal/application/test"
 	"vago/internal/application/topic"
 	"vago/internal/application/user"
 	"vago/internal/config/route"
@@ -39,13 +39,13 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 
 	// Хендлеры
 	topicRepo := gorm.NewTopicRepo(ctx.DB)
-	questionSvc := quiz.NewService(gorm.NewQuestionRepo(ctx.DB), topicRepo)
+	questionSvc := test.NewService(gorm.NewQuestionRepo(ctx.DB), topicRepo)
 	topicSvc := topic.NewService(topicRepo)
 	commentSvc := comment.NewService(gorm.NewCommentRepo(ctx.DB))
 
 	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret, ctx.Cfg.RefreshTTLInt(), ctx.Log)
-	quizHandler := handler.NewQuizHandler(questionSvc, topicSvc, ctx.Cfg.PostgresDsn)
-	adminHandler := handler.NewAdminHandler(tokenProvider, userSvc, chatSvc, commentSvc)
+	testH := handler.NewTestHandler(questionSvc, topicSvc, ctx.Cfg.PostgresDsn)
+	adminH := handler.NewAdminHandler(tokenProvider, userSvc, chatSvc, commentSvc)
 
 	gin.SetMode(ctx.Cfg.GinMode)
 	r := gin.New()
@@ -76,11 +76,11 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	r.POST(route.Register, handler.PerformRegister(userSvc))
 	r.POST(route.Logout, handler.Logout)
 
-	r.GET("/quiz", quizHandler.ShowQuizRandom())
-	r.GET("/quiz/:id", quizHandler.ShowQuizByID())
-	r.POST("/quiz/check", quizHandler.Check())
+	r.GET("/test", testH.ShowTestRandom())
+	r.GET("/test/:id", testH.ShowTestByID())
+	r.POST("/test/check", testH.Check())
 
-	r.GET("/questions", quizHandler.ShowQuestions)
+	r.GET("/questions", testH.ShowQuestions)
 
 	// Защищенные маршруты
 	auth := r.Group("/")
@@ -88,13 +88,13 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	{
 		admin := auth.Group(route.Admin)
 		{
-			admin.GET("", adminHandler.ShowAdmin)
+			admin.GET("", adminH.ShowAdmin)
 
-			admin.GET(route.User, adminHandler.ShowUser)
-			admin.GET(route.Comments, adminHandler.ShowComments)
-			admin.GET(route.Users, adminHandler.ShowUsers)
-			admin.GET(route.Messages, adminHandler.ShowMessages)
-			admin.GET(route.Grpc, adminHandler.ShowGrpc)
+			admin.GET(route.User, adminH.ShowUser)
+			admin.GET(route.Comments, adminH.ShowComments)
+			admin.GET(route.Users, adminH.ShowUsers)
+			admin.GET(route.Messages, adminH.ShowMessages)
+			admin.GET(route.Grpc, adminH.ShowGrpc)
 		}
 
 		auth.GET(route.Tasks, handler.Tasks(taskSvc))
@@ -111,11 +111,11 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 		auth.POST("/messagesDeleteAll", messagesHandler.DeleteAll())
 		auth.DELETE("/messages/:id", messagesHandler.Delete())
 
-		auth.GET("/add_questions", quizHandler.ShowAddQuestion())
-		auth.POST("/add_questions", quizHandler.AddQuestion())
+		auth.GET("/add_questions", testH.ShowAddQuestion())
+		auth.POST("/add_questions", testH.AddQuestion())
 
-		auth.POST("/runTopicsSeed", quizHandler.RunTopicsSeed())
-		auth.POST("/run_questions_seed", quizHandler.RunQuestionsSeedNew())
+		auth.POST("/runTopicsSeed", testH.RunTopicsSeed())
+		auth.POST("/run_questions_seed", testH.RunQuestionsSeedNew())
 	}
 
 	r.NoRoute(handler.NotFoundHandler)

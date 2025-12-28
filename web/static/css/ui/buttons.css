@@ -22,6 +22,10 @@
             transform 0.12s ease;
 }
 
+[hidden] {
+    display: none !important;
+}
+
 /* ---------- Типы ---------- */
 .btn-primary {
     --btn-bg: var(--color-primary);
