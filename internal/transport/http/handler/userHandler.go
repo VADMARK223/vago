@@ -10,8 +10,8 @@ import (
 
 func DeleteUser(service *user.Service) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		parseUint, parseUintErr := strconv.ParseInt(c.Param("id"), 10, 32)
-		if parseUintErr != nil {
+		parseId, parseIdErr := strconv.ParseInt(c.Param("id"), 10, 64)
+		if parseIdErr != nil {
 			return
 		}
 
@@ -23,7 +23,7 @@ func DeleteUser(service *user.Service) func(c *gin.Context) {
 			return
 		}
 
-		if currentId == uint(parseUint) {
+		if currentId == parseId {
 			c.JSON(400, gin.H{
 				"error": "Вы пытаетесь удалить свой собственный аккаунт",
 			})
@@ -45,7 +45,7 @@ func DeleteUser(service *user.Service) func(c *gin.Context) {
 			return
 		}
 
-		err := service.DeleteUser(parseUint)
+		err := service.DeleteUser(parseId)
 		if err != nil {
 			ShowError(c, "Ошибка удаления пользователя", err.Error())
 			return

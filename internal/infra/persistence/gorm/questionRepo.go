@@ -87,7 +87,7 @@ func (q QuestionRepo) Random() (*domain.Question, error) {
 	return res, nil
 }
 
-func (q QuestionRepo) FindByTopicID(topicID uint) ([]*domain.Question, error) {
+func (q QuestionRepo) FindByTopicID(topicID int64) ([]*domain.Question, error) {
 	var entities []QuestionEntity
 
 	err := q.db.

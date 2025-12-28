@@ -22,7 +22,7 @@ func NewMessageHandler(chatSvc *chat.Service, userSvc *user.Service) *MessageHan
 
 func (h *MessageHandler) Delete() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		parseUint, parseUintErr := strconv.ParseInt(c.Param("id"), 10, 32)
+		parseUint, parseUintErr := strconv.ParseInt(c.Param("id"), 10, 64)
 		if parseUintErr != nil {
 			ShowError(c, "Ошибка конвертации идентификатора", parseUintErr.Error())
 			return

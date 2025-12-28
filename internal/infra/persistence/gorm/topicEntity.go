@@ -1,7 +1,7 @@
 package gorm
 
 type TopicEntity struct {
-	ID   uint   `gorm:"primaryKey"`
+	ID   int64  `gorm:"primaryKey"`
 	Name string `gorm:"column:name"`
 }
 

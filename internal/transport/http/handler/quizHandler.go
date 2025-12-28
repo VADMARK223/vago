@@ -112,7 +112,7 @@ func (h *QuizHandler) ShowQuestions(c *gin.Context) {
 			ShowError(c, "Ошибка", err.Error())
 			return
 		}
-		questions, err = h.quizSvc.GetQuestionsByTopic(uint(topicID))
+		questions, err = h.quizSvc.GetQuestionsByTopic(topicID)
 	} else {
 		questions, err = h.quizSvc.AllQuestions()
 	}

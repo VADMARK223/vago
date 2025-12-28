@@ -1,12 +1,12 @@
 package domain
 
 type Topic struct {
-	ID   uint
+	ID   int64
 	Name string
 }
 
 type TopicWithCount struct {
-	ID             uint
+	ID             int64
 	Name           string
-	QuestionsCount uint
+	QuestionsCount int
 }

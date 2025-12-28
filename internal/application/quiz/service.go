@@ -88,6 +88,6 @@ func (s *Service) CheckAnswer(qID, aID int64) (bool, string) {
 	return false, q.Explanation
 }
 
-func (s *Service) GetQuestionsByTopic(topicId uint) ([]*domain.Question, error) {
+func (s *Service) GetQuestionsByTopic(topicId int64) ([]*domain.Question, error) {
 	return s.questionRepo.FindByTopicID(topicId)
 }
