@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="/static/css/main.css">
     <link rel="stylesheet" href="/static/css/github-dark.min.css">
     <script src="/static/js/lib/highlight.min.js"></script>
+    <script src="/static/js/common/scroll.js" defer></script>
     <script src="/static/js/components/test.js" defer></script>
 </head>
 <body>
@@ -19,7 +20,7 @@
         <span style="margin-bottom: var(--space-2)">Тема: {{.question.TopicName}}</span>
 
         {{if .question.Code}}
-            <pre><code class="language-go">{{.question.Code}}</code></pre>
+        <pre><code class="language-go">{{.question.Code}}</code></pre>
         {{end}}
 
         {{range .question.Answers}}
@@ -28,15 +29,39 @@
         </button>
         {{end}}
 
-        <div class="stack">
-            <p id="result" class="hidden"></p>
+        <div class="stack" style="margin-bottom: var(--space-2)">
+            <p id="result">Выберите ответ 👆</p>
             <p id="explanation" class="panel hidden" style="width: 100%"></p>
 
             <button id="continueBtn" class="btn btn-primary" hidden>
                 Продолжить
             </button>
-
         </div>
+
+        <div class="scrollable-wrapper">
+            <div class="scrollable-content" id="scrollable">
+                <div class="stack">
+                    <div class="panel" style="width: 100%">
+                        <div style="margin-bottom: var(--space-2)">
+                            {{ if gt .comments_count 0 }}
+                            <p>Комментариев: {{ .comments_count }}</p>
+                            {{ else }}
+                            <p>Комментариев пока нет</p>
+                            {{ end }}
+                        </div>
+                        <div id="comments">
+                            {{ template "component.comments" .comments }}
+                        </div>
+                    </div>
+
+                    <div class="panel panel--success" style="width: 100%">
+                        <a href="/login">Зарегистрируйтесь на портале</a>, чтобы оставить комментарий
+                    </div>
+                </div>
+            </div>
+            {{ template "component.up_btn" . }}
+        </div>
+
     </div>
 </main>
 <script>hljs.highlightAll();</script>

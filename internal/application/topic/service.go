@@ -2,11 +2,12 @@ package topic
 
 import (
 	"vago/internal/domain"
+	"vago/internal/domain/repository"
 	"vago/internal/infra/persistence/gorm"
 )
 
 type Service struct {
-	repo domain.TopicRepository
+	repo repository.TopicRepository
 }
 
 func NewService(repo *gorm.TopicRepo) *Service {

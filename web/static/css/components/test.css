@@ -44,3 +44,63 @@
 .hidden {
     display: none;
 }
+
+.comments {
+    margin-top: 16px;
+}
+
+.comment {
+    margin-bottom: 12px;
+}
+
+.comment-body {
+    background: var(--bg-panel);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.comment-children {
+    margin-left: 24px;
+    margin-top: 8px;
+    border-left: 2px solid #ddd;
+    padding-left: 12px;
+}
+
+.comment-meta {
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 6px;
+}
+
+.comment-content {
+    font-size: 14px;
+}
+
+.comment-actions {
+    margin-top: 6px;
+    font-size: 12px;
+}
+
+.shake {
+    animation: shake 0.3s;
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    50% { transform: translateX(4px); }
+    75% { transform: translateX(-4px); }
+    100% { transform: translateX(0); }
+}
+
+@keyframes pop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.12); }
+    100% { transform: scale(1); }
+}
+
+.success {
+    animation: pop 0.25s ease-out;
+    color: #2ecc71;
+    font-weight: 600;
+}

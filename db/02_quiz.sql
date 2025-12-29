@@ -1,14 +1,14 @@
 CREATE TABLE IF NOT EXISTS topics
 (
-    id   SERIAL PRIMARY KEY,
+    id   BIGSERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE
 );
 COMMENT ON TABLE topics IS 'Таблица тем';
 
 CREATE TABLE IF NOT EXISTS questions
 (
-    id           SERIAL PRIMARY KEY,
-    topic_id     INTEGER NOT NULL REFERENCES topics (id) ON DELETE CASCADE,
+    id           BIGSERIAL PRIMARY KEY,
+    topic_id     BIGINT NOT NULL REFERENCES topics (id) ON DELETE CASCADE,
     text         TEXT    NOT NULL,
     code         TEXT,
     explanation  TEXT,
@@ -27,8 +27,8 @@ CREATE UNIQUE INDEX questions_content_hash_uq
 
 CREATE TABLE IF NOT EXISTS answers
 (
-    id          SERIAL PRIMARY KEY,
-    question_id INTEGER NOT NULL REFERENCES questions (id) ON DELETE CASCADE,
+    id          BIGSERIAL PRIMARY KEY,
+    question_id BIGINT NOT NULL REFERENCES questions (id) ON DELETE CASCADE,
     text        TEXT    NOT NULL,
     is_correct  BOOLEAN NOT NULL DEFAULT false
 );

@@ -29,6 +29,8 @@
     const disableAnswers = (state) => {
         buttons.forEach(b=>b.disabled = state)
     }
+    let lastWrongIndex = -1;
+    let lastRightIndex = -1;
 
     buttons.forEach(btn => {
         btn.addEventListener("click", async () => {
@@ -43,7 +45,7 @@
 
             disableAnswers(true)
 
-            result.classList.add("hidden");
+            result.innerText = "Выберите ответ";
             explanation.classList.add("hidden");
             result.classList.remove("ok", "bad");
 
@@ -80,7 +82,7 @@
         btn.classList.add("correct");
 
         result.classList.add("ok");
-        result.innerText = "Правильно!";
+        showRightResult(result)
 
         if (dataExplanation) {
             explanation.classList.remove("hidden");
@@ -95,7 +97,8 @@
         disableAnswers(false)
 
         result.classList.add("bad");
-        result.innerText = "Неправильно 😞";
+        showWrongResult(result)
+
 
         continueBtnNew.hidden = true
     }
@@ -105,5 +108,49 @@
         explanation.classList.add("hidden");
         result.classList.add("bad");
         result.innerText = "Ошибка проверки ответа 😕";
+    }
+
+    function showWrongResult(resultEl) {
+        const messages = [
+            "Неправильно 😞",
+            "Мимо 😬",
+            "Увы, не угадал 😔",
+            "Ошибка! 🤦‍♂️",
+            "Почти, но нет 😅"
+        ];
+
+        let index;
+        do {
+            index = Math.floor(Math.random() * messages.length);
+        } while (index === lastWrongIndex && messages.length > 1);
+
+        lastWrongIndex = index;
+        resultEl.innerText = messages[index];
+
+        resultEl.classList.remove("shake");
+        void resultEl.offsetWidth;
+        resultEl.classList.add("shake");
+    }
+
+    function showRightResult(resultEl) {
+        const messages = [
+            "Правильно! 🎉",
+            "Отлично! 😄",
+            "Верно 👍",
+            "Так держать! 💪",
+            "Супер! 🔥"
+        ];
+
+        let index;
+        do {
+            index = Math.floor(Math.random() * messages.length);
+        } while (index === lastRightIndex && messages.length > 1);
+
+        lastRightIndex = index;
+        resultEl.innerText = messages[index];
+
+        resultEl.classList.remove("success");
+        void resultEl.offsetWidth;
+        resultEl.classList.add("success");
     }
 })();

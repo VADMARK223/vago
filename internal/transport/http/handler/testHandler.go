@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"vago/internal/application/comment"
 	"vago/internal/application/test"
 	"vago/internal/application/topic"
 	"vago/internal/config/code"
@@ -16,9 +17,10 @@ import (
 )
 
 type TestHandler struct {
-	testSvc  *test.Service
-	topicSvc *topic.Service
-	dsn      string
+	testSvc    *test.Service
+	topicSvc   *topic.Service
+	commentSvc *comment.Service
+	dsn        string
 }
 
 type CheckRequest struct {
@@ -31,8 +33,8 @@ type CheckResponse struct {
 	Explanation string `json:"explanation"`
 }
 
-func NewTestHandler(testSvc *test.Service, topicSvc *topic.Service, dsn string) *TestHandler {
-	return &TestHandler{testSvc: testSvc, topicSvc: topicSvc, dsn: dsn}
+func NewTestHandler(testSvc *test.Service, topicSvc *topic.Service, commentSvc *comment.Service, dsn string) *TestHandler {
+	return &TestHandler{testSvc: testSvc, topicSvc: topicSvc, commentSvc: commentSvc, dsn: dsn}
 }
 
 func (h *TestHandler) ShowTestRandom() func(c *gin.Context) {
@@ -57,13 +59,21 @@ func (h *TestHandler) ShowTestByID() func(c *gin.Context) {
 
 		q := h.testSvc.RandomPublicQuestion(&id64)
 
-		renderQuiz(c, q)
+		renderTestPage(c, h, q)
 	}
 }
 
-func renderQuiz(c *gin.Context, q test.QuestionPublic) {
-	data := tplWithMetaData(c, "Викторина")
+func renderTestPage(c *gin.Context, h *TestHandler, q test.QuestionPublic) {
+	comments, count, err := h.commentSvc.ListByQuestionID(q.ID)
+	if err != nil {
+		ShowError(c, "Ошибка загрузки комментариев", err.Error())
+		return
+	}
+
+	data := tplWithMetaData(c, "Тест")
 	data[code.Question] = q
+	data[code.CommentsCount] = count
+	data[code.Comments] = comments
 
 	c.HTML(http.StatusOK, "test.html", data)
 }

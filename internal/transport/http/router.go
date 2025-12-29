@@ -44,7 +44,7 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	commentSvc := comment.NewService(gorm.NewCommentRepo(ctx.DB))
 
 	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret, ctx.Cfg.RefreshTTLInt(), ctx.Log)
-	testH := handler.NewTestHandler(questionSvc, topicSvc, ctx.Cfg.PostgresDsn)
+	testH := handler.NewTestHandler(questionSvc, topicSvc, commentSvc, ctx.Cfg.PostgresDsn)
 	adminH := handler.NewAdminHandler(tokenProvider, userSvc, chatSvc, commentSvc)
 
 	gin.SetMode(ctx.Cfg.GinMode)

@@ -26,6 +26,8 @@ const (
 	VagoSession          = "vago_session"
 	TokenInfo            = "token_info"
 	Messages             = "messages"
+	Comments             = "comments"
+	CommentsCount        = "comments_count"
 	MessagesJson         = "messages_json"
 	MessagesCount        = "messages_count"
 	QuestionsCount       = "questions_count"

@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS users
 (
-    id         SERIAL PRIMARY KEY,
+    id         BIGSERIAL PRIMARY KEY,
     login      VARCHAR(30) UNIQUE                                         NOT NULL,
     username   VARCHAR(30)                                                NOT NULL,
     password   VARCHAR(255)                                               NOT NULL,
@@ -18,7 +18,7 @@ comment on column users.role is 'Роль пользователя';
 
 create table if not exists tasks
 (
-    id          serial primary key,
+    id          BIGSERIAL primary key,
     name        varchar(255)                        NOT NULL,
     description text,
     created_at  timestamp default CURRENT_TIMESTAMP NOT NULL,
@@ -39,7 +39,7 @@ CREATE INDEX idx_tasks_completed ON tasks(completed);
 CREATE TABLE IF NOT EXISTS messages
 (
     id           BIGSERIAL PRIMARY KEY,
-    user_id      INTEGER     NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    user_id      BIGINT     NOT NULL REFERENCES users (id) ON DELETE CASCADE,
     content      TEXT        NOT NULL,
     message_type VARCHAR(30) NOT NULL     DEFAULT 'text',
     created_at   TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP

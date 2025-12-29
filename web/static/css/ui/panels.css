@@ -2,11 +2,28 @@
 
 /*Самая универсальная панель*/
 .panel {
+    position: relative;
     background: var(--bg-item);
     border: var(--border-1);
     padding: var(--space-4);
     border-radius: var(--radius-md);
 }
+
+.panel--success {
+    border-left: 6px solid var(--color-success);
+}
+
+/*.panel::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background: var(--color-success);
+    border-top-left-radius: var(--radius-md);
+    border-bottom-left-radius: var(--radius-md);
+}*/
 
 /*Вертикальная панель с отступом*/
 .stack {
