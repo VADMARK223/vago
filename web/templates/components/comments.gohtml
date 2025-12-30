@@ -1,8 +1,9 @@
 {{ define "component.comments" }}
-    {{ range $i, $c := . }}
-        <div class="comment">
+    {{ range $i, $c := .Comments }}
+        <div class="comment" id="comment-{{ .ID }}">
             <div class="comment-body">
                 <div class="comment-meta">
+                    <span class="author">ID комментария #{{ .ID }}</span>
                     <span class="author">Автор #{{ .AuthorID }}</span>
                     <span class="date">{{ .CreatedAt.Format "02.01.2006 15:04" }}</span>
                 </div>
@@ -12,13 +13,42 @@
                 </div>
 
                 <div class="comment-actions">
-                    <a href="#" class="reply">Ответить</a>
+                    {{ if $.IsAuth }}
+                        <a href="#" class="reply" data-comment-id="{{ .ID }}">Ответить</a>
+
+                        <form class="reply-form hidden"
+                              id="reply-form-{{ .ID }}"
+                              method="post"
+                              action="/comments">
+                            <input type="hidden" name="parent_id" value="{{ .ID }}">
+                            <input type="hidden" name="question_id" value="{{ .QuestionID }}">
+
+                            <label>
+                            <textarea name="content"
+                                      rows="3"
+                                      placeholder="Ваш ответ..."
+                                      required></textarea>
+                            </label>
+
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                Отправить
+                            </button>
+                        </form>
+
+                    {{ else }}
+                        <div class="reply-hint">
+                            Чтобы ответить, <a href="/login">войдите</a>
+                        </div>
+                    {{ end }}
                 </div>
             </div>
 
             {{ if .Children }}
                 <div class="comment-children">
-                    {{ template "component.comments" .Children }}
+                    {{ template "component.comments" dict
+                    "Comments" .Children
+                    "IsAuth" $.IsAuth
+                    }}
                 </div>
             {{ end }}
         </div>

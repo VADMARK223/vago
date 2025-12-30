@@ -27,7 +27,7 @@
     })
 
     const disableAnswers = (state) => {
-        buttons.forEach(b=>b.disabled = state)
+        buttons.forEach(b => b.disabled = state)
     }
     let lastWrongIndex = -1;
     let lastRightIndex = -1;
@@ -77,7 +77,7 @@
         });
     });
 
-    function showCorrect (btn, dataExplanation) {
+    function showCorrect(btn, dataExplanation) {
         finished = true;
         btn.classList.add("correct");
 
@@ -92,7 +92,7 @@
         continueBtnNew.hidden = false
     }
 
-    function showWrong (btn) {
+    function showWrong(btn) {
         btn.classList.add("wrong");
         disableAnswers(false)
 
@@ -103,7 +103,7 @@
         continueBtnNew.hidden = true
     }
 
-    function showError () {
+    function showError() {
         disableAnswers(false)
         explanation.classList.add("hidden");
         result.classList.add("bad");
@@ -153,4 +153,24 @@
         void resultEl.offsetWidth;
         resultEl.classList.add("success");
     }
+
+    // ----- Comments -----
+    document.addEventListener("click", (e) => {
+        const btn = e.target.closest(".reply");
+        if (!btn) return;
+
+        e.preventDefault();
+
+        const id = btn.dataset.commentId;
+        const form = document.getElementById(`reply-form-${id}`);
+        if (!form) return;
+
+        // закрываем все остальные формы
+        document.querySelectorAll(".reply-form").forEach(f => {
+            if (f !== form) f.classList.add("hidden");
+        });
+
+        form.classList.toggle("hidden");
+    })
+
 })();

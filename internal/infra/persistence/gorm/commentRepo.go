@@ -56,6 +56,32 @@ func (r *CommentRepo) List(ctx context.Context) ([]*domain.Comment, error) {
 	return out, nil
 }
 
+func (r *CommentRepo) Create(ctx context.Context, c *domain.Comment) (*domain.Comment, error) {
+	entity := CommentEntity{
+		QuestionID: c.QuestionID,
+		ParentID:   c.ParentID,
+		AuthorID:   c.AuthorID,
+		Content:    c.Content,
+	}
+
+	if err := r.db.WithContext(ctx).Create(&entity).Error; err != nil {
+		return nil, err
+	}
+
+	c.ID = entity.ID
+	c.CreatedAt = entity.CreatedAt
+	return c, nil
+}
+
+func (r *CommentRepo) GetByID(ctx context.Context, id int64) (*domain.Comment, error) {
+	var e CommentEntity
+	if err := r.db.WithContext(ctx).First(&e, id).Error; err != nil {
+		return nil, err
+	}
+
+	return commentEntityToDomain(&e), nil
+}
+
 func commentEntityToDomain(e *CommentEntity) *domain.Comment {
 	return &domain.Comment{
 		ID:         e.ID,

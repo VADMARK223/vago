@@ -46,6 +46,7 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret, ctx.Cfg.RefreshTTLInt(), ctx.Log)
 	testH := handler.NewTestHandler(questionSvc, topicSvc, commentSvc, ctx.Cfg.PostgresDsn)
 	adminH := handler.NewAdminHandler(tokenProvider, userSvc, chatSvc, commentSvc)
+	commentH := handler.NewCommentHandler(commentSvc)
 
 	gin.SetMode(ctx.Cfg.GinMode)
 	r := gin.New()
@@ -116,6 +117,8 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 
 		auth.POST("/runTopicsSeed", testH.RunTopicsSeed())
 		auth.POST("/run_questions_seed", testH.RunQuestionsSeedNew())
+
+		auth.POST("/comments", commentH.PostComment)
 	}
 
 	r.NoRoute(handler.NotFoundHandler)

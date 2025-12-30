@@ -2,6 +2,7 @@ package comment
 
 import (
 	"context"
+	"errors"
 	"vago/internal/domain"
 	"vago/internal/domain/repository"
 	"vago/internal/infra/persistence/gorm"
@@ -36,6 +37,32 @@ func (s *Service) ListByQuestionID(questionID int64) ([]*domain.Comment, int, er
 	result := buildTree(comments)
 
 	return result, len(comments), nil
+}
+
+func (s *Service) Create(ctx context.Context, dto CreateCommentDTO) (*domain.Comment, error) {
+	if dto.Content == "" {
+		return nil, errors.New("empty content")
+	}
+
+	if dto.ParentID != nil {
+		parent, err := s.repo.GetByID(ctx, *dto.ParentID)
+		if err != nil {
+			return nil, errors.New("parent comment not found")
+		}
+
+		if parent.QuestionID != dto.QuestionID {
+			return nil, errors.New("parent belongs to another question")
+		}
+	}
+
+	comment := &domain.Comment{
+		QuestionID: dto.QuestionID,
+		ParentID:   dto.ParentID,
+		AuthorID:   dto.AuthorID,
+		Content:    dto.Content,
+	}
+
+	return s.repo.Create(ctx, comment)
 }
 
 func buildTree(comments []*domain.Comment) []*domain.Comment {

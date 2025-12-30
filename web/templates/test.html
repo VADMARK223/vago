@@ -16,6 +16,12 @@
     <div id="quiz" data-question-id="{{.question.ID}}"></div>
 
     <div class="container">
+        {{if .user_id}}
+        <p>Залогинен</p>
+        {{else}}
+        <p>Не Залогинен</p>
+        {{end}}
+
         <h3>{{.question.ID}}. {{.question.Text}}</h3>
         <span style="margin-bottom: var(--space-2)">Тема: {{.question.TopicName}}</span>
 
@@ -50,13 +56,17 @@
                             {{ end }}
                         </div>
                         <div id="comments">
-                            {{ template "component.comments" .comments }}
+                            {{ template "component.comments" dict
+                            "Comments" .comments
+                            "IsAuth" .user_id}}
                         </div>
                     </div>
 
+                    {{if not .user_id}}
                     <div class="panel panel--success" style="width: 100%">
                         <a href="/login">Зарегистрируйтесь на портале</a>, чтобы оставить комментарий
                     </div>
+                    {{ end }}
                 </div>
             </div>
             {{ template "component.up_btn" . }}
