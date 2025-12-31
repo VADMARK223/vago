@@ -4,21 +4,29 @@
     color: white;
     pointer-events: none;
     user-select: none;
-    opacity: 0.8;
-    animation-name: fall, sway;
-    animation-timing-function: linear, ease-in-out;
-    animation-iteration-count: 1, infinite;
+    opacity: 0.85;
+
+    animation-name: fall, sway, spin;
+    animation-timing-function: linear, ease-in-out, linear;
+    animation-iteration-count: 1, infinite, infinite;
 }
 
-/* падение */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 @keyframes fall {
     to {
-        transform: translateY(140px);
+        translate: 0 140px;
         opacity: 0;
     }
 }
 
-/* покачивание */
 @keyframes sway {
     0%   { margin-left: 0; }
     50%  { margin-left: 20px; }

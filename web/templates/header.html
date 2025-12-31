@@ -91,33 +91,39 @@
             if (!header) return;
 
             const SNOWFLAKES = ["❄", "❅", "❆"];
-            const MAX_SNOW = 120;
+            const MAX_SNOW = 150;
 
             function createSnowflake() {
-                if (header.children.length > MAX_SNOW) return;
+                if (header.querySelectorAll(".snowflake").length > MAX_SNOW) return;
 
                 const snow = document.createElement("div");
                 snow.className = "snowflake";
                 snow.textContent = SNOWFLAKES[Math.floor(Math.random() * SNOWFLAKES.length)];
 
                 const size = 10 + Math.random() * 14;
-                const duration = 2 + Math.random() * 3;
+                const fallDuration = 2 + Math.random() * 3;
+                const spinDuration = 1 + Math.random() * 2;
+                const spinDirection = Math.random() > 0.5 ? "normal" : "reverse";
 
                 snow.style.left = Math.random() * header.offsetWidth + "px";
                 snow.style.fontSize = size + "px";
-                snow.style.animationDuration = `${duration}s, ${1 + Math.random() * 2}s`;
+
+                snow.style.animationDuration =
+                    `${fallDuration}s, ${1 + Math.random() * 2}s, ${spinDuration}s`;
+
+                snow.style.animationDirection =
+                    `normal, alternate, ${spinDirection}`;
 
                 header.appendChild(snow);
 
-                setTimeout(() => snow.remove(), duration * 1000);
+                setTimeout(() => snow.remove(), fallDuration * 1000);
             }
 
-            // 💥 основной снегопад
             setInterval(() => {
-                for (let i = 0; i < 3; i++) {
+                for (let i = 0; i < 4; i++) {
                     createSnowflake();
                 }
-            }, 150);
+            }, 120);
         })();
     </script>
 
