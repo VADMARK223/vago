@@ -44,4 +44,6 @@
     --border-1: 1px solid var(--bg-border);
     --shadow-sm: 0 1px 3px #0005;
     --shadow-md: 0 2px 8px #0007;
+
+    --wind-x: -550px;
 }

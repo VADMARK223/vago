@@ -91,7 +91,7 @@
             if (!header) return;
 
             const SNOWFLAKES = ["❄", "❅", "❆"];
-            const MAX_SNOW = 150;
+            const MAX_SNOW = 160;
 
             function createSnowflake() {
                 if (header.querySelectorAll(".snowflake").length > MAX_SNOW) return;
@@ -103,16 +103,19 @@
                 const size = 10 + Math.random() * 14;
                 const fallDuration = 2 + Math.random() * 3;
                 const spinDuration = 1 + Math.random() * 2;
-                const spinDirection = Math.random() > 0.5 ? "normal" : "reverse";
+
+                // 🌬️ ветер: от -60 до +60 px
+                const windX = (Math.random() * 120 - 60).toFixed(1);
 
                 snow.style.left = Math.random() * header.offsetWidth + "px";
                 snow.style.fontSize = size + "px";
+                snow.style.setProperty("--wind-x", windX + "px");
 
                 snow.style.animationDuration =
-                    `${fallDuration}s, ${1 + Math.random() * 2}s, ${spinDuration}s`;
+                    `${fallDuration}s, ${1 + Math.random() * 2}s, ${spinDuration}s, ${fallDuration}s`;
 
                 snow.style.animationDirection =
-                    `normal, alternate, ${spinDirection}`;
+                    `normal, alternate, ${Math.random() > 0.5 ? "normal" : "reverse"}, normal`;
 
                 header.appendChild(snow);
 

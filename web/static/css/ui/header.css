@@ -6,9 +6,24 @@
     user-select: none;
     opacity: 0.85;
 
-    animation-name: fall, sway, spin;
-    animation-timing-function: linear, ease-in-out, linear;
-    animation-iteration-count: 1, infinite, infinite;
+    animation-name: fall, sway, spin, drift;
+    animation-timing-function: linear, ease-in-out, linear, linear;
+    animation-iteration-count: 1, infinite, infinite, 1;
+}
+
+/* падение вниз */
+@keyframes fall {
+    to {
+        translate: 0 140px;
+        opacity: 0;
+    }
+}
+
+/* ветер вбок */
+@keyframes drift {
+    to {
+        translate: var(--wind-x, 40px) 140px;
+    }
 }
 
 @keyframes spin {
@@ -17,13 +32,6 @@
     }
     to {
         transform: rotate(360deg);
-    }
-}
-
-@keyframes fall {
-    to {
-        translate: 0 140px;
-        opacity: 0;
     }
 }
 
