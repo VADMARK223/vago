@@ -1,0 +1,26 @@
+.snowflake {
+    position: absolute;
+    top: -20px;
+    color: white;
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.8;
+    animation-name: fall, sway;
+    animation-timing-function: linear, ease-in-out;
+    animation-iteration-count: 1, infinite;
+}
+
+/* падение */
+@keyframes fall {
+    to {
+        transform: translateY(140px);
+        opacity: 0;
+    }
+}
+
+/* покачивание */
+@keyframes sway {
+    0%   { margin-left: 0; }
+    50%  { margin-left: 20px; }
+    100% { margin-left: 0; }
+}

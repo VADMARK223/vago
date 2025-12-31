@@ -1,4 +1,4 @@
-(()=>{
+(() => {
     const loginInput = document.querySelector('input[name="login"]');
     if (!loginInput) {
         console.warn("[login] elements not found");
