@@ -16,12 +16,6 @@
     <div id="quiz" data-question-id="{{.question.ID}}"></div>
 
     <div class="container">
-        {{if .user_id}}
-        <p>Залогинен</p>
-        {{else}}
-        <p>Не Залогинен</p>
-        {{end}}
-
         <h3>{{.question.ID}}. {{.question.Text}}</h3>
         <span style="margin-bottom: var(--space-2)">Тема: {{.question.TopicName}}</span>
 
@@ -60,13 +54,29 @@
                             "Comments" .comments
                             "IsAuth" .user_id}}
                         </div>
-                    </div>
 
-                    {{if not .user_id}}
-                    <div class="panel panel--success" style="width: 100%">
-                        <a href="/login">Зарегистрируйтесь на портале</a>, чтобы оставить комментарий
+
+                        {{ if .user_id }}
+                        <div class="panel" style="width: 100%; margin-top: 16px">
+                            <form method="post" action="/comments">
+                                <input type="hidden" name="question_id" value="{{ .question.ID }}">
+
+                                <label>
+                                    <textarea name="content" rows="4" placeholder="Оставьте комментарий..."
+                                              required></textarea>
+                                </label>
+
+                                <button type="submit" class="btn btn-primary" style="margin-top: var(--space-2)">
+                                    Отправить комментарий
+                                </button>
+                            </form>
+                        </div>
+                        {{ else }}
+                        <div class="panel panel--success" style="width: 100%; margin-top: 16px">
+                            <a href="/login">Зарегистрируйтесь</a>, чтобы оставить комментарий
+                        </div>
+                        {{ end }}
                     </div>
-                    {{ end }}
                 </div>
             </div>
             {{ template "component.up_btn" . }}

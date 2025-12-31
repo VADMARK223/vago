@@ -2,6 +2,7 @@ package gorm
 
 import (
 	"context"
+	"time"
 	"vago/internal/domain"
 
 	"gorm.io/gorm"
@@ -17,25 +18,47 @@ func NewCommentRepo(db *gorm.DB) *CommentRepo {
 	}
 }
 
+type commentRow struct {
+	ID             int64
+	QuestionID     int64
+	ParentID       *int64
+	AuthorID       int64
+	AuthorUsername string
+	Content        string
+	CreatedAt      time.Time
+}
+
 func (r *CommentRepo) ListByQuestionID(ctx context.Context, qid int64) ([]*domain.Comment, error) {
-	var ents []CommentEntity
+	var rows []commentRow
 	err := r.db.WithContext(ctx).
+		Table("comments c").
+		Select(`
+			c.id,
+			c.question_id,
+			c.parent_id,
+			c.author_id,
+			u.username AS author_username,
+			c.content,
+			c.created_at
+		`).
+		Joins("JOIN users u ON u.id = c.author_id").
 		Where("question_id = ?", qid).
 		Order("created_at ASC").
-		Find(&ents).Error
+		Find(&rows).Error
 	if err != nil {
 		return nil, err
 	}
 
-	out := make([]*domain.Comment, 0, len(ents))
-	for _, e := range ents {
+	out := make([]*domain.Comment, 0, len(rows))
+	for _, e := range rows {
 		out = append(out, &domain.Comment{
-			ID:         e.ID,
-			QuestionID: e.QuestionID,
-			ParentID:   e.ParentID,
-			AuthorID:   e.AuthorID,
-			Content:    e.Content,
-			CreatedAt:  e.CreatedAt,
+			ID:             e.ID,
+			QuestionID:     e.QuestionID,
+			ParentID:       e.ParentID,
+			AuthorID:       e.AuthorID,
+			AuthorUsername: e.AuthorUsername,
+			Content:        e.Content,
+			CreatedAt:      e.CreatedAt,
 		})
 	}
 	return out, nil

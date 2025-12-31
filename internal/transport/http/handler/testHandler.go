@@ -39,13 +39,12 @@ func NewTestHandler(testSvc *test.Service, topicSvc *topic.Service, commentSvc *
 
 func (h *TestHandler) ShowTestRandom() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		/*id, err := h.testSvc.RandomID()
+		id, err := h.testSvc.RandomID()
 		if err != nil {
 			ShowError(c, "Ошибка генерации случайного вопроса", err.Error())
 			return
-		}*/
-		// TODO: remove after test
-		id := 1
+		}
+		//id := 1
 		c.Redirect(http.StatusFound, fmt.Sprintf("/test/%d", id))
 	}
 }

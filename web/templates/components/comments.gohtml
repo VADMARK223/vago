@@ -3,8 +3,7 @@
         <div class="comment" id="comment-{{ .ID }}">
             <div class="comment-body">
                 <div class="comment-meta">
-                    <span class="author">ID комментария #{{ .ID }}</span>
-                    <span class="author">Автор #{{ .AuthorID }}</span>
+                    <span class="author">{{ .AuthorUsername }}</span>
                     <span class="date">{{ .CreatedAt.Format "02.01.2006 15:04" }}</span>
                 </div>
 
@@ -30,7 +29,7 @@
                                       required></textarea>
                             </label>
 
-                            <button type="submit" class="btn btn-primary btn-sm">
+                            <button type="submit" class="btn btn-primary btn-sm" style="margin-top: var(--space-2)">
                                 Отправить
                             </button>
                         </form>

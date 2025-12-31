@@ -3,6 +3,7 @@ package comment
 import (
 	"context"
 	"errors"
+	"vago/internal/app"
 	"vago/internal/domain"
 	"vago/internal/domain/repository"
 	"vago/internal/infra/persistence/gorm"
@@ -30,6 +31,9 @@ func (s *Service) All() ([]*domain.Comment, error) {
 func (s *Service) ListByQuestionID(questionID int64) ([]*domain.Comment, int, error) {
 	ctx := context.TODO()
 	comments, err := s.repo.ListByQuestionID(ctx, questionID)
+
+	app.Dump("Commets", comments)
+
 	if err != nil {
 		return nil, 0, err
 	}
