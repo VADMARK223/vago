@@ -6,11 +6,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const version = "0.20.4"
+const version = "1.0.0"
 
 func ShowIndex() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		capture := "Vago портал"
+		capture := "Портал по изучению Golang"
 		if gin.Mode() == gin.DebugMode {
 			capture += " (debug)"
 		}

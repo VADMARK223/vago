@@ -61,6 +61,8 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 		c.File("web/static/favicon.ico")
 	})
 
+	registerReactApp(r)
+
 	// Middleware
 	r.Use(middleware.SessionMiddleware())
 	r.Use(middleware.CheckJWT(tokenProvider, ctx.Cfg.RefreshTTLInt()))
@@ -80,6 +82,16 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	r.GET("/test", testH.ShowTestRandom())
 	r.GET("/test/:id", testH.ShowTestByID())
 	r.POST("/test/check", testH.Check())
+
+	api := r.Group("/api")
+	api.GET("/vadmark/:id", func(c *gin.Context) {
+		id := c.Param("id")
+
+		c.JSON(200, gin.H{
+			"id":      id,
+			"message": "Hello react!",
+		})
+	})
 
 	r.GET("/questions", testH.ShowQuestions)
 
@@ -187,4 +199,25 @@ func dict(values ...interface{}) (map[string]interface{}, error) {
 		m[key] = values[i+1]
 	}
 	return m, nil
+}
+
+func registerReactApp(r *gin.Engine) {
+	distDir := "./web/v2/dist"
+
+	r.GET("/v2/*path", func(c *gin.Context) {
+		// Например: "/assets/index-xxxx.js" или "/courses" или "/"
+		p := strings.TrimPrefix(c.Param("path"), "/")
+
+		// Если запросили конкретный файл — отдадим его
+		if p != "" {
+			fp := filepath.Join(distDir, p)
+			if st, err := os.Stat(fp); err == nil && !st.IsDir() {
+				c.File(fp)
+				return
+			}
+		}
+
+		// Иначе — SPA fallback
+		c.File(filepath.Join(distDir, "index.html"))
+	})
 }
