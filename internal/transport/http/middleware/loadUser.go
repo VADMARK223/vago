@@ -6,7 +6,6 @@ import (
 	"vago/internal/app"
 	"vago/internal/application/user"
 	"vago/internal/config/code"
-	"vago/internal/config/route"
 	"vago/internal/domain"
 
 	"github.com/gin-gonic/gin"
@@ -25,7 +24,11 @@ func LoadUserContext(svc *user.Service, cache *app.LocalCache) gin.HandlerFunc {
 			return
 		}
 
-		userID := uidVal.(int64)
+		userID, ok := uidVal.(int64)
+		if !ok {
+			c.Next()
+			return
+		}
 
 		if cached, ok := cache.Get(userID); ok {
 			c.Set(code.CurrentUser, cached.(domain.User))
@@ -36,12 +39,16 @@ func LoadUserContext(svc *user.Service, cache *app.LocalCache) gin.HandlerFunc {
 		u, err := svc.GetByID(userID)
 		if err != nil {
 			domain.ClearTokenCookies(c)
-			c.Redirect(http.StatusFound, route.Login)
-			c.Abort()
+			//c.Redirect(http.StatusFound, route.Login)
+			//c.Abort()
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+			return
 		}
 
 		cache.Set(userID, u, time.Minute*5)
 		c.Set(code.CurrentUser, u)
+
+		app.Dump("U", u)
 
 		c.Next()
 	}

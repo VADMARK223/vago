@@ -14,7 +14,9 @@ import (
 	"vago/internal/application/test"
 	"vago/internal/application/topic"
 	"vago/internal/application/user"
+	"vago/internal/config/code"
 	"vago/internal/config/route"
+	"vago/internal/domain"
 	"vago/internal/infra/persistence/gorm"
 	"vago/internal/infra/token"
 	"vago/internal/transport/http/handler"
@@ -51,11 +53,11 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	gin.SetMode(ctx.Cfg.GinMode)
 	r := gin.New()
 	r.Use(gin.Logger(), gin.Recovery())
+	// Статика и шаблоны
+	r.Static("/static", "web/static")
 	// Шаблоны
 	r.SetHTMLTemplate(loadTemplates("web/templates"))
 	_ = r.SetTrustedProxies(nil)
-	// Статика и шаблоны
-	r.Static("/static", "/app/web/static")
 	// Favicon: отдаём напрямую, чтобы не было 404
 	r.GET("/favicon.ico", func(c *gin.Context) {
 		c.File("web/static/favicon.ico")
@@ -84,6 +86,23 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	r.POST("/test/check", testH.Check())
 
 	api := r.Group("/api")
+	api.GET("/me", func(c *gin.Context) {
+		uAny, ok := c.Get(code.CurrentUser)
+		if !ok {
+			c.AbortWithStatusJSON(401, gin.H{"error": "unauthorized"})
+			return
+		}
+		u, ok := uAny.(domain.User)
+		if !ok {
+			c.AbortWithStatusJSON(500, gin.H{"error": "invalid user in context"})
+			return
+		}
+
+		c.JSON(200, gin.H{
+			"username": u.Username,
+		})
+	})
+
 	api.GET("/vadmark/:id", func(c *gin.Context) {
 		id := c.Param("id")
 

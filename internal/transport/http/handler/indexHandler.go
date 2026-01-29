@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const version = "1.0.1"
+const version = "1.2.0"
 
 func ShowIndex() gin.HandlerFunc {
 	return func(c *gin.Context) {
