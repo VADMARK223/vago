@@ -48,8 +48,6 @@ func LoadUserContext(svc *user.Service, cache *app.LocalCache) gin.HandlerFunc {
 		cache.Set(userID, u, time.Minute*5)
 		c.Set(code.CurrentUser, u)
 
-		app.Dump("U", u)
-
 		c.Next()
 	}
 }

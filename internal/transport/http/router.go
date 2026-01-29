@@ -86,6 +86,7 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	r.POST("/test/check", testH.Check())
 
 	api := r.Group("/api")
+	api.POST("/login", authH.LoginAPI)
 	api.GET("/me", func(c *gin.Context) {
 		uAny, ok := c.Get(code.CurrentUser)
 		if !ok {

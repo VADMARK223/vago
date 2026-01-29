@@ -20,6 +20,11 @@ type AuthHandler struct {
 	log        *zap.SugaredLogger
 }
 
+type LoginReq struct {
+	Login    string `json:"login"`
+	Password string `json:"password"`
+}
+
 func NewAuthHandler(service *user2.Service, secret string, refreshTTL int, log *zap.SugaredLogger) *AuthHandler {
 	return &AuthHandler{
 		service:    service,
@@ -54,6 +59,30 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	_ = session.Save()
 
 	c.Redirect(http.StatusFound, redirectTo.(string))
+}
+
+func (h *AuthHandler) LoginAPI(c *gin.Context) {
+	var req LoginReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Некорректные данные",
+		})
+		return
+	}
+
+	_, tokens, err := h.service.Login(req.Login, req.Password)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": strx.Capitalize(err.Error()),
+		})
+		return
+	}
+
+	domain.SetTokenCookies(c, tokens, h.refreshTTL)
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Успешный вход!",
+	})
 }
 
 func PerformRegister(service *user2.Service) gin.HandlerFunc {
