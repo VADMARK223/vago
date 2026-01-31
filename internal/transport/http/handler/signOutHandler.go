@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Logout(c *gin.Context) {
+func SignOut(c *gin.Context) {
 	domain.ClearTokenCookies(c)
 	c.Redirect(http.StatusFound, "/")
 }

@@ -88,11 +88,12 @@ func (h *AuthHandler) LoginAPI(c *gin.Context) {
 func PerformRegister(service *user2.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		login := c.PostForm(code.Login)
-		email := c.PostForm(code.Email)
 		password := c.PostForm(code.Password)
+		username := c.PostForm(code.Username)
+		email := c.PostForm(code.Email)
+
 		role := c.PostForm(code.Role)
 		color := c.PostForm(code.Color)
-		username := c.PostForm(code.Username)
 
 		err := service.CreateUser(domain.DTO{Login: login, Email: email, Password: password, Role: domain.Role(role), Color: color, Username: username})
 

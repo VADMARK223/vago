@@ -79,7 +79,7 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	r.POST(route.Login, authH.Login)
 	r.GET(route.Register, handler.ShowSignup)
 	r.POST(route.Register, handler.PerformRegister(userSvc))
-	r.POST(route.Logout, handler.Logout)
+	r.GET(route.SignOut, handler.SignOut)
 
 	r.GET("/test", testH.ShowTestRandom())
 	r.GET("/test/:id", testH.ShowTestByID())
@@ -87,6 +87,7 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 
 	api := r.Group("/api")
 	api.POST("/login", authH.LoginAPI)
+	api.GET(route.SignOut, handler.SignOut)
 	api.GET("/me", func(c *gin.Context) {
 		uAny, ok := c.Get(code.CurrentUser)
 		if !ok {

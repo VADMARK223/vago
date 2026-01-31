@@ -4,7 +4,7 @@ const (
 	Index    = "/"
 	Login    = "/login"
 	Book     = "/book"
-	Logout   = "/logout"
+	SignOut  = "/sign_out"
 	Register = "/register"
 	Tasks    = "/tasks"
 
