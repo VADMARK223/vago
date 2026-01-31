@@ -78,7 +78,7 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	r.GET(route.Login, handler.ShowLogin)
 	r.POST(route.Login, authH.Login)
 	r.GET(route.Register, handler.ShowSignup)
-	r.POST(route.Register, handler.PerformRegister(userSvc))
+	r.POST(route.Register, handler.SignUp(userSvc))
 	r.GET(route.SignOut, handler.SignOut)
 
 	r.GET("/test", testH.ShowTestRandom())

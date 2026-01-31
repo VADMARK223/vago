@@ -71,7 +71,7 @@ func (h *AuthHandler) LoginAPI(c *gin.Context) {
 	var req SignInReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Некорректные данные",
+			"message": "Некорректные данные",
 		})
 		return
 	}
@@ -91,7 +91,7 @@ func (h *AuthHandler) LoginAPI(c *gin.Context) {
 	})
 }
 
-func PerformRegister(service *user2.Service) gin.HandlerFunc {
+func SignUp(service *user2.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		login := c.PostForm(code.Login)
 		password := c.PostForm(code.Password)
