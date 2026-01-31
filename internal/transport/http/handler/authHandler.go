@@ -20,9 +20,15 @@ type AuthHandler struct {
 	log        *zap.SugaredLogger
 }
 
-type LoginReq struct {
+type SignInReq struct {
 	Login    string `json:"login"`
 	Password string `json:"password"`
+}
+
+type SignUpReq struct {
+	Login    string `json:"login"`
+	Password string `json:"password"`
+	Username string `json:"username"`
 }
 
 func NewAuthHandler(service *user2.Service, secret string, refreshTTL int, log *zap.SugaredLogger) *AuthHandler {
@@ -62,7 +68,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 }
 
 func (h *AuthHandler) LoginAPI(c *gin.Context) {
-	var req LoginReq
+	var req SignInReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Некорректные данные",
@@ -103,5 +109,33 @@ func PerformRegister(service *user2.Service) gin.HandlerFunc {
 		}
 
 		c.Redirect(http.StatusFound, "/login")
+	}
+}
+
+func SignUpApi(service *user2.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req SignUpReq
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "Некорректные данные",
+			})
+			return
+		}
+
+		role := "user"
+		color := "#FF5733"
+
+		err := service.CreateUser(domain.DTO{Login: req.Login, Password: req.Password, Role: domain.Role(role), Color: color, Username: req.Username})
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": strx.Capitalize(err.Error()),
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Успешная регистрация!",
+		})
 	}
 }

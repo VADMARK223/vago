@@ -24,7 +24,6 @@
         const v = loginInput.value.trim();
 
         if (v) {
-            passwordInput.value = v;
             usernameInput.value = `User${v}`.slice(0, 30);
         }
 
