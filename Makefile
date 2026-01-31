@@ -25,6 +25,8 @@ PROTO_DIR = api/proto
 PROTO_FILES := $(wildcard $(PROTO_DIR)/*.proto)
 PROTOC = protoc
 
+.PHONY: front-sync front-build front-copy
+
 build:
 	docker build -t ghcr.io/vadmark223/vago:latest .
 
@@ -106,6 +108,22 @@ proto-js-all: ## 🚀 Full pipeline: clean → generate → bundle
 	@$(MAKE) bundle || { echo "$(ORANGE)❌ Stage failed: bundle$(RESET)"; exit 1; }
 	@echo "$(GREEN)✅ All stages completed successfully!$(RESET)"
 
+FRONT_DIR := ~/WebstormProjects/vago-react
+FRONT_DIST := $(FRONT_DIR)/dist
+GO_STATIC_DIR := ./web/v2/dist
+NPM := npm
+front-build:
+	@echo "$(BLUE)🚀 Starting front build in $(FRONT_DIR) $(RESET)"
+	@cd $(FRONT_DIR) && $(NPM) run build
+
+front-copy:
+	@echo "$(BLUE)Front copy: $(FRONT_DIST) -> $(GO_STATIC_DIR) $(RESET)"
+	@rm -rf $(GO_STATIC_DIR)
+	@mkdir -p $(GO_STATIC_DIR)
+	@rsync -a --delete $(FRONT_DIST)/ $(GO_STATIC_DIR)/
+
+front-sync: front-build front-copy
+
 help:
 	@echo "$(YELLOW)🧩 Available Make targets:$(RESET)"
 	@echo ""
@@ -129,6 +147,7 @@ help:
 	@echo "  $(GREEN)make proto-js-all$(RESET)   - 🚀 Run the full pipeline: clean → generate → bundle"
 	@echo ""
 	@echo "$(CYAN)Others:$(RESET)"
-	@echo "  $(GREEN)make kafka-up$(RESET)   - start kafka and kafka UI containers"
-	@echo "  $(GREEN)make kafka-down$(RESET) - stop kafka and kafka UI containers"
+	@echo "  $(GREEN)make front-sync$(RESET)   - front build and copy"
+	@echo "  $(GREEN)make front-build$(RESET)  - front build"
+	@echo "  $(GREEN)make front-copy$(RESET)   - front copy"
 .DEFAULT_GOAL := help
