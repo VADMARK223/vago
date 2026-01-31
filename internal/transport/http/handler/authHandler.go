@@ -90,12 +90,11 @@ func PerformRegister(service *user2.Service) gin.HandlerFunc {
 		login := c.PostForm(code.Login)
 		password := c.PostForm(code.Password)
 		username := c.PostForm(code.Username)
-		email := c.PostForm(code.Email)
 
 		role := c.PostForm(code.Role)
 		color := c.PostForm(code.Color)
 
-		err := service.CreateUser(domain.DTO{Login: login, Email: email, Password: password, Role: domain.Role(role), Color: color, Username: username})
+		err := service.CreateUser(domain.DTO{Login: login, Password: password, Role: domain.Role(role), Color: color, Username: username})
 
 		if err != nil {
 			c.Set(code.Error, strx.Capitalize(err.Error()))

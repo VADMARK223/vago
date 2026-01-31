@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS users
     login      VARCHAR(30) UNIQUE                                         NOT NULL,
     username   VARCHAR(30)                                                NOT NULL,
     password   VARCHAR(255)                                               NOT NULL,
-    email      VARCHAR(100) UNIQUE                                        NOT NULL,
     role       varchar(20) CHECK (role IN ('user', 'moderator', 'admin')) NOT NULL,
     color      VARCHAR(7) CHECK (color ~ '^#[0-9A-Fa-f]{6}$')             NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -12,7 +11,6 @@ CREATE TABLE IF NOT EXISTS users
 comment on table users is 'Таблица пользователей';
 comment on column users.login is 'Логин пользователя';
 comment on column users.username is 'Отображаемое имя пользователя';
-comment on column users.email is 'Почта пользователя';
 comment on column users.color is 'Цвет пользователя в HEX (#RRGGBB)';
 comment on column users.role is 'Роль пользователя';
 

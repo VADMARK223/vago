@@ -20,7 +20,6 @@ func Test_Service_CreateUser_Success(t *testing.T) {
 	dto := domain.DTO{
 		Login:    "testuser",
 		Password: "securePassword123",
-		Email:    "test@example.com",
 		Username: "Test User",
 		Role:     domain.RoleUser,
 		Color:    "#FF5733",
@@ -32,7 +31,6 @@ func Test_Service_CreateUser_Success(t *testing.T) {
 		err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(dto.Password))
 		return err == nil &&
 			user.Login == dto.Login &&
-			user.Email == dto.Email &&
 			user.Username == dto.Username &&
 			user.Role == dto.Role &&
 			user.Color == dto.Color
@@ -55,7 +53,6 @@ func Test_Service_CreateUser_RepositoryError(t *testing.T) {
 	dto := domain.DTO{
 		Login:    "testuser",
 		Password: "password123",
-		Email:    "test@example.com",
 		Username: "Test User",
 		Role:     domain.RoleUser,
 		Color:    "#FF5733",
@@ -83,7 +80,6 @@ func Test_Service_CreateUser_PasswordHashing(t *testing.T) {
 	dto := domain.DTO{
 		Login:    "testuser",
 		Password: plainPassword,
-		Email:    "test@example.com",
 		Username: "Test User",
 		Role:     domain.RoleUser,
 		Color:    "#FF5733",
@@ -130,7 +126,6 @@ func Test_Service_CreateUser_DifferentRoles(t *testing.T) {
 			dto := domain.DTO{
 				Login:    "testuser",
 				Password: "password123",
-				Email:    "test@example.com",
 				Username: "Test User",
 				Role:     tt.role,
 				Color:    "#FF5733",

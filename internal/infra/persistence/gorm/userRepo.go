@@ -15,12 +15,10 @@ const (
 	UniqueCode      = "23505"
 	ValueToLong     = "22001"
 	ConstraintLogin = "users_login_key"
-	ConstraintEmail = "users_email_key"
 )
 
 var (
 	ErrLoginExists = errors.New("пользователь с таким логином уже существует")
-	ErrEmailExists = errors.New("пользователь с такой почтой уже существует")
 	ErrValueToLong = errors.New("значение слишком длинное")
 )
 
@@ -45,8 +43,6 @@ func (r *UserRepository) CreateUser(u domain.User) error {
 				switch pgErr.ConstraintName {
 				case ConstraintLogin:
 					return ErrLoginExists
-				case ConstraintEmail:
-					return ErrEmailExists
 				}
 			case ValueToLong:
 				return ErrValueToLong
@@ -122,7 +118,6 @@ func toDomain(e UserEntity) domain.User {
 		Login:     e.Login,
 		Username:  e.Username,
 		Password:  e.Password,
-		Email:     e.Email,
 		CreatedAt: e.CreatedAt,
 		Role:      domain.Role(e.Role),
 		Color:     e.Color,
@@ -135,7 +130,6 @@ func toEntity(u domain.User) UserEntity {
 		Login:     u.Login,
 		Password:  u.Password,
 		Username:  u.Username,
-		Email:     u.Email,
 		Color:     u.Color,
 		Role:      string(u.Role), // доменный тип → строка
 		CreatedAt: u.CreatedAt,

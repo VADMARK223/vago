@@ -11,7 +11,6 @@ type UserEntity struct {
 	Password  string    `gorm:"not null"`
 	Role      string    `gorm:"not null"`
 	Color     string    `gorm:"not null"`
-	Email     string    `gorm:"unique;not null"`
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 }
 

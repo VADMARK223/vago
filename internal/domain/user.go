@@ -9,7 +9,6 @@ type User struct {
 	Login     string
 	Username  string
 	Password  string
-	Email     string
 	Role      Role
 	Color     string
 	CreatedAt time.Time
@@ -19,11 +18,10 @@ func (u User) IsAdmin() bool {
 	return u.Role == RoleAdmin
 }
 
-func New(login, password, email, username, color string, role Role) User {
+func New(login, password, username, color string, role Role) User {
 	return User{
 		Login:    login,
 		Password: password,
-		Email:    email,
 		Username: username,
 		Role:     role,
 		Color:    color,
@@ -33,7 +31,6 @@ func New(login, password, email, username, color string, role Role) User {
 type DTO struct {
 	Login    string
 	Password string
-	Email    string
 	Username string
 	Role     Role
 	Color    string

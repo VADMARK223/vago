@@ -9,11 +9,6 @@
         console.warn("[password] elements not found");
         return;
     }
-    const emailInput = document.querySelector('input[name="email"]')
-    if (!emailInput) {
-        console.warn("[email] elements not found");
-        return;
-    }
     const usernameInput = document.querySelector('input[name="username"]')
     if (!usernameInput) {
         console.warn("[username] elements not found");
@@ -30,7 +25,6 @@
 
         if (v) {
             passwordInput.value = v;
-            emailInput.value = `${v}@mail.ru`;
             usernameInput.value = `User${v}`.slice(0, 30);
         }
 
@@ -38,19 +32,17 @@
     })
 
     passwordInput.addEventListener("input", updateState);
-    emailInput.addEventListener("input", updateState);
     usernameInput.addEventListener("input", updateState);
 
     function updateState() {
         const login = loginInput.value.trim();
         const password = passwordInput.value.trim();
-        const email = emailInput.value.trim();
         const username = usernameInput.value.trim();
-        setDisabledSubmitBtn(login, password, email, username);
+        setDisabledSubmitBtn(login, password, username);
     }
 
-    function setDisabledSubmitBtn(login, password, email, username) {
-        submitBtn.disabled = login === "" || password === "" || email === "" || username === "";
+    function setDisabledSubmitBtn(login, password, username) {
+        submitBtn.disabled = login === "" || password === "" || username === "";
     }
 
     updateState();

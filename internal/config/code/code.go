@@ -15,7 +15,6 @@ const (
 	RefreshTokenExpireAt = "refresh_token_expire_at"
 	Role                 = "role"
 	Color                = "color"
-	Email                = "email"
 	Password             = "password"
 	CurrentUser          = "current_user"
 	Login                = "login"

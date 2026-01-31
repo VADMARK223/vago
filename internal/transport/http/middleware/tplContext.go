@@ -19,7 +19,6 @@ func TemplateContext(c *gin.Context) {
 		result[code.Login] = u.Login
 		result[code.Username] = u.Username
 		result[code.Role] = u.Role
-		result[code.Email] = u.Email
 		result[code.IsAdmin] = u.IsAdmin()
 	}
 

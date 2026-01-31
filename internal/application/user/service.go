@@ -27,7 +27,7 @@ func (s *Service) CreateUser(dto domain.DTO) error {
 	if err != nil {
 		return fmt.Errorf("failed to hash password: %w", err)
 	}
-	user := domain.New(dto.Login, string(hash), dto.Email, dto.Username, dto.Color, dto.Role)
+	user := domain.New(dto.Login, string(hash), dto.Username, dto.Color, dto.Role)
 	return s.repo.CreateUser(user)
 }
 
