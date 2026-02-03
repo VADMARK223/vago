@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"html/template"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -19,6 +20,8 @@ import (
 	"vago/internal/domain"
 	"vago/internal/infra/persistence/gorm"
 	"vago/internal/infra/token"
+	"vago/internal/transport/http/api"
+	"vago/internal/transport/http/dto"
 	"vago/internal/transport/http/handler"
 	"vago/internal/transport/http/middleware"
 	"vago/internal/transport/ws"
@@ -126,32 +129,31 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	}
 
 	// ========= API =========
-	api := r.Group("/api")
-	api.POST("/login", authH.LoginAPI)
-	api.POST("/sign_up", handler.SignUpApi(userSvc))
-	api.GET(route.SignOut, handler.SignOut)
-	api.GET("/me", func(c *gin.Context) {
+	apiGroup := r.Group("/api")
+	apiGroup.GET("/me", func(c *gin.Context) {
 		uAny, ok := c.Get(code.CurrentUser)
 		if !ok {
-			c.AbortWithStatusJSON(401, gin.H{"error": "unauthorized"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 			return
 		}
 		u, ok := uAny.(domain.User)
 		if !ok {
-			c.AbortWithStatusJSON(500, gin.H{"error": "invalid user in context"})
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "invalid user in context"})
 			return
 		}
 
-		c.JSON(200, gin.H{
-			"username": u.Username,
-		})
+		api.OK(c, "Пользователь", dto.MeDTO{Username: u.Username, Role: u.Role})
 	})
-	api.GET(route.Users, adminH.UsersApi)
+	apiGroup.POST("/login", authH.LoginAPI)
+	apiGroup.POST("/sign_up", handler.SignUpApi(userSvc))
+	apiGroup.GET(route.SignOut, handler.SignOut)
+
+	apiGroup.GET(route.Users, adminH.UsersApi)
 
 	// Защищенные маршруты (API)
-	api.Use(middleware.RequireAuthApi)
+	apiGroup.Use(middleware.RequireAuthApi)
 	{
-		api.DELETE("/users/:id", handler.DeleteUser(userSvc))
+		apiGroup.DELETE("/users/:id", handler.DeleteUser(userSvc))
 	}
 
 	r.NoRoute(handler.NotFoundHandler)
