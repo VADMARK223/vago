@@ -85,41 +85,11 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	r.GET("/test/:id", testH.ShowTestByID())
 	r.POST("/test/check", testH.Check())
 
-	api := r.Group("/api")
-	api.POST("/login", authH.LoginAPI)
-	api.POST("/sign_up", handler.SignUpApi(userSvc))
-	api.GET(route.SignOut, handler.SignOut)
-	api.GET("/me", func(c *gin.Context) {
-		uAny, ok := c.Get(code.CurrentUser)
-		if !ok {
-			c.AbortWithStatusJSON(401, gin.H{"error": "unauthorized"})
-			return
-		}
-		u, ok := uAny.(domain.User)
-		if !ok {
-			c.AbortWithStatusJSON(500, gin.H{"error": "invalid user in context"})
-			return
-		}
-
-		c.JSON(200, gin.H{
-			"username": u.Username,
-		})
-	})
-
-	api.GET("/vadmark/:id", func(c *gin.Context) {
-		id := c.Param("id")
-
-		c.JSON(200, gin.H{
-			"id":      id,
-			"message": "Hello react!",
-		})
-	})
-
 	r.GET("/questions", testH.ShowQuestions)
 
 	// Защищенные маршруты
 	auth := r.Group("/")
-	auth.Use(middleware.CheckAuthAndRedirect())
+	auth.Use(middleware.RequireAuthAndRedirect)
 	{
 		admin := auth.Group(route.Admin)
 		{
@@ -153,6 +123,44 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 		auth.POST("/run_questions_seed", testH.RunQuestionsSeedNew())
 
 		auth.POST("/comments", commentH.PostComment)
+	}
+
+	// ========= API =========
+	api := r.Group("/api")
+	api.POST("/login", authH.LoginAPI)
+	api.POST("/sign_up", handler.SignUpApi(userSvc))
+	api.GET(route.SignOut, handler.SignOut)
+	api.GET("/me", func(c *gin.Context) {
+		uAny, ok := c.Get(code.CurrentUser)
+		if !ok {
+			c.AbortWithStatusJSON(401, gin.H{"error": "unauthorized"})
+			return
+		}
+		u, ok := uAny.(domain.User)
+		if !ok {
+			c.AbortWithStatusJSON(500, gin.H{"error": "invalid user in context"})
+			return
+		}
+
+		c.JSON(200, gin.H{
+			"username": u.Username,
+		})
+	})
+	api.GET(route.Users, adminH.UsersApi)
+
+	api.GET("/vadmark/:id", func(c *gin.Context) {
+		id := c.Param("id")
+
+		c.JSON(200, gin.H{
+			"id":      id,
+			"message": "Hello react!",
+		})
+	})
+
+	// Защищенные маршруты (API)
+	api.Use(middleware.RequireAuthApi)
+	{
+		api.DELETE("/users/:id", handler.DeleteUser(userSvc))
 	}
 
 	r.NoRoute(handler.NotFoundHandler)

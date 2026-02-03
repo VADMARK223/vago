@@ -71,6 +71,19 @@ func (h *AdminHandler) ShowUsers(c *gin.Context) {
 	c.HTML(http.StatusOK, "admin/layout", data)
 }
 
+func (h *AdminHandler) UsersApi(c *gin.Context) {
+	users, err := h.userSvc.GetAll()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			//ShowError(c, "Ошибка загрузки пользователя", err.Error())
+			"message": "Список пользователей",
+		})
+		return
+	}
+
+	OK(c, "Список пользователей", UsersApiDTO{Users: usersToResponse(users)})
+}
+
 func (h *AdminHandler) ShowMessages(c *gin.Context) {
 	all, err := h.chatSvc.MessagesDTO(context.Background())
 	if err != nil {

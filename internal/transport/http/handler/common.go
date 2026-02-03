@@ -1,7 +1,10 @@
 package handler
 
 import (
+	"errors"
+	"net/http"
 	"vago/internal/config/code"
+	"vago/internal/domain"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,4 +20,13 @@ func tplWithMetaData(c *gin.Context, capture string) gin.H {
 	data[code.Path] = path
 
 	return data
+}
+
+func mapErrorToHTTP(err error) int {
+	switch {
+	case errors.Is(err, domain.ErrUserNotFound):
+		return http.StatusNotFound
+	default:
+		return http.StatusInternalServerError
+	}
 }

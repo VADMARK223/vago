@@ -1,7 +1,6 @@
 package gorm
 
 import (
-	"errors"
 	"math/rand"
 	"time"
 	"vago/internal/domain"
@@ -50,7 +49,7 @@ func (q QuestionRepo) RandomID() (int64, error) {
 		return 0, err
 	}
 	if count == 0 {
-		return 0, errors.New("вопросов нет")
+		return 0, domain.ErrNoQuestion
 	}
 
 	offset := rand.Intn(int(count))

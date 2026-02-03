@@ -17,11 +17,6 @@ const (
 	ConstraintLogin = "users_login_key"
 )
 
-var (
-	ErrLoginExists = errors.New("пользователь с таким логином уже существует")
-	ErrValueToLong = errors.New("значение слишком длинное")
-)
-
 type UserRepository struct {
 	db  *gorm.DB
 	log *zap.SugaredLogger
@@ -42,10 +37,10 @@ func (r *UserRepository) CreateUser(u domain.User) error {
 			case UniqueCode:
 				switch pgErr.ConstraintName {
 				case ConstraintLogin:
-					return ErrLoginExists
+					return domain.ErrLoginExists
 				}
 			case ValueToLong:
-				return ErrValueToLong
+				return domain.ErrValueToLong
 			}
 		}
 		return fmt.Errorf("failed to create user: %w", err)
@@ -54,8 +49,14 @@ func (r *UserRepository) CreateUser(u domain.User) error {
 }
 
 func (r *UserRepository) DeleteUser(id int64) error {
-	if err := r.db.Delete(&UserEntity{}, id).Error; err != nil {
-		return fmt.Errorf("failed to delete user: %w", err)
+	res := r.db.Delete(&UserEntity{}, id)
+
+	if res.Error != nil {
+		return fmt.Errorf("ошибка удаления пользователя: %w", res.Error)
+	}
+
+	if res.RowsAffected == 0 {
+		return domain.ErrUserNotFound
 	}
 
 	return nil

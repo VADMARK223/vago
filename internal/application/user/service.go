@@ -1,7 +1,6 @@
 package user
 
 import (
-	"errors"
 	"fmt"
 	"vago/internal/domain"
 
@@ -43,11 +42,11 @@ func (s *Service) Login(login, password string) (domain.User, *domain.TokenPair,
 	u, errGetUser := s.repo.GetByLogin(login)
 
 	if errGetUser != nil {
-		return domain.User{}, nil, errors.New("пользователь не найден")
+		return domain.User{}, nil, domain.ErrUserNotFound
 	}
 
 	if bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)) != nil {
-		return u, nil, errors.New("неверный пароль")
+		return u, nil, domain.ErrIncorrectPassword
 	}
 
 	tokens, err := s.tokens.CreateTokenPair(u.ID, string(u.Role))
@@ -65,7 +64,7 @@ func (s *Service) Refresh(token string) (domain.User, string, error) {
 	}
 	u, errGetUser := s.repo.GetByID(claims.UserID())
 	if errGetUser != nil {
-		return domain.User{}, "", errors.New("пользователь не найден")
+		return domain.User{}, "", domain.ErrUserNotFound
 	}
 
 	newToken, errToken := s.tokens.CreateToken(u.ID, string(u.Role), true)
