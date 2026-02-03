@@ -148,15 +148,6 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	})
 	api.GET(route.Users, adminH.UsersApi)
 
-	api.GET("/vadmark/:id", func(c *gin.Context) {
-		id := c.Param("id")
-
-		c.JSON(200, gin.H{
-			"id":      id,
-			"message": "Hello react!",
-		})
-	})
-
 	// Защищенные маршруты (API)
 	api.Use(middleware.RequireAuthApi)
 	{

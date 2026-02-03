@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"vago/internal/application/user"
 	"vago/internal/config/code"
+	"vago/internal/transport/http/api"
 	"vago/pkg/strx"
 
 	"github.com/gin-gonic/gin"
@@ -19,33 +20,33 @@ func DeleteUser(service *user.Service) func(c *gin.Context) {
 
 		currentId, errGetUSerId := c.Get(code.UserId)
 		if !errGetUSerId {
-			Error(c, http.StatusUnauthorized, "Пользователь не аутентифицировался")
+			api.Error(c, http.StatusUnauthorized, "Пользователь не аутентифицировался")
 			return
 		}
 
 		if currentId == parseId {
-			Error(c, http.StatusBadRequest, "Вы пытаетесь удалить свой собственный аккаунт")
+			api.Error(c, http.StatusBadRequest, "Вы пытаетесь удалить свой собственный аккаунт")
 			return
 		}
 
 		role, errRole := c.Get(code.Role)
 		if !errRole {
-			Error(c, http.StatusBadRequest, "Роль пользователя неизвестна")
+			api.Error(c, http.StatusBadRequest, "Роль пользователя неизвестна")
 			return
 		}
 
 		if role != "admin" {
 			// Пользователь аутентифицирован, но не авторизован для этого действия
-			Error(c, http.StatusForbidden, "У вас нет прав на удаление пользователей")
+			api.Error(c, http.StatusForbidden, "У вас нет прав на удаление пользователей")
 			return
 		}
 
 		err := service.DeleteUser(parseId)
 		if err != nil {
-			Error(c, mapErrorToHTTP(err), strx.Capitalize(err.Error()))
+			api.Error(c, mapErrorToHTTP(err), strx.Capitalize(err.Error()))
 			return
 		}
 
-		OKNoData(c, "Пользователь удален")
+		api.OKNoData(c, "Пользователь удален")
 	}
 }

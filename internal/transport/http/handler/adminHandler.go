@@ -12,6 +12,7 @@ import (
 	"vago/internal/config/code"
 	"vago/internal/config/route"
 	"vago/internal/infra/token"
+	"vago/internal/transport/http/api"
 	"vago/internal/transport/http/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -81,7 +82,7 @@ func (h *AdminHandler) UsersApi(c *gin.Context) {
 		return
 	}
 
-	OK(c, "Список пользователей", UsersApiDTO{Users: usersToResponse(users)})
+	api.OK(c, "Список пользователей", UsersApiDTO{Users: usersToResponse(users)})
 }
 
 func (h *AdminHandler) ShowMessages(c *gin.Context) {
