@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"html/template"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -15,13 +14,9 @@ import (
 	"vago/internal/application/test"
 	"vago/internal/application/topic"
 	"vago/internal/application/user"
-	"vago/internal/config/code"
 	"vago/internal/config/route"
-	"vago/internal/domain"
 	"vago/internal/infra/persistence/gorm"
 	"vago/internal/infra/token"
-	"vago/internal/transport/http/api"
-	"vago/internal/transport/http/dto"
 	"vago/internal/transport/http/handler"
 	"vago/internal/transport/http/middleware"
 	"vago/internal/transport/ws"
@@ -97,10 +92,9 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 		admin := auth.Group(route.Admin)
 		{
 			admin.GET("", adminH.ShowAdmin)
-
 			admin.GET(route.User, adminH.ShowUser)
 			admin.GET(route.Comments, adminH.ShowComments)
-			admin.GET(route.Users, adminH.ShowUsers)
+			admin.GET(route.Users, adminH.Users)
 			admin.GET(route.Messages, adminH.ShowMessages)
 			admin.GET(route.Grpc, adminH.ShowGrpc)
 		}
@@ -130,30 +124,18 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 
 	// ========= API =========
 	apiGroup := r.Group("/api")
-	apiGroup.GET("/me", func(c *gin.Context) {
-		uAny, ok := c.Get(code.CurrentUser)
-		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-			return
-		}
-		u, ok := uAny.(domain.User)
-		if !ok {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "invalid user in context"})
-			return
-		}
-
-		api.OK(c, "Пользователь", dto.MeDTO{Username: u.Username, Role: u.Role})
-	})
-	apiGroup.POST("/login", authH.LoginAPI)
-	apiGroup.POST("/sign_up", handler.SignUpApi(userSvc))
+	apiGroup.GET(route.Me, authH.MeAPI)
+	apiGroup.POST(route.SignIn, authH.SignInAPI)
+	apiGroup.POST(route.SignUp, handler.SignUpApi(userSvc))
 	apiGroup.GET(route.SignOut, handler.SignOut)
-
-	apiGroup.GET(route.Users, adminH.UsersApi)
 
 	// Защищенные маршруты (API)
 	apiGroup.Use(middleware.RequireAuthApi)
 	{
+		apiGroup.GET(route.Users, adminH.UsersApi)
 		apiGroup.DELETE("/users/:id", handler.DeleteUser(userSvc))
+
+		apiGroup.GET(route.Tasks, handler.TasksAPI(taskSvc))
 	}
 
 	r.NoRoute(handler.NotFoundHandler)

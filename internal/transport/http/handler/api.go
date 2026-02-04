@@ -5,11 +5,7 @@ import (
 	"vago/internal/domain"
 )
 
-type UsersApiDTO struct {
-	Users []UserResponseDTO `json:"users"`
-}
-
-type UserResponseDTO struct {
+type UserApiDTO struct {
 	ID        int64     `json:"id"`
 	Login     string    `json:"login"`
 	Username  string    `json:"username"`
@@ -18,8 +14,12 @@ type UserResponseDTO struct {
 	CreatedAt time.Time `json:"createdAt"`
 }
 
-func userToResponse(u domain.User) UserResponseDTO {
-	return UserResponseDTO{
+type UsersApiDTO struct {
+	Users []UserApiDTO `json:"users"`
+}
+
+func userToDTO(u domain.User) UserApiDTO {
+	return UserApiDTO{
 		ID:        u.ID,
 		Login:     u.Login,
 		Username:  u.Username,
@@ -29,10 +29,41 @@ func userToResponse(u domain.User) UserResponseDTO {
 	}
 }
 
-func usersToResponse(users []domain.User) []UserResponseDTO {
-	result := make([]UserResponseDTO, 0, len(users))
+func usersToDTO(users []domain.User) []UserApiDTO {
+	result := make([]UserApiDTO, 0, len(users))
 	for _, u := range users {
-		result = append(result, userToResponse(u))
+		result = append(result, userToDTO(u))
 	}
+	return result
+}
+
+type TaskApiDTO struct {
+	ID          int64     `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"createdAt"`
+	Completed   bool      `json:"completed"`
+}
+
+type TasksApiDTO struct {
+	Tasks []TaskApiDTO `json:"tasks"`
+}
+
+func taskToDTO(t domain.Task) TaskApiDTO {
+	return TaskApiDTO{
+		ID:          t.ID,
+		Name:        t.Name,
+		Description: t.Description,
+		CreatedAt:   t.CreatedAt,
+		Completed:   t.Completed,
+	}
+}
+
+func tasksToDTO(tasks []domain.Task) []TaskApiDTO {
+	result := make([]TaskApiDTO, 0, len(tasks))
+	for _, t := range tasks {
+		result = append(result, taskToDTO(t))
+	}
+
 	return result
 }

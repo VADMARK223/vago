@@ -5,17 +5,20 @@ import (
 	"net/http"
 	"strconv"
 	"vago/internal/app"
-	task2 "vago/internal/application/task"
+	"vago/internal/application/task"
 	"vago/internal/config/code"
 	"vago/internal/domain"
 	"vago/internal/infra/persistence/gorm"
+	"vago/internal/transport/http/api"
 
 	"github.com/gin-gonic/gin"
 )
 
-func Tasks(service *task2.Service) gin.HandlerFunc {
+func Tasks(service *task.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		data := tplWithMetaData(c, "Задачи пользователя")
+
+		app.Dump("Tasks:data", data)
 
 		tasks, err := service.GetAllByUser(data[code.UserId].(int64))
 		if err != nil {
@@ -27,6 +30,19 @@ func Tasks(service *task2.Service) gin.HandlerFunc {
 
 		data["Tasks"] = tasks
 		c.HTML(http.StatusOK, "tasks.html", data)
+	}
+}
+
+func TasksAPI(service *task.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		td, exists := c.Get(code.TemplateData)
+		data := td.(gin.H)
+		app.Dump("TasksAPI:td", data[code.UserId])
+		app.Dump("TasksAPI:exists", exists)
+
+		tasks, _ := service.GetAllByUser(data[code.UserId].(int64))
+
+		api.OK(c, "Задачи", tasksToDTO(tasks))
 	}
 }
 
@@ -82,7 +98,7 @@ func DeleteTask(appCtx *app.Context) gin.HandlerFunc {
 	}
 }
 
-func UpdateTask(appCtx *app.Context, service *task2.Service) gin.HandlerFunc {
+func UpdateTask(appCtx *app.Context, service *task.Service) gin.HandlerFunc {
 	type reqBody struct {
 		Completed bool `json:"completed"`
 	}

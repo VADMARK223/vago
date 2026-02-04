@@ -59,7 +59,7 @@ func (h *AdminHandler) ShowComments(c *gin.Context) {
 	c.HTML(http.StatusOK, "admin/layout", data)
 }
 
-func (h *AdminHandler) ShowUsers(c *gin.Context) {
+func (h *AdminHandler) Users(c *gin.Context) {
 	users, err := h.userSvc.GetAll()
 	if err != nil {
 		ShowError(c, "Ошибка загрузки пользователя", err.Error())
@@ -75,14 +75,11 @@ func (h *AdminHandler) ShowUsers(c *gin.Context) {
 func (h *AdminHandler) UsersApi(c *gin.Context) {
 	users, err := h.userSvc.GetAll()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			//ShowError(c, "Ошибка загрузки пользователя", err.Error())
-			"message": "Список пользователей",
-		})
+		api.Error(c, http.StatusInternalServerError, "\"Список пользователей\"")
 		return
 	}
 
-	api.OK(c, "Список пользователей", UsersApiDTO{Users: usersToResponse(users)})
+	api.OK(c, "Список пользователей", UsersApiDTO{Users: usersToDTO(users)})
 }
 
 func (h *AdminHandler) ShowMessages(c *gin.Context) {
