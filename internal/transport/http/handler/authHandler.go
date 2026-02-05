@@ -2,7 +2,7 @@ package handler
 
 import (
 	"net/http"
-	user2 "vago/internal/application/user"
+	"vago/internal/application/user"
 	"vago/internal/config/code"
 	"vago/internal/config/route"
 	"vago/internal/domain"
@@ -16,7 +16,7 @@ import (
 )
 
 type AuthHandler struct {
-	service    *user2.Service
+	service    *user.Service
 	secret     string
 	refreshTTL int
 	log        *zap.SugaredLogger
@@ -28,12 +28,13 @@ type SignInReq struct {
 }
 
 type SignUpReq struct {
-	Login    string `json:"login"`
-	Password string `json:"password"`
-	Username string `json:"username"`
+	Login    string      `json:"login"`
+	Password string      `json:"password"`
+	Username string      `json:"username"`
+	Role     domain.Role `json:"role"`
 }
 
-func NewAuthHandler(service *user2.Service, secret string, refreshTTL int, log *zap.SugaredLogger) *AuthHandler {
+func NewAuthHandler(service *user.Service, secret string, refreshTTL int, log *zap.SugaredLogger) *AuthHandler {
 	return &AuthHandler{
 		service:    service,
 		secret:     secret,
@@ -70,7 +71,6 @@ func (h *AuthHandler) Login(c *gin.Context) {
 }
 
 func (h *AuthHandler) MeAPI(c *gin.Context) {
-	//time.Sleep(3 * time.Second)
 	uAny, ok := c.Get(code.CurrentUser)
 	if !ok {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
@@ -103,7 +103,7 @@ func (h *AuthHandler) SignInAPI(c *gin.Context) {
 	api.OKNoData(c, "Успешный вход!")
 }
 
-func SignUp(service *user2.Service) gin.HandlerFunc {
+func SignUp(service *user.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		login := c.PostForm(code.Login)
 		password := c.PostForm(code.Password)
@@ -124,30 +124,21 @@ func SignUp(service *user2.Service) gin.HandlerFunc {
 	}
 }
 
-func SignUpApi(service *user2.Service) gin.HandlerFunc {
+func SignUpApi(service *user.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req SignUpReq
 		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "Некорректные данные",
-			})
+			api.Error(c, http.StatusBadRequest, "Некорректные данные")
 			return
 		}
 
-		role := "user"
-		color := "#FF5733"
-
-		err := service.CreateUser(domain.DTO{Login: req.Login, Password: req.Password, Role: domain.Role(role), Color: color, Username: req.Username})
+		err := service.CreateUser(domain.DTO{Login: req.Login, Password: req.Password, Role: req.Role, Color: "#FF5733", Username: req.Username})
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"message": strx.Capitalize(err.Error()),
-			})
+			api.Error(c, http.StatusInternalServerError, strx.Capitalize(err.Error()))
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Успешная регистрация!",
-		})
+		api.OKNoData(c, "Успешная регистрация!")
 	}
 }
