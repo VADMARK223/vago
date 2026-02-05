@@ -63,3 +63,8 @@ blockquote.note {
 .red {
     color: var(--color-error);
 }
+
+.hint {
+    font-size: 14px;
+    color: #888;
+}

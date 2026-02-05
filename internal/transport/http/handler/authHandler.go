@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"vago/internal/application/user"
 	"vago/internal/config/code"
@@ -110,6 +111,9 @@ func SignUp(service *user.Service) gin.HandlerFunc {
 		username := c.PostForm(code.Username)
 
 		role := c.PostForm(code.Role)
+
+		fmt.Printf("➡️ \033[93m%s: \033[92m%v\033[0m\n", "rolw", role)
+
 		color := c.PostForm(code.Color)
 
 		err := service.CreateUser(domain.DTO{Login: login, Password: password, Role: domain.Role(role), Color: color, Username: username})

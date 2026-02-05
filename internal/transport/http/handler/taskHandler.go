@@ -18,8 +18,6 @@ func Tasks(service *task.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		data := tplWithMetaData(c, "Задачи пользователя")
 
-		app.Dump("Tasks:data", data)
-
 		tasks, err := service.GetAllByUser(data[code.UserId].(int64))
 		if err != nil {
 			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
@@ -36,10 +34,10 @@ func Tasks(service *task.Service) gin.HandlerFunc {
 func TasksAPI(service *task.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		td, exists := c.Get(code.TemplateData)
+		if !exists {
+			panic("TemplateData not found")
+		}
 		data := td.(gin.H)
-		app.Dump("TasksAPI:td", data[code.UserId])
-		app.Dump("TasksAPI:exists", exists)
-
 		tasks, _ := service.GetAllByUser(data[code.UserId].(int64))
 
 		api.OK(c, "Задачи", tasksToDTO(tasks))

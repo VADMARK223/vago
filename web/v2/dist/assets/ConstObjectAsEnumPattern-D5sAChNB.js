@@ -1,0 +1,21 @@
+import{t as e}from"./CodeBlock-C80_TiuN.js";import{E as t,t as n,u as r}from"./index-C_au5oyt.js";var i=t(),a=r();function o(){return(0,i.useEffect)(()=>{n.admin=`asd`},[]),(0,a.jsxs)(a.Fragment,{children:[(0,a.jsx)(`a`,{href:`#1`,children:`Почему не enum?`}),(0,a.jsx)(`br`,{}),(0,a.jsx)(e,{code:`export const ROLE = {
+    user: 'user',
+    moderator: 'moderator',
+    admin: 'admin',
+} as const
+
+export type Role = typeof ROLE[keyof typeof ROLE];`}),(0,a.jsx)(`hr`,{}),(0,a.jsxs)(`h2`,{children:[`1. Что делает `,(0,a.jsx)(`code`,{children:`as const`})]}),(0,a.jsxs)(`p`,{children:[(0,a.jsx)(`code`,{children:`as const`}),` делает:`]}),(0,a.jsxs)(`ul`,{children:[(0,a.jsxs)(`li`,{children:[`Все поля `,(0,a.jsx)(`code`,{children:`readonly`})]}),(0,a.jsxs)(`li`,{children:[`Все значения становятся `,(0,a.jsx)(`b`,{children:`литеральными типами`})]})]}),(0,a.jsx)(e,{code:`{
+  readonly user: "user"
+  readonly moderator: "moderator"
+  readonly admin: "admin"
+}
+`}),(0,a.jsxs)(`p`,{children:[`⚠️ Это важно:`,(0,a.jsx)(`br`,{}),`значение `,(0,a.jsx)(`code`,{children:`"user"`}),` теперь не просто `,(0,a.jsx)(`code`,{children:`string`}),`, а конкретный тип `,(0,a.jsx)(`code`,{children:`"user"`}),`.`]}),(0,a.jsx)(`hr`,{}),(0,a.jsx)(`h2`,{children:`2. Создание типа`}),(0,a.jsx)(e,{code:`export type Role = typeof ROLE[keyof typeof ROLE];
+`}),(0,a.jsxs)(`h3`,{children:[`Шаг1 - `,(0,a.jsx)(`code`,{children:`typeof ROLE`})]}),(0,a.jsx)(`p`,{children:`Это тип объекта:`}),(0,a.jsx)(e,{code:`{
+  readonly user: "user"
+  readonly moderator: "moderator"
+  readonly admin: "admin"
+}`}),(0,a.jsx)(`hr`,{}),(0,a.jsxs)(`h3`,{children:[`Шаг 2 — `,(0,a.jsx)(`code`,{children:`keyof typeof ROLE`})]}),(0,a.jsx)(`p`,{children:`keyof берёт ключи объекта:`}),(0,a.jsx)(e,{code:`"user" | "moderator" | "admin"`}),(0,a.jsx)(`hr`,{}),(0,a.jsxs)(`h3`,{children:[`Шаг 3 — `,(0,a.jsx)(`code`,{children:`typeof ROLE[keyof typeof ROLE]`})]}),(0,a.jsxs)(`p`,{children:[`Это называется `,(0,a.jsx)(`b`,{children:`indexed access type`}),`.`]}),(0,a.jsx)(`blockquote`,{children:`Возьми тип ROLE и получи типы всех значений по всем ключам.`}),(0,a.jsx)(e,{code:`"user" | "moderator" | "admin"`}),(0,a.jsx)(`hr`,{}),(0,a.jsxs)(`h3`,{children:[`🔥 В итоге тип `,(0,a.jsx)(`code`,{children:`Role`}),` равен:`]}),(0,a.jsx)(e,{code:`type Role = "user" | "moderator" | "admin"`}),(0,a.jsx)(`p`,{children:`И при этом:`}),(0,a.jsxs)(`ul`,{children:[(0,a.jsx)(`li`,{children:`не нужно вручную писать union`}),(0,a.jsx)(`li`,{children:`всё синхронизировано с объектом ROLE`})]}),(0,a.jsx)(`hr`,{}),(0,a.jsx)(`h2`,{id:`1`,children:`🔥 Почему не enum?`}),(0,a.jsx)(`p`,{children:`Можно было бы так:`}),(0,a.jsx)(e,{code:`enum Role {
+  User = "user",
+  Moderator = "moderator",
+  Admin = "admin"
+}`}),(0,a.jsxs)(`ul`,{children:[(0,a.jsx)(`li`,{children:`не генерирует лишний JS код`}),(0,a.jsx)(`li`,{children:`проще`}),(0,a.jsx)(`li`,{children:`гибче`}),(0,a.jsx)(`li`,{children:`лучше работает с tree-shaking`}),(0,a.jsx)(`li`,{children:`удобнее в React / фронте`})]}),(0,a.jsx)(`hr`,{})]})}export{o as default};

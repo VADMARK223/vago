@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"vago/internal/application/user"
 	"vago/internal/config/code"
+	"vago/internal/domain"
 	"vago/internal/transport/http/api"
 	"vago/pkg/strx"
 
@@ -35,7 +36,7 @@ func DeleteUser(service *user.Service) func(c *gin.Context) {
 			return
 		}
 
-		if role != "admin" {
+		if role != domain.RoleAdmin {
 			// Пользователь аутентифицирован, но не авторизован для этого действия
 			api.Error(c, http.StatusForbidden, "У вас нет прав на удаление пользователей")
 			return

@@ -6,7 +6,10 @@ import (
 	"strconv"
 	"vago/internal/application/chat"
 	"vago/internal/application/user"
+	"vago/internal/config/code"
 	"vago/internal/config/route"
+	"vago/internal/domain"
+	"vago/internal/transport/http/api"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,6 +25,17 @@ func NewMessageHandler(chatSvc *chat.Service, userSvc *user.Service) *MessageHan
 
 func (h *MessageHandler) Delete() func(c *gin.Context) {
 	return func(c *gin.Context) {
+		role, errRole := c.Get(code.Role)
+		if !errRole {
+			api.Error(c, http.StatusBadRequest, "Роль пользователя неизвестна")
+			return
+		}
+
+		if role != domain.RoleAdmin {
+			api.Error(c, http.StatusForbidden, "У вас нет прав на удаление пользователей")
+			return
+		}
+
 		parseUint, parseUintErr := strconv.ParseInt(c.Param("id"), 10, 64)
 		if parseUintErr != nil {
 			ShowError(c, "Ошибка конвертации идентификатора", parseUintErr.Error())
@@ -41,9 +55,20 @@ func (h *MessageHandler) Delete() func(c *gin.Context) {
 
 func (h *MessageHandler) DeleteAll() func(c *gin.Context) {
 	return func(c *gin.Context) {
+		role, errRole := c.Get(code.Role)
+		if !errRole {
+			ShowError(c, "Ошибка удаления всех сообщений", "Роль пользователя неизвестна")
+			return
+		}
+
+		if role != domain.RoleAdmin {
+			ShowError(c, "Ошибка удаления всех сообщений", "У вас нет прав на удаление пользователей")
+			return
+		}
+
 		err := h.chatSvc.DeleteAll()
 		if err != nil {
-			ShowError(c, "Ошибка удаления всех", err.Error())
+			ShowError(c, "Ошибка удаления всех сообщений", err.Error())
 		}
 		c.Redirect(http.StatusSeeOther, route.Admin+route.Messages)
 	}

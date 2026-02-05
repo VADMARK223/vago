@@ -1,4 +1,4 @@
-import{t as e}from"./CodeBlock-BLk5sE89.js";import{l as t}from"./index-C7tfuoLV.js";var n=t();function r(){return(0,n.jsxs)(n.Fragment,{children:[(0,n.jsx)(`a`,{href:`#rules`,children:`Привила`}),(0,n.jsx)(`br`,{}),(0,n.jsx)(`h2`,{id:`rules`,children:`Правила`}),(0,n.jsxs)(`h3`,{id:`rules`,children:[`Правило №1 — Props = `,(0,n.jsx)(`code`,{children:`interface`})]}),(0,n.jsxs)(`p`,{children:[`Всегда описываем props компонентов через `,(0,n.jsx)(`code`,{children:`interface`}),`.`]}),(0,n.jsx)(e,{code:`interface CodeBlockProps {
+import{t as e}from"./CodeBlock-C80_TiuN.js";import{u as t}from"./index-C_au5oyt.js";var n=t();function r(){return(0,n.jsxs)(n.Fragment,{children:[(0,n.jsx)(`a`,{href:`#rules`,children:`Привила`}),(0,n.jsx)(`br`,{}),(0,n.jsx)(`h2`,{id:`rules`,children:`Правила`}),(0,n.jsxs)(`h3`,{id:`rules`,children:[`Правило №1 — Props = `,(0,n.jsx)(`code`,{children:`interface`})]}),(0,n.jsxs)(`p`,{children:[`Всегда описываем props компонентов через `,(0,n.jsx)(`code`,{children:`interface`}),`.`]}),(0,n.jsx)(e,{code:`interface CodeBlockProps {
   code: string
   lang?: CodeLang
 }

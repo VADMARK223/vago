@@ -8,10 +8,10 @@ import (
 )
 
 func ShowLogin(c *gin.Context) {
-	data := tplWithMetaData(c, "Логин")
+	data := tplWithMetaData(c, "Вход")
 	if errVal, exists := c.Get(code.Error); exists {
 		data[code.Error] = errVal
 	}
 
-	c.HTML(http.StatusOK, "login.html", data)
+	c.HTML(http.StatusOK, "sign_in.html", data)
 }

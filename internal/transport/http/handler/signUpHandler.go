@@ -12,5 +12,5 @@ func ShowSignup(c *gin.Context) {
 	if errVal, exists := c.Get(code.Error); exists {
 		data[code.Error] = errVal
 	}
-	c.HTML(http.StatusOK, "register.html", data)
+	c.HTML(http.StatusOK, "sign_up.html", data)
 }

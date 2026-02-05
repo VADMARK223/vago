@@ -19,7 +19,7 @@ func TemplateContext(c *gin.Context) {
 		result[code.Login] = u.Login
 		result[code.Username] = u.Username
 		result[code.Role] = u.Role
-		result[code.IsAdmin] = u.IsAdmin()
+		result[code.IsAdminModerator] = u.IsAdminOrModerator()
 	}
 
 	c.Set(code.TemplateData, result)

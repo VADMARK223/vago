@@ -20,6 +20,23 @@
         return;
     }
 
+    const select = document.getElementById("roleSelect");
+    if (!select) {
+        console.warn("[select] elements not found");
+        return;
+    }
+
+    const hint = document.getElementById("roleHint");
+    if (!hint) {
+        console.warn("[hint] elements not found");
+        return;
+    }
+
+    const ROLE_HINT = {
+        moderator: "Доступны все разделы с ограниченными правами.",
+        user: "Некоторые разделы не доступы."
+    };
+
     loginInput.addEventListener("input", () => {
         const v = loginInput.value.trim();
 
@@ -45,4 +62,16 @@
     }
 
     updateState();
+
+    function updateHint(role) {
+        hint.textContent = ROLE_HINT[role];
+    }
+
+    // начальное состояние
+    updateHint(select.value);
+
+    // при изменении
+    select.addEventListener("change", function () {
+        updateHint(this.value);
+    });
 })();

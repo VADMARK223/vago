@@ -14,8 +14,8 @@ type User struct {
 	CreatedAt time.Time
 }
 
-func (u User) IsAdmin() bool {
-	return u.Role == RoleAdmin
+func (u User) IsAdminOrModerator() bool {
+	return u.Role == RoleAdmin || u.Role == RoleModerator
 }
 
 func New(login, password, username, color string, role Role) User {

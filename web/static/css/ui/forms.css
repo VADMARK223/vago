@@ -72,7 +72,7 @@ input[type="checkbox"]:checked::after {
 
 select {
     width: 100%;
-    background: var(--bg-entry);
+    background: var(--bg-entry); !important;
     color: var(--text);
     border: 1px solid var(--bg-border);
     transition: border-color .2s, box-shadow .2s;
@@ -80,14 +80,15 @@ select {
     padding: var(--space-2);
     font-family: inherit;
     cursor: pointer;
-    appearance: none; /* скрываем браузерную стрелку */
-}
 
-select {
+    appearance: none;
+    -webkit-appearance: none;
+
+    /*Стрелка*/
     background-image: url("data:image/svg+xml;utf8,<svg fill='%23a9b7c6' height='16' viewBox='0 0 24 24' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
     background-repeat: no-repeat;
     background-position: right var(--space-2) center;
-    padding-right: calc(var(--space-2) * 4); /* место под стрелку */
+    padding-right: calc(var(--space-2) * 4); /*место под стрелку*/
 }
 
 select:hover {
