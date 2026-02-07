@@ -100,9 +100,9 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 		}
 
 		auth.GET(route.Tasks, handler.Tasks(taskSvc))
-		auth.POST(route.Tasks, handler.AddTask(ctx))
-		auth.DELETE("/tasks/:id", handler.DeleteTask(ctx))
-		auth.PUT("/tasks/:id", handler.UpdateTask(ctx, taskSvc))
+		auth.POST(route.Tasks, handler.PostTask(taskSvc))
+		auth.DELETE(route.Tasks+"/:id", handler.DeleteTask(ctx))
+		auth.PUT(route.Tasks+"/:id", handler.UpdateTask(taskSvc))
 		auth.DELETE("/users/:id", handler.DeleteUser(userSvc))
 
 		auth.GET("/ws", handler.ServeSW(hub, ctx.Log, tokenProvider, chatSvc))
@@ -133,7 +133,11 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	apiGroup.Use(middleware.RequireAuthApi)
 	{
 		apiGroup.GET(route.Users, adminH.UsersApi)
-		apiGroup.DELETE("/users/:id", handler.DeleteUser(userSvc))
+		apiGroup.DELETE(route.Users+"/:id", handler.DeleteUser(userSvc))
+
+		apiGroup.POST(route.Tasks, handler.PostTaskAPI(taskSvc))
+		apiGroup.DELETE(route.Tasks+"/:id", handler.DeleteTaskAPI(taskSvc))
+		apiGroup.PUT(route.Tasks+"/:id", handler.UpdateTaskAPI(taskSvc))
 
 		apiGroup.GET(route.Tasks, handler.TasksAPI(taskSvc))
 	}

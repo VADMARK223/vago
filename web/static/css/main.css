@@ -14,6 +14,7 @@
 
 @import url("/static/css/components/book.css");
 @import url("/static/css/components/test.css");
+@import url("/static/css/components/tasks.css");
 
 .menu,
 .container {

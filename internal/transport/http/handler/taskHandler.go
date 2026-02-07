@@ -8,7 +8,6 @@ import (
 	"vago/internal/application/task"
 	"vago/internal/config/code"
 	"vago/internal/domain"
-	"vago/internal/infra/persistence/gorm"
 	"vago/internal/transport/http/api"
 
 	"github.com/gin-gonic/gin"
@@ -44,12 +43,35 @@ func TasksAPI(service *task.Service) gin.HandlerFunc {
 	}
 }
 
-func AddTask(appCtx *app.Context) gin.HandlerFunc {
+func PostTaskAPI(service *task.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var dto PostTaskDTO
+		if err := c.ShouldBindJSON(&dto); err != nil {
+			api.Error(c, http.StatusBadRequest, "Некорректные данные")
+			return
+		}
+
+		currentId, errGetUSerId := c.Get(code.UserId)
+		if !errGetUSerId {
+			api.Error(c, http.StatusUnauthorized, "Пользователь не аутентифицировался")
+			return
+		}
+
+		err := service.PostTask(dto.Name, dto.Description, dto.Completed, currentId.(int64))
+		if err != nil {
+			api.Error(c, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		api.OKNoData(c, "Задача создана")
+	}
+}
+
+func PostTask(service *task.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		name := c.PostForm("name")
 		desc := c.PostForm("description")
 		completed := c.PostForm("completed")
-		appCtx.Log.Debugw("Add task", "name", name, "desc", desc, "completed", completed)
 
 		if name == "" {
 			c.String(http.StatusBadRequest, "Название задачи обязательно")
@@ -64,21 +86,31 @@ func AddTask(appCtx *app.Context) gin.HandlerFunc {
 			})
 		}
 
-		appCtx.Log.Debugw("Add task", "sessionUserID", sessionUserID)
-		t := gorm.TaskEntity{
-			Name:        name,
-			Description: desc,
-			Completed:   completed == "on",
-			UserID:      sessionUserID.(int64),
-		}
-
-		if err := appCtx.DB.Create(&t).Error; err != nil {
-			appCtx.Log.Errorw("failed to create task", "error", err)
+		err := service.PostTask(name, desc, completed == "on", sessionUserID.(int64))
+		if err != nil {
 			ShowError(c, "Ошибка создания задачи", err.Error())
 			return
 		}
 
 		c.Redirect(http.StatusSeeOther, "/tasks")
+	}
+}
+
+func DeleteTaskAPI(service *task.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		parseId, parseIdErr := strconv.ParseInt(c.Param("id"), 10, 64)
+		if parseIdErr != nil {
+			api.Error(c, http.StatusBadRequest, "Некорректные данные")
+			return
+		}
+
+		err := service.DeleteTask(parseId)
+		if err != nil {
+			api.Error(c, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		api.OKNoData(c, "Задача удалена.")
 	}
 }
 
@@ -96,13 +128,54 @@ func DeleteTask(appCtx *app.Context) gin.HandlerFunc {
 	}
 }
 
-func UpdateTask(appCtx *app.Context, service *task.Service) gin.HandlerFunc {
+func UpdateTaskAPI(service *task.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		parseId, parseIdErr := strconv.ParseInt(c.Param("id"), 10, 64)
+		if parseIdErr != nil {
+			api.Error(c, http.StatusBadRequest, "Некорректные данные")
+			return
+		}
+
+		var dto UpdateTaskDTO
+		if err := c.ShouldBindJSON(&dto); err != nil {
+			api.Error(c, http.StatusBadRequest, "Некорректные данные")
+			return
+		}
+
+		currentId, errGetUSerId := c.Get(code.UserId)
+		if !errGetUSerId {
+			api.Error(c, http.StatusUnauthorized, "Пользователь не аутентифицировался")
+			return
+		}
+
+		errUpdate := service.UpdateCompleted(parseId, currentId.(int64), dto.Completed)
+		if errUpdate != nil {
+			api.Error(c, http.StatusInternalServerError, errUpdate.Error())
+			return
+		}
+
+		api.OKNoData(c, "Успешное обновление задачи")
+
+		/*userID := c.MustGet(code.UserId).(int64)
+
+
+		if errUpdate != nil {
+			appCtx.Log.Errorw("failed to update task", "error", errUpdate)
+			c.JSON(http.StatusBadRequest, gin.H{"error": errUpdate.Error()})
+			return
+		}
+
+		appCtx.Log.Debugw("Update task", "taskID", taskID, "userID", userID)
+		c.Redirect(http.StatusSeeOther, "/tasks")*/
+	}
+}
+
+func UpdateTask(service *task.Service) gin.HandlerFunc {
 	type reqBody struct {
 		Completed bool `json:"completed"`
 	}
 
 	return func(c *gin.Context) {
-		appCtx.Log.Debugw("Update task")
 		taskID, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
@@ -119,12 +192,10 @@ func UpdateTask(appCtx *app.Context, service *task.Service) gin.HandlerFunc {
 
 		errUpdate := service.UpdateCompleted(int64(taskID), userID, body.Completed)
 		if errUpdate != nil {
-			appCtx.Log.Errorw("failed to update task", "error", errUpdate)
 			c.JSON(http.StatusBadRequest, gin.H{"error": errUpdate.Error()})
 			return
 		}
 
-		appCtx.Log.Debugw("Update task", "taskID", taskID, "userID", userID)
 		c.Redirect(http.StatusSeeOther, "/tasks")
 	}
 }

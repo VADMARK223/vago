@@ -67,3 +67,13 @@ func tasksToDTO(tasks []domain.Task) []TaskApiDTO {
 
 	return result
 }
+
+type PostTaskDTO struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Completed   bool   `json:"completed"`
+}
+
+type UpdateTaskDTO struct {
+	Completed bool `json:"completed"`
+}

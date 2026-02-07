@@ -14,10 +14,17 @@
     <div class="container">
         <form class="form-add" action="/tasks" method="POST" style="margin-bottom: var(--space-2)">
             <label>
-                <input type="text" name="name" placeholder="Наименование задачи" required>
+                {{ template "component.inputWithClear" dict
+                "ID" "nameInput"
+                "Name" "name"
+                "Placeholder" "Введите наименование задачи"
+                "MaxLength" "255"
+                "Required" "true"
+                "Autofocus" "true"
+                }}
             </label>
             <label>
-                <textarea name="description" placeholder="Описания задачи"></textarea>
+                <textarea name="description" placeholder="Описание задачи"></textarea>
             </label>
             <label>
                 <input type="checkbox" name="completed">Выполнена
@@ -38,31 +45,43 @@
 
         <div class="scrollable-wrapper">
             <div class="scrollable-content" id="scrollable">
-                <div class="list">
+                <div class="task-list">
                     {{range .Tasks}}
-                    <div class="item {{if .Completed}}completed{{end}}" id="task-{{.ID}}">
-                        <div class="item-info">
-                            <h3>{{.Name}}</h3>
+                    <article class="task-card {{if .Completed}}is-completed{{end}}" id="task-{{.ID}}">
+                        <header class="task-card__header">
+                            <div class="task-card__title">
+                                <h3 title="{{.Name}}">{{.Name}}</h3>
+                            </div>
+
+                            <div class="task-card__extra">
+                                <label class="task-card__check">
+                                    <input type="checkbox"
+                                           name="completed"
+                                           {{if .Completed}}checked{{end}}
+                                           onchange="toggleCompleted('{{.ID}}', this.checked)"
+                                    >
+                                    <span>Выполнена</span>
+                                </label>
+
+                                <button class="btn btn-danger btn-sm"
+                                        type="button"
+                                        onclick="deleteTask('{{.ID}}')">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </header>
+
+                        <div class="task-card__body">
                             <p>{{.Description}}</p>
+                        </div>
+
+                        <footer class="task-card__footer">
                             <small>Создана: {{.CreatedAt.Format "02.01.2006 15:04"}}</small>
-                        </div>
-
-                        <div>
-                            <label>
-                                <input type="checkbox"
-                                       name="completed"
-                                       {{if .Completed}}checked{{end}}
-                                       onchange="toggleCompleted('{{.ID}}', this.checked)"
-                                >Выполнена
-                            </label>
-
-                            <button class="btn btn-danger btn-sm" onclick="deleteTask('{{.ID}}')"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>
+                        </footer>
+                    </article>
                     {{else}}
                     <p class="empty">Список задач пуст</p>
                     {{end}}
-                </div>
             </div>
             <button class="scroll-top-btn" id="scrollTopBtn" title="Наверх">↑</button>
         </div>

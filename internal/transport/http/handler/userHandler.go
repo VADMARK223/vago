@@ -16,6 +16,7 @@ func DeleteUser(service *user.Service) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		parseId, parseIdErr := strconv.ParseInt(c.Param("id"), 10, 64)
 		if parseIdErr != nil {
+			api.Error(c, http.StatusBadRequest, "Некорректные данные")
 			return
 		}
 

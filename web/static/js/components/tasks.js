@@ -23,12 +23,6 @@
             return;
         }
 
-        // Меняем стиль строки без обновления страницы
-        const li = document.getElementById(`task-${id}`);
-        if (completed) {
-            li.classList.add("completed");
-        } else {
-            li.classList.remove("completed");
-        }
+        window.location.reload()
     }
 })();

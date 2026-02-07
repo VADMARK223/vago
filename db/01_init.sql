@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users
     role       varchar(20) CHECK (role IN ('user', 'moderator', 'admin')) NOT NULL,
     color      VARCHAR(7) CHECK (color ~ '^#[0-9A-Fa-f]{6}$')             NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 comment on table users is 'Таблица пользователей';
 comment on column users.login is 'Логин пользователя';

@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"vago/internal/application/user"
 	"vago/internal/config/code"
@@ -87,7 +86,6 @@ func (h *AuthHandler) MeAPI(c *gin.Context) {
 }
 
 func (h *AuthHandler) SignInAPI(c *gin.Context) {
-	//time.Sleep(3 * time.Second)
 	var req SignInReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		api.Error(c, http.StatusBadRequest, "Некорректные данные")
@@ -109,11 +107,7 @@ func SignUp(service *user.Service) gin.HandlerFunc {
 		login := c.PostForm(code.Login)
 		password := c.PostForm(code.Password)
 		username := c.PostForm(code.Username)
-
 		role := c.PostForm(code.Role)
-
-		fmt.Printf("➡️ \033[93m%s: \033[92m%v\033[0m\n", "rolw", role)
-
 		color := c.PostForm(code.Color)
 
 		err := service.CreateUser(domain.DTO{Login: login, Password: password, Role: domain.Role(role), Color: color, Username: username})
