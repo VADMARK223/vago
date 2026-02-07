@@ -1,4 +1,4 @@
-import{t as e}from"./CodeBlock-B2jgU2WP.js";import{E as t,t as n,u as r}from"./index-BrDgW9Ov.js";var i=t(),a=r();function o(){return(0,i.useEffect)(()=>{n.admin=`asd`},[]),(0,a.jsxs)(a.Fragment,{children:[(0,a.jsx)(`a`,{href:`#1`,children:`Почему не enum?`}),(0,a.jsx)(`br`,{}),(0,a.jsx)(e,{code:`export const ROLE = {
+import{t as e}from"./CodeBlock-CSDKc65B.js";import{D as t,d as n,n as r}from"./index-DVS8RGJf.js";var i=t(),a=n();function o(){return(0,i.useEffect)(()=>{r.admin=`asd`},[]),(0,a.jsxs)(a.Fragment,{children:[(0,a.jsx)(`a`,{href:`#1`,children:`Почему не enum?`}),(0,a.jsx)(`br`,{}),(0,a.jsx)(e,{code:`export const ROLE = {
     user: 'user',
     moderator: 'moderator',
     admin: 'admin',
