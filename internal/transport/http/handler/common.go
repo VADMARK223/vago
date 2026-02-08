@@ -9,13 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func tplWithMetaData(c *gin.Context, capture string) gin.H {
+func tplWithMetaData(c *gin.Context, caption string) gin.H {
 	td, exists := c.Get(code.TemplateData)
 	if !exists {
 		panic("TemplateData not found")
 	}
 	data := td.(gin.H)
-	data[code.Capture] = capture
+	data[code.Caption] = caption
 	path := c.Request.URL.Path
 	data[code.Path] = path
 

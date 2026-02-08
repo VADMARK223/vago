@@ -20,7 +20,7 @@ const (
 	Login                = "login"
 	Username             = "username"
 	IsAdminModerator     = "is_admin_or_moderator"
-	Capture              = "capture"
+	Caption              = "caption"
 	Vago                 = "vago"
 	VagoSession          = "vago_session"
 	TokenInfo            = "token_info"

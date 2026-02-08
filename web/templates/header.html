@@ -1,13 +1,13 @@
 {{ define "header" }}
 <header>
-    <div style="display: flex; align-items: center; gap: 12px; justify-content: center;">
-        <h2>{{.capture}}</h2>
+    <div class="caption">
+        <h2>{{.caption}}</h2>
 
-        {{ template "component.href_btn" dict
-        "Href" "/v2"
-        "Name" "Портал на React"
-        "Path" .Path
-        }}
+        <a class="btn btn-primary react-btn" href="/v2">
+            <div class="icon-item">
+                <span>Портал на React</span>
+            </div>
+        </a>
     </div>
     <div class="menu">
         <div>
