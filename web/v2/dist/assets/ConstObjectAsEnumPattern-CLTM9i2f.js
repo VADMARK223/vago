@@ -1,4 +1,4 @@
-import{t as e}from"./CodeBlock-BfBBByQQ.js";import{u as t}from"./index-DIPfJl0t.js";var n=t();function r(){return(0,n.jsxs)(n.Fragment,{children:[(0,n.jsx)(`a`,{href:`#1`,children:`Почему не enum?`}),(0,n.jsx)(`br`,{}),(0,n.jsx)(e,{code:`export const ROLE = {
+import{t as e}from"./CodeBlock-DSrwo_jx.js";import{u as t}from"./index-BOseedww.js";var n=t();function r(){return(0,n.jsxs)(n.Fragment,{children:[(0,n.jsx)(`a`,{href:`#1`,children:`Почему не enum?`}),(0,n.jsx)(`br`,{}),(0,n.jsx)(e,{code:`export const ROLE = {
     user: 'user',
     moderator: 'moderator',
     admin: 'admin',
@@ -9,7 +9,7 @@ export type Role = typeof ROLE[keyof typeof ROLE];`}),(0,n.jsx)(`hr`,{}),(0,n.js
   readonly moderator: "moderator"
   readonly admin: "admin"
 }
-`}),(0,n.jsxs)(`p`,{children:[`⚠️ Это важно:`,(0,n.jsx)(`br`,{}),`значение `,(0,n.jsx)(`code`,{children:`"user"`}),` теперь не просто `,(0,n.jsx)(`code`,{children:`string`}),`, а конкретный тип `,(0,n.jsx)(`code`,{children:`"user"`}),`.`]}),(0,n.jsx)(`hr`,{}),(0,n.jsx)(`h2`,{children:`2. Создание типа`}),(0,n.jsx)(e,{code:`export type Role = typeof ROLE[keyof typeof ROLE];
+`}),(0,n.jsxs)(`p`,{children:[`⚠️ Это важно:`,(0,n.jsx)(`br`,{}),`значение `,(0,n.jsx)(`code`,{children:`"user"`}),` теперь не просто `,(0,n.jsx)(`code`,{children:`string`}),`, а конкретный тип`,` `,(0,n.jsx)(`code`,{children:`"user"`}),`.`]}),(0,n.jsx)(`hr`,{}),(0,n.jsx)(`h2`,{children:`2. Создание типа`}),(0,n.jsx)(e,{code:`export type Role = typeof ROLE[keyof typeof ROLE];
 `}),(0,n.jsxs)(`h3`,{children:[`Шаг1 - `,(0,n.jsx)(`code`,{children:`typeof ROLE`})]}),(0,n.jsx)(`p`,{children:`Это тип объекта:`}),(0,n.jsx)(e,{code:`{
   readonly user: "user"
   readonly moderator: "moderator"
