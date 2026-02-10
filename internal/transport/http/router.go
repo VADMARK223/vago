@@ -83,7 +83,7 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	r.GET("/test/:id", testH.ShowTestByID())
 	r.POST("/test/check", testH.Check())
 
-	r.GET("/questions", testH.ShowQuestions)
+	r.GET(route.Questions, testH.ShowQuestions)
 
 	// Защищенные маршруты
 	auth := r.Group("/")
@@ -128,6 +128,7 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	apiGroup.POST(route.SignIn, authH.SignInAPI)
 	apiGroup.POST(route.SignUp, handler.SignUpApi(userSvc))
 	apiGroup.GET(route.SignOut, handler.SignOut)
+	apiGroup.GET(route.Questions, testH.ShowQuestionsAPI)
 
 	// Защищенные маршруты (API)
 	apiGroup.Use(middleware.RequireAuthApi)

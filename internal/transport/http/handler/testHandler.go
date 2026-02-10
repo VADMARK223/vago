@@ -111,17 +111,39 @@ func (h *TestHandler) ShowAddQuestion() func(c *gin.Context) {
 	}
 }
 
-func (h *TestHandler) ShowQuestions(c *gin.Context) {
-	topicIDStr := c.Query("topic_id")
-
-	topics, _ := h.topicSvc.AllWithCount()
-
+func (h *TestHandler) ShowQuestionsAPI(c *gin.Context) {
 	var (
 		topicID   int64
 		questions []*domain.Question
 		err       error
 	)
 
+	topicIDStr := c.Query("topic_id")
+	topics, _ := h.topicSvc.AllWithCount()
+
+	if topicIDStr != "" {
+		topicID, err = strconv.ParseInt(topicIDStr, 10, 64)
+		if err != nil {
+			ShowError(c, "Ошибка", err.Error())
+			return
+		}
+		questions, err = h.testSvc.GetQuestionsByTopic(topicID)
+	} else {
+		questions, err = h.testSvc.AllQuestions()
+	}
+
+	//api.OK(c, "Вопросы", topicsToDTO(topics))
+	api.OK(c, "Вопросы", topicWithQuestionsToDTO(topics, questions))
+}
+
+func (h *TestHandler) ShowQuestions(c *gin.Context) {
+	var (
+		topicID   int64
+		questions []*domain.Question
+		err       error
+	)
+
+	topicIDStr := c.Query("topic_id")
 	if topicIDStr != "" {
 		topicID, err = strconv.ParseInt(topicIDStr, 10, 64)
 		if err != nil {
@@ -138,6 +160,8 @@ func (h *TestHandler) ShowQuestions(c *gin.Context) {
 		return
 	}
 
+	topics, _ := h.topicSvc.AllWithCount()
+
 	data := tplWithMetaData(c, "Редактор вопросов")
 	data[code.Topics] = topics
 	data["topic_id"] = topicID
@@ -149,13 +173,14 @@ func (h *TestHandler) ShowQuestions(c *gin.Context) {
 
 func (h *TestHandler) AddQuestion() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		role, errRole := c.Get(code.Role)
-		if !errRole {
+		role, ok := c.Get(code.Role)
+		r, ok := role.(string)
+		if !ok {
 			api.Error(c, http.StatusBadRequest, "Роль пользователя неизвестна")
 			return
 		}
 
-		if role != domain.RoleAdmin {
+		if r != string(domain.RoleAdmin) {
 			api.Error(c, http.StatusForbidden, "У вас нет прав на это действие")
 			return
 		}
@@ -206,13 +231,14 @@ func (h *TestHandler) AddQuestion() func(c *gin.Context) {
 
 func (h *TestHandler) RunGoTopicsSeed() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		role, errRole := c.Get(code.Role)
-		if !errRole {
+		role, ok := c.Get(code.Role)
+		r, ok := role.(string)
+		if !ok {
 			api.Error(c, http.StatusBadRequest, "Роль пользователя неизвестна")
 			return
 		}
 
-		if role != domain.RoleAdmin {
+		if r != string(domain.RoleAdmin) {
 			api.Error(c, http.StatusForbidden, "У вас нет прав на это действие")
 			return
 		}
@@ -231,13 +257,14 @@ func (h *TestHandler) RunGoQuestionsSeed() func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 		defer cancel()
 
-		role, errRole := c.Get(code.Role)
-		if !errRole {
+		role, ok := c.Get(code.Role)
+		r, ok := role.(string)
+		if !ok {
 			api.Error(c, http.StatusBadRequest, "Роль пользователя неизвестна")
 			return
 		}
 
-		if role != domain.RoleAdmin {
+		if r != string(domain.RoleAdmin) {
 			api.Error(c, http.StatusForbidden, "У вас нет прав на это действие")
 			return
 		}

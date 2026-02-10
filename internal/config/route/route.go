@@ -1,15 +1,16 @@
 package route
 
 const (
-	Index    = "/"
-	Login    = "/login"
-	Book     = "/book"
-	Me       = "/me"
-	SignIn   = "/sign_in"
-	SignUp   = "/sign_up"
-	SignOut  = "/sign_out"
-	Register = "/register"
-	Tasks    = "/tasks"
+	Index     = "/"
+	Login     = "/login"
+	Book      = "/book"
+	Me        = "/me"
+	SignIn    = "/sign_in"
+	SignUp    = "/sign_up"
+	SignOut   = "/sign_out"
+	Register  = "/register"
+	Tasks     = "/tasks"
+	Questions = "/questions"
 
 	Admin    = "/admin"
 	User     = "/user"

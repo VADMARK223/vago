@@ -77,3 +77,62 @@ type PostTaskDTO struct {
 type UpdateTaskDTO struct {
 	Completed bool `json:"completed"`
 }
+
+type TopicsAndQuestionsApiDTO struct {
+	Topics    []TopicApiDTO    `json:"topics"`
+	Questions []QuestionApiDTO `json:"questions"`
+}
+
+type TopicApiDTO struct {
+	ID             int64  `json:"id"`
+	Name           string `json:"name"`
+	QuestionsCount int    `json:"questionsCount"`
+}
+
+type QuestionApiDTO struct {
+	ID          int64  `json:"id"`
+	TopicID     int64  `json:"topicId"`
+	Text        string `json:"text"`
+	Code        string `json:"code"`
+	Explanation string `json:"explanation"`
+}
+
+func topicToDTO(t domain.TopicWithCount) TopicApiDTO {
+	return TopicApiDTO{
+		ID:             t.ID,
+		Name:           t.Name,
+		QuestionsCount: t.QuestionsCount,
+	}
+}
+
+func topicsToDTO(topics []domain.TopicWithCount) []TopicApiDTO {
+	result := make([]TopicApiDTO, 0, len(topics))
+	for _, t := range topics {
+		result = append(result, topicToDTO(t))
+	}
+
+	return result
+}
+
+func topicWithQuestionsToDTO(topics []domain.TopicWithCount, questions []*domain.Question) TopicsAndQuestionsApiDTO {
+	return TopicsAndQuestionsApiDTO{Topics: topicsToDTO(topics), Questions: questionsToDTO(questions)}
+}
+
+func questionsToDTO(questions []*domain.Question) []QuestionApiDTO {
+	result := make([]QuestionApiDTO, 0, len(questions))
+	for _, t := range questions {
+		result = append(result, questionToDTO(t))
+	}
+
+	return result
+}
+
+func questionToDTO(t *domain.Question) QuestionApiDTO {
+	return QuestionApiDTO{
+		ID:          t.ID,
+		Text:        t.Text,
+		Code:        t.Code,
+		Explanation: t.Explanation,
+		TopicID:     t.TopicID,
+	}
+}
