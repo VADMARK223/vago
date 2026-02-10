@@ -1,9 +1,34 @@
+CREATE TABLE IF NOT EXISTS chapters
+(
+    id    BIGSERIAL PRIMARY KEY,
+    name  VARCHAR(50) NOT NULL UNIQUE,
+    "order" INT NOT NULL
+    );
+
+COMMENT ON TABLE chapters IS 'Справочник глав (Go/React/TS/JS)';
+COMMENT ON COLUMN chapters."order" IS 'Порядок отображения глав';
+
+INSERT INTO chapters (id, name, "order")
+VALUES
+    (1,'Go', 1),
+    (2,'React', 2),
+    (3,'TypeScript', 3),
+    (4,'JavaScript', 4)
+    ON CONFLICT (name) DO NOTHING;
+
 CREATE TABLE IF NOT EXISTS topics
 (
-    id   BIGSERIAL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL UNIQUE
+    id          BIGSERIAL PRIMARY KEY,
+    name        VARCHAR(50) NOT NULL UNIQUE,
+    chapter_id  INT NOT NULL REFERENCES chapters (id) ON DELETE CASCADE
 );
 COMMENT ON TABLE topics IS 'Таблица тем';
+ALTER TABLE topics
+    ADD CONSTRAINT topics_chapter_fk
+        FOREIGN KEY (chapter_id)
+            REFERENCES chapters (id)
+            ON UPDATE CASCADE
+            ON DELETE RESTRICT;
 
 CREATE TABLE IF NOT EXISTS questions
 (
@@ -68,3 +93,5 @@ CREATE INDEX idx_comments_parent
 
 CREATE INDEX idx_comments_created
     ON comments (created_at);
+
+CREATE INDEX IF NOT EXISTS topics_chapter_id_idx ON topics (chapter_id);

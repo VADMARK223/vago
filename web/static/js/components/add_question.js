@@ -12,10 +12,15 @@
         questionsSeedBtn.textContent = "Running..."
 
         try {
-            await runSeed("/run_questions_seed", {method: "POST"})
-            location.reload()
-        } catch (err) {
-            alert("Error: " + err.message)
+            const resp = await fetch("/run_questions_seed", {method: "POST"})
+            const data = await resp.json();
+            if (!resp.ok) {
+                alert('Ошибка: ' + data.message);
+                return;
+            }
+
+            location.reload();
+
         } finally {
             resetQuestionsSeedBtn()
         }
@@ -25,14 +30,4 @@
             questionsSeedBtn.textContent = questionsSeedBtnText
         }
     })
-
-    async function runSeed(url, options) {
-        const resp = await fetch(url, options);
-        const data = await resp.json();
-        if (!resp.ok) {
-            throw new Error(data.error || resp.statusText);
-        }
-
-        return data
-    }
 })();

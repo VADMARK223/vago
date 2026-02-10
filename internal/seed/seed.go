@@ -29,8 +29,9 @@ type Question struct {
 }
 
 type Topic struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	ChapterId int    `json:"chapter_id"`
 }
 
 const (
@@ -85,10 +86,6 @@ func SyncQuestions(ctx context.Context, dsn string) error {
 		return err
 	}
 
-	/*if err := truncateTables(db); err != nil {
-		return err
-	}*/
-
 	for i := 0; i < len(questions); i += batchSize {
 		fmt.Printf("➡️ \033[93m%s: \033[92m%v\033[0m\n", "Batch", i)
 		if err := ctx.Err(); err != nil {
@@ -104,22 +101,6 @@ func SyncQuestions(ctx context.Context, dsn string) error {
 	fmt.Printf("➡️ \033[93m%s: \033[92m%v\033[0m\n", "End seed questions", time.Since(start))
 	return nil
 }
-
-/*func truncateTables(db *gorm.DB) error {
-	if err := db.Exec(
-		"TRUNCATE TABLE answers RESTART IDENTITY CASCADE",
-	).Error; err != nil {
-		return err
-	}
-
-	if err := db.Exec(
-		"TRUNCATE TABLE questions RESTART IDENTITY CASCADE",
-	).Error; err != nil {
-		return err
-	}
-
-	return nil
-}*/
 
 type upsertResult struct {
 	ID       int
@@ -183,7 +164,7 @@ func insertBatch(ctx context.Context, db *gorm.DB, batch []Question) error {
 	return nil
 }
 
-func Topics(dsn string) error {
+func GoTopics(dsn string) error {
 	start := time.Now()
 	log.Println("Start topics: ", dsn)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})

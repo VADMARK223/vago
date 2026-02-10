@@ -12,6 +12,7 @@ import (
 	"vago/internal/config/code"
 	"vago/internal/domain"
 	"vago/internal/seed"
+	"vago/internal/transport/http/api"
 
 	"github.com/gin-gonic/gin"
 )
@@ -148,6 +149,17 @@ func (h *TestHandler) ShowQuestions(c *gin.Context) {
 
 func (h *TestHandler) AddQuestion() func(c *gin.Context) {
 	return func(c *gin.Context) {
+		role, errRole := c.Get(code.Role)
+		if !errRole {
+			api.Error(c, http.StatusBadRequest, "Роль пользователя неизвестна")
+			return
+		}
+
+		if role != domain.RoleAdmin {
+			api.Error(c, http.StatusForbidden, "У вас нет прав на это действие")
+			return
+		}
+
 		text := c.PostForm("text")
 		codeStr := c.PostForm("code")
 		answer1 := c.PostForm("answer1")
@@ -192,9 +204,20 @@ func (h *TestHandler) AddQuestion() func(c *gin.Context) {
 	}
 }
 
-func (h *TestHandler) RunTopicsSeed() func(c *gin.Context) {
+func (h *TestHandler) RunGoTopicsSeed() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		err := seed.Topics(h.dsn)
+		role, errRole := c.Get(code.Role)
+		if !errRole {
+			api.Error(c, http.StatusBadRequest, "Роль пользователя неизвестна")
+			return
+		}
+
+		if role != domain.RoleAdmin {
+			api.Error(c, http.StatusForbidden, "У вас нет прав на это действие")
+			return
+		}
+
+		err := seed.GoTopics(h.dsn)
 		if err != nil {
 			ShowError(c, "Ошибка сидирования", err.Error())
 			return
@@ -203,10 +226,21 @@ func (h *TestHandler) RunTopicsSeed() func(c *gin.Context) {
 	}
 }
 
-func (h *TestHandler) RunQuestionsSeedNew() func(c *gin.Context) {
+func (h *TestHandler) RunGoQuestionsSeed() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 		defer cancel()
+
+		role, errRole := c.Get(code.Role)
+		if !errRole {
+			api.Error(c, http.StatusBadRequest, "Роль пользователя неизвестна")
+			return
+		}
+
+		if role != domain.RoleAdmin {
+			api.Error(c, http.StatusForbidden, "У вас нет прав на это действие")
+			return
+		}
 
 		if err := seed.SyncQuestions(ctx, h.dsn); err != nil {
 			c.JSON(500, gin.H{"error": err.Error()})
@@ -214,16 +248,5 @@ func (h *TestHandler) RunQuestionsSeedNew() func(c *gin.Context) {
 		}
 
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
-	}
-}
-
-func (h *TestHandler) RunTopicsSeedNew() func(c *gin.Context) {
-	return func(c *gin.Context) {
-		//err := seed.SyncQuestionsNew(h.dsn)
-		//if err != nil {
-		//	ShowError(c, "Ошибка сидирования топиков", err.Error())
-		//	return
-		//}
-		c.Redirect(http.StatusSeeOther, "/add_questions")
 	}
 }

@@ -17,4 +17,6 @@ const (
 	Users    = "/users"
 	Messages = "/messages"
 	Grpc     = "/grpc"
+
+	RunGoTopicsSeed = "/runTopicsSeed"
 )

@@ -1,4 +1,4 @@
-import{t as e}from"./CodeBlock-DSrwo_jx.js";import{u as t}from"./index-BOseedww.js";var n=t();function r(){return(0,n.jsxs)(n.Fragment,{children:[(0,n.jsxs)(`p`,{children:[`Это `,(0,n.jsx)(`b`,{children:`встроенные типы-утилиты`}),`, которые помогают преобразовывать типы.`]}),(0,n.jsx)(e,{code:`type User = {
+import{t as e}from"./CodeBlock-CLW1ebBG.js";import{u as t}from"./index-CaOsRqCb.js";var n=t();function r(){return(0,n.jsxs)(n.Fragment,{children:[(0,n.jsxs)(`p`,{children:[`Это `,(0,n.jsx)(`b`,{children:`встроенные типы-утилиты`}),`, которые помогают преобразовывать типы.`]}),(0,n.jsx)(e,{code:`type User = {
 	id: number
 	name: string
 	age: number

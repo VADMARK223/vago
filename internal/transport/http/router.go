@@ -116,8 +116,8 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 		auth.GET("/add_questions", testH.ShowAddQuestion())
 		auth.POST("/add_questions", testH.AddQuestion())
 
-		auth.POST("/runTopicsSeed", testH.RunTopicsSeed())
-		auth.POST("/run_questions_seed", testH.RunQuestionsSeedNew())
+		auth.POST("/run_questions_seed", testH.RunGoQuestionsSeed())
+		auth.POST(route.RunGoTopicsSeed, testH.RunGoTopicsSeed())
 
 		auth.POST("/comments", commentH.PostComment)
 	}
