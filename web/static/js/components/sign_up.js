@@ -34,7 +34,7 @@
 
     const ROLE_HINT = {
         moderator: "Доступны все разделы с ограниченными правами.",
-        user: "Некоторые разделы не доступы."
+        user: "Некоторые разделы недоступны."
     };
 
     loginInput.addEventListener("input", () => {
