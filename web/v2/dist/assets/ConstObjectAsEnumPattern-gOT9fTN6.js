@@ -1,4 +1,4 @@
-import{d as e,n as t}from"./index-DdFErLIs.js";var n=e();function r(){return(0,n.jsxs)(n.Fragment,{children:[(0,n.jsx)(`a`,{href:`#1`,children:`Почему не enum?`}),(0,n.jsx)(`br`,{}),(0,n.jsx)(t,{code:`export const ROLE = {
+import{d as e,n as t}from"./index-BvNZr30m.js";var n=e();function r(){return(0,n.jsxs)(n.Fragment,{children:[(0,n.jsx)(`a`,{href:`#1`,children:`Почему не enum?`}),(0,n.jsx)(`br`,{}),(0,n.jsx)(t,{code:`export const ROLE = {
     user: 'user',
     moderator: 'moderator',
     admin: 'admin',
