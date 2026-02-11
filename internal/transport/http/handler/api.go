@@ -96,11 +96,18 @@ type ChapterApiDTO struct {
 }
 
 type QuestionApiDTO struct {
-	ID          int64  `json:"id"`
-	TopicID     int64  `json:"topicId"`
-	Text        string `json:"text"`
-	Code        string `json:"code"`
-	Explanation string `json:"explanation"`
+	ID          int64          `json:"id"`
+	TopicID     int64          `json:"topicId"`
+	Text        string         `json:"text"`
+	Code        string         `json:"code"`
+	Explanation string         `json:"explanation"`
+	Answers     []AnswerApiDTO `json:"answers"`
+}
+
+type AnswerApiDTO struct {
+	ID        int64  `json:"id"`
+	Text      string `json:"text"`
+	IsCorrect bool   `json:"isCorrect"`
 }
 
 func topicToDTO(t domain.TopicWithCount) TopicApiDTO {
@@ -143,19 +150,38 @@ func toQuestionsPageDataDTO(chapters []*domain.Chapter, topics []domain.TopicWit
 
 func questionsToDTO(questions []*domain.Question) []QuestionApiDTO {
 	result := make([]QuestionApiDTO, 0, len(questions))
-	for _, t := range questions {
-		result = append(result, questionToDTO(t))
+	for _, q := range questions {
+		result = append(result, questionToDTO(q))
 	}
 
 	return result
 }
 
-func questionToDTO(t *domain.Question) QuestionApiDTO {
-	return QuestionApiDTO{
-		ID:          t.ID,
-		Text:        t.Text,
-		Code:        t.Code,
-		Explanation: t.Explanation,
-		TopicID:     t.TopicID,
+func answerToDTO(t domain.Answer) AnswerApiDTO {
+	return AnswerApiDTO{
+		ID:        t.ID,
+		Text:      t.Text,
+		IsCorrect: t.IsCorrect,
 	}
+}
+
+func answersToDTO(answers []domain.Answer) []AnswerApiDTO {
+	result := make([]AnswerApiDTO, 0, len(answers))
+	for _, a := range answers {
+		result = append(result, answerToDTO(a))
+	}
+
+	return result
+}
+
+func questionToDTO(q *domain.Question) QuestionApiDTO {
+	result := QuestionApiDTO{
+		ID:          q.ID,
+		Text:        q.Text,
+		Code:        q.Code,
+		Explanation: q.Explanation,
+		TopicID:     q.TopicID,
+	}
+	result.Answers = answersToDTO(q.Answers)
+	return result
 }

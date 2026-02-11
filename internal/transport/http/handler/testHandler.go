@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-	"vago/internal/application/chapter"
 	"vago/internal/application/comment"
 	"vago/internal/application/test"
 	"vago/internal/application/topic"
@@ -20,7 +19,6 @@ import (
 
 type TestHandler struct {
 	testSvc    *test.Service
-	chapterSvc *chapter.Service
 	topicSvc   *topic.Service
 	commentSvc *comment.Service
 	dsn        string
@@ -38,11 +36,10 @@ type CheckResponse struct {
 
 func NewTestHandler(
 	testSvc *test.Service,
-	chapterSvc *chapter.Service,
 	topicSvc *topic.Service,
 	commentSvc *comment.Service, dsn string,
 ) *TestHandler {
-	return &TestHandler{testSvc: testSvc, chapterSvc: chapterSvc, topicSvc: topicSvc, commentSvc: commentSvc, dsn: dsn}
+	return &TestHandler{testSvc: testSvc, topicSvc: topicSvc, commentSvc: commentSvc, dsn: dsn}
 }
 
 func (h *TestHandler) ShowTestRandom() func(c *gin.Context) {
@@ -52,7 +49,6 @@ func (h *TestHandler) ShowTestRandom() func(c *gin.Context) {
 			ShowError(c, "Ошибка генерации случайного вопроса", err.Error())
 			return
 		}
-		//id := 1
 		c.Redirect(http.StatusFound, fmt.Sprintf("/test/%d", id))
 	}
 }
@@ -116,69 +112,6 @@ func (h *TestHandler) ShowAddQuestion() func(c *gin.Context) {
 
 		c.HTML(http.StatusOK, "add_question.html", data)
 	}
-}
-
-func (h *TestHandler) ShowQuestionsAPI(c *gin.Context) {
-	var (
-		topicID   int64
-		questions []*domain.Question
-		err       error
-	)
-
-	chapters, errChapters := h.chapterSvc.All()
-	fmt.Println("chapters: ", chapters)
-	fmt.Println("errChapters: ", errChapters)
-
-	topicIDStr := c.Query("topic_id")
-	topics, _ := h.topicSvc.AllWithCount()
-
-	if topicIDStr != "" {
-		topicID, err = strconv.ParseInt(topicIDStr, 10, 64)
-		if err != nil {
-			ShowError(c, "Ошибка", err.Error())
-			return
-		}
-		questions, err = h.testSvc.GetQuestionsByTopic(topicID)
-	} else {
-		questions, err = h.testSvc.AllQuestions()
-	}
-
-	api.OK(c, "Вопросы", toQuestionsPageDataDTO(chapters, topics, questions))
-}
-
-func (h *TestHandler) ShowQuestions(c *gin.Context) {
-	var (
-		topicID   int64
-		questions []*domain.Question
-		err       error
-	)
-
-	topicIDStr := c.Query("topic_id")
-	if topicIDStr != "" {
-		topicID, err = strconv.ParseInt(topicIDStr, 10, 64)
-		if err != nil {
-			ShowError(c, "Ошибка", err.Error())
-			return
-		}
-		questions, err = h.testSvc.GetQuestionsByTopic(topicID)
-	} else {
-		questions, err = h.testSvc.AllQuestions()
-	}
-
-	if err != nil {
-		ShowError(c, "Ошибка выборки", err.Error())
-		return
-	}
-
-	topics, _ := h.topicSvc.AllWithCount()
-
-	data := tplWithMetaData(c, "Редактор вопросов")
-	data[code.Topics] = topics
-	data["topic_id"] = topicID
-	data[code.Questions] = questions
-	data[code.QuestionsCount] = len(questions)
-
-	c.HTML(http.StatusOK, "questions.html", data)
 }
 
 func (h *TestHandler) AddQuestion() func(c *gin.Context) {

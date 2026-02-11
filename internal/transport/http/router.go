@@ -46,7 +46,8 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	commentSvc := comment.NewService(gorm.NewCommentRepo(ctx.DB))
 
 	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret, ctx.Cfg.RefreshTTLInt(), ctx.Log)
-	testH := handler.NewTestHandler(questionSvc, chapterSvc, topicSvc, commentSvc, ctx.Cfg.PostgresDsn)
+	questionH := handler.NewQuestionHandler(chapterSvc, topicSvc, questionSvc)
+	testH := handler.NewTestHandler(questionSvc, topicSvc, commentSvc, ctx.Cfg.PostgresDsn)
 	adminH := handler.NewAdminHandler(tokenProvider, userSvc, chatSvc, commentSvc)
 	commentH := handler.NewCommentHandler(commentSvc)
 
@@ -130,7 +131,7 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	apiGroup.POST(route.SignIn, authH.SignInAPI)
 	apiGroup.POST(route.SignUp, handler.SignUpApi(userSvc))
 	apiGroup.GET(route.SignOut, handler.SignOut)
-	apiGroup.GET(route.Questions, testH.ShowQuestionsAPI)
+	apiGroup.GET(route.Questions, questionH.ShowQuestionsAPI)
 
 	// Защищенные маршруты (API)
 	apiGroup.Use(middleware.RequireAuthApi)

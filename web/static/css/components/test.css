@@ -108,3 +108,11 @@
 .reply-form {
     margin-top: var(--space-2);
 }
+
+.explanation {
+    padding:4px;
+    color: white;
+    border-radius: 5px;
+    background: #474e78!important;
+    border-color: #3fa34d;
+}

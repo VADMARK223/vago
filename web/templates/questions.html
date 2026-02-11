@@ -40,16 +40,16 @@
                         {{end}}
 
                         {{range .Answers}}
-                        <div style="font-size: small">
-                            <span>{{.ID}}) {{.Text}}</span>
+                        <div class="answer {{if .IsCorrect}}correct{{end}}">
+                            <span>
+                                {{.ID}}) {{.Text}}
+                            </span>
                             {{if .IsCorrect}}
-                            <span class="correct">✔</span>
+                            <span>✔</span>
                             {{end}}
                         </div>
-                        {{else}}
-                        <div class="empty">Ответов пока нет</div>
                         {{end}}
-                        <div style="padding:4px; color: white; background: #2e6230 !important; border-color: #3fa34d;">
+                        <div class="explanation">
                             {{.Explanation}}
                         </div>
                     </div>
