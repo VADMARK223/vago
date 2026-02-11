@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"vago/internal/application/chapter"
 	"vago/internal/application/comment"
 	"vago/internal/application/test"
 	"vago/internal/application/topic"
@@ -19,6 +20,7 @@ import (
 
 type TestHandler struct {
 	testSvc    *test.Service
+	chapterSvc *chapter.Service
 	topicSvc   *topic.Service
 	commentSvc *comment.Service
 	dsn        string
@@ -34,8 +36,13 @@ type CheckResponse struct {
 	Explanation string `json:"explanation"`
 }
 
-func NewTestHandler(testSvc *test.Service, topicSvc *topic.Service, commentSvc *comment.Service, dsn string) *TestHandler {
-	return &TestHandler{testSvc: testSvc, topicSvc: topicSvc, commentSvc: commentSvc, dsn: dsn}
+func NewTestHandler(
+	testSvc *test.Service,
+	chapterSvc *chapter.Service,
+	topicSvc *topic.Service,
+	commentSvc *comment.Service, dsn string,
+) *TestHandler {
+	return &TestHandler{testSvc: testSvc, chapterSvc: chapterSvc, topicSvc: topicSvc, commentSvc: commentSvc, dsn: dsn}
 }
 
 func (h *TestHandler) ShowTestRandom() func(c *gin.Context) {
@@ -118,6 +125,10 @@ func (h *TestHandler) ShowQuestionsAPI(c *gin.Context) {
 		err       error
 	)
 
+	chapters, errChapters := h.chapterSvc.All()
+	fmt.Println("chapters: ", chapters)
+	fmt.Println("errChapters: ", errChapters)
+
 	topicIDStr := c.Query("topic_id")
 	topics, _ := h.topicSvc.AllWithCount()
 
@@ -132,8 +143,7 @@ func (h *TestHandler) ShowQuestionsAPI(c *gin.Context) {
 		questions, err = h.testSvc.AllQuestions()
 	}
 
-	//api.OK(c, "Вопросы", topicsToDTO(topics))
-	api.OK(c, "Вопросы", topicWithQuestionsToDTO(topics, questions))
+	api.OK(c, "Вопросы", toQuestionsPageDataDTO(chapters, topics, questions))
 }
 
 func (h *TestHandler) ShowQuestions(c *gin.Context) {

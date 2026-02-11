@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 	"vago/internal/app"
+	"vago/internal/application/chapter"
 	"vago/internal/application/chat"
 	"vago/internal/application/comment"
 	"vago/internal/application/task"
@@ -40,11 +41,12 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	// Хендлеры
 	topicRepo := gorm.NewTopicRepo(ctx.DB)
 	questionSvc := test.NewService(gorm.NewQuestionRepo(ctx.DB), topicRepo)
+	chapterSvc := chapter.NewService(gorm.NewChapterRepo(ctx.DB))
 	topicSvc := topic.NewService(topicRepo)
 	commentSvc := comment.NewService(gorm.NewCommentRepo(ctx.DB))
 
 	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret, ctx.Cfg.RefreshTTLInt(), ctx.Log)
-	testH := handler.NewTestHandler(questionSvc, topicSvc, commentSvc, ctx.Cfg.PostgresDsn)
+	testH := handler.NewTestHandler(questionSvc, chapterSvc, topicSvc, commentSvc, ctx.Cfg.PostgresDsn)
 	adminH := handler.NewAdminHandler(tokenProvider, userSvc, chatSvc, commentSvc)
 	commentH := handler.NewCommentHandler(commentSvc)
 

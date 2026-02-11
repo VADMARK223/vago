@@ -78,7 +78,8 @@ type UpdateTaskDTO struct {
 	Completed bool `json:"completed"`
 }
 
-type TopicsAndQuestionsApiDTO struct {
+type QuestionsPageDataApiDTO struct {
+	Chapters  []ChapterApiDTO  `json:"chapters"`
 	Topics    []TopicApiDTO    `json:"topics"`
 	Questions []QuestionApiDTO `json:"questions"`
 }
@@ -87,6 +88,11 @@ type TopicApiDTO struct {
 	ID             int64  `json:"id"`
 	Name           string `json:"name"`
 	QuestionsCount int    `json:"questionsCount"`
+}
+type ChapterApiDTO struct {
+	ID    int64  `json:"id"`
+	Name  string `json:"name"`
+	Order int64  `json:"order"`
 }
 
 type QuestionApiDTO struct {
@@ -105,6 +111,14 @@ func topicToDTO(t domain.TopicWithCount) TopicApiDTO {
 	}
 }
 
+func chapterToDTO(c *domain.Chapter) ChapterApiDTO {
+	return ChapterApiDTO{
+		ID:    c.ID,
+		Name:  c.Name,
+		Order: c.Order,
+	}
+}
+
 func topicsToDTO(topics []domain.TopicWithCount) []TopicApiDTO {
 	result := make([]TopicApiDTO, 0, len(topics))
 	for _, t := range topics {
@@ -114,8 +128,17 @@ func topicsToDTO(topics []domain.TopicWithCount) []TopicApiDTO {
 	return result
 }
 
-func topicWithQuestionsToDTO(topics []domain.TopicWithCount, questions []*domain.Question) TopicsAndQuestionsApiDTO {
-	return TopicsAndQuestionsApiDTO{Topics: topicsToDTO(topics), Questions: questionsToDTO(questions)}
+func chaptersToDTO(chapters []*domain.Chapter) []ChapterApiDTO {
+	result := make([]ChapterApiDTO, 0, len(chapters))
+	for _, t := range chapters {
+		result = append(result, chapterToDTO(t))
+	}
+
+	return result
+}
+
+func toQuestionsPageDataDTO(chapters []*domain.Chapter, topics []domain.TopicWithCount, questions []*domain.Question) QuestionsPageDataApiDTO {
+	return QuestionsPageDataApiDTO{Chapters: chaptersToDTO(chapters), Topics: topicsToDTO(topics), Questions: questionsToDTO(questions)}
 }
 
 func questionsToDTO(questions []*domain.Question) []QuestionApiDTO {
