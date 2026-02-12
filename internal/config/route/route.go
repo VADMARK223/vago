@@ -18,6 +18,9 @@ const (
 	Users    = "/users"
 	Messages = "/messages"
 	Grpc     = "/grpc"
+	Test     = "/test"
 
-	RunGoTopicsSeed = "/runTopicsSeed"
+	AddQuestions     = "/add_questions"
+	RunQuestionsSeed = "/run_questions_seed"
+	RunGoTopicsSeed  = "/runTopicsSeed"
 )

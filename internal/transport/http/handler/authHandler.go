@@ -82,7 +82,7 @@ func (h *AuthHandler) MeAPI(c *gin.Context) {
 		return
 	}
 
-	api.OK(c, "Пользователь", dto.MeDTO{Username: u.Username, Role: u.Role})
+	api.OK(c, "Пользователь", dto.Me{Username: u.Username, Role: u.Role})
 }
 
 func (h *AuthHandler) SignInAPI(c *gin.Context) {

@@ -32,7 +32,8 @@ func (s *Service) RandomID() (int64, error) {
 	return s.questionRepo.RandomID()
 }
 
-func (s *Service) RandomPublicQuestion(id *int64) QuestionPublic {
+// PublicQuestion если id пустой, возвращаем случайный вопрос, иначе получаем вопрос по его id
+func (s *Service) PublicQuestion(id *int64) QuestionPublic {
 	question, err := s.randomQuestion(id)
 	if err != nil {
 		panic(err)

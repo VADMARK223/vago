@@ -1,18 +1,16 @@
 package handler
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"strconv"
-	"time"
 	"vago/internal/application/comment"
 	"vago/internal/application/test"
 	"vago/internal/application/topic"
 	"vago/internal/config/code"
-	"vago/internal/domain"
-	"vago/internal/seed"
+	"vago/internal/config/route"
 	"vago/internal/transport/http/api"
+	"vago/internal/transport/http/dto"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,7 +19,6 @@ type TestHandler struct {
 	testSvc    *test.Service
 	topicSvc   *topic.Service
 	commentSvc *comment.Service
-	dsn        string
 }
 
 type CheckRequest struct {
@@ -29,31 +26,56 @@ type CheckRequest struct {
 	AnswerID   int64 `json:"answer_id"`
 }
 
+type CheckRequestAPI struct {
+	QuestionID int64 `json:"questionId"`
+	AnswerID   int64 `json:"answerId"`
+}
+
 type CheckResponse struct {
 	Correct     bool   `json:"correct"`
-	Explanation string `json:"explanation"`
+	Explanation string `json:"explanation,omitempty"`
 }
 
 func NewTestHandler(
 	testSvc *test.Service,
 	topicSvc *topic.Service,
-	commentSvc *comment.Service, dsn string,
+	commentSvc *comment.Service,
 ) *TestHandler {
-	return &TestHandler{testSvc: testSvc, topicSvc: topicSvc, commentSvc: commentSvc, dsn: dsn}
+	return &TestHandler{testSvc: testSvc, topicSvc: topicSvc, commentSvc: commentSvc}
 }
 
-func (h *TestHandler) ShowTestRandom() func(c *gin.Context) {
-	return func(c *gin.Context) {
-		id, err := h.testSvc.RandomID()
-		if err != nil {
-			ShowError(c, "Ошибка генерации случайного вопроса", err.Error())
-			return
-		}
-		c.Redirect(http.StatusFound, fmt.Sprintf("/test/%d", id))
+func (h *TestHandler) ShowRandom(c *gin.Context) {
+	id, err := h.testSvc.RandomID()
+	if err != nil {
+		ShowError(c, "Ошибка генерации случайного вопроса", err.Error())
+		return
 	}
+	c.Redirect(http.StatusFound, fmt.Sprintf(route.Test+"/%d", id))
 }
 
-func (h *TestHandler) ShowTestByID() func(c *gin.Context) {
+func (h *TestHandler) RandomQuestionIdAPI(c *gin.Context) {
+	id, err := h.testSvc.RandomID()
+	if err != nil {
+		api.Error(c, http.StatusInternalServerError, "Ошибка генерации случайного вопроса"+err.Error())
+		return
+	}
+
+	api.OK(c, fmt.Sprintf("Идентификатор вопроса: %d", id), id)
+}
+
+func (h *TestHandler) QuestionByIdAPI(c *gin.Context) {
+	questionId, parseIdErr := strconv.ParseInt(c.Param("id"), 10, 64)
+	if parseIdErr != nil {
+		api.Error(c, http.StatusBadRequest, "Некорректные данные")
+		return
+	}
+
+	q := h.testSvc.PublicQuestion(&questionId)
+
+	api.OK(c, fmt.Sprintf("Вопрос: %d", questionId), dto.QuestionPublicToDTO(q))
+}
+
+func (h *TestHandler) ShowByID() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		idStr := c.Param("id")
 		id64, err := strconv.ParseInt(idStr, 10, 64)
@@ -62,10 +84,45 @@ func (h *TestHandler) ShowTestByID() func(c *gin.Context) {
 			return
 		}
 
-		q := h.testSvc.RandomPublicQuestion(&id64)
+		q := h.testSvc.PublicQuestion(&id64)
 
 		renderTestPage(c, h, q)
 	}
+}
+
+func (h *TestHandler) CheckAnswerAPI(c *gin.Context) {
+	var req CheckRequestAPI
+	if err := c.ShouldBindJSON(&req); err != nil {
+		api.Error(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	correct, explanation, err := h.testSvc.CheckAnswer(req.QuestionID, req.AnswerID)
+	if err != nil {
+		api.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if correct {
+		api.OK(c, "Правильный ответ", CheckResponse{Correct: correct, Explanation: explanation})
+	} else {
+		api.OK(c, "Неправильный ответ", CheckResponse{Correct: correct})
+	}
+}
+
+func (h *TestHandler) CheckAnswer(c *gin.Context) {
+	var req CheckRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{"error": "invalid"})
+		return
+	}
+
+	correct, explanation, err := h.testSvc.CheckAnswer(req.QuestionID, req.AnswerID)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, CheckResponse{Correct: correct, Explanation: explanation})
 }
 
 func renderTestPage(c *gin.Context, h *TestHandler, q test.QuestionPublic) {
@@ -81,142 +138,4 @@ func renderTestPage(c *gin.Context, h *TestHandler, q test.QuestionPublic) {
 	data[code.Comments] = comments
 
 	c.HTML(http.StatusOK, "test.html", data)
-}
-
-func (h *TestHandler) Check() func(c *gin.Context) {
-	return func(c *gin.Context) {
-		var req CheckRequest
-		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(400, gin.H{"error": "invalid"})
-			return
-		}
-
-		correct, explanation, err := h.testSvc.CheckAnswer(req.QuestionID, req.AnswerID)
-		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-		c.JSON(200, CheckResponse{Correct: correct, Explanation: explanation})
-	}
-}
-
-func (h *TestHandler) ShowAddQuestion() func(c *gin.Context) {
-	return func(c *gin.Context) {
-		topics, _ := h.topicSvc.AllWithCount()
-
-		questions, _ := h.testSvc.AllQuestions()
-
-		data := tplWithMetaData(c, "Добавление вопроса")
-		data[code.Topics] = topics
-		data[code.QuestionsCount] = len(questions)
-
-		c.HTML(http.StatusOK, "add_question.html", data)
-	}
-}
-
-func (h *TestHandler) AddQuestion() func(c *gin.Context) {
-	return func(c *gin.Context) {
-		role, ok := c.Get(code.Role)
-		r, ok := role.(string)
-		if !ok {
-			api.Error(c, http.StatusBadRequest, "Роль пользователя неизвестна")
-			return
-		}
-
-		if r != string(domain.RoleAdmin) {
-			api.Error(c, http.StatusForbidden, "У вас нет прав на это действие")
-			return
-		}
-
-		text := c.PostForm("text")
-		codeStr := c.PostForm("code")
-		answer1 := c.PostForm("answer1")
-		answer2 := c.PostForm("answer2")
-		answer3 := c.PostForm("answer3")
-		answer4 := c.PostForm("answer4")
-		correctAnswerIdxStr := c.PostForm("correct_answer_index")
-		topicIdStr := c.PostForm("topic_id")
-		explanation := c.PostForm("explanation")
-
-		topicId, _ := strconv.Atoi(topicIdStr)
-		correctIdx, _ := strconv.Atoi(correctAnswerIdxStr)
-
-		answers := []seed.Answer{
-			{Text: answer1},
-			{Text: answer2},
-			{Text: answer3},
-			{Text: answer4},
-		}
-
-		if correctIdx >= 0 && correctIdx < len(answers) {
-			answers[correctIdx].Correct = true
-		}
-
-		ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
-		defer cancel()
-
-		err := seed.AddQuestion(ctx, h.dsn, seed.Question{
-			TopicID:     topicId,
-			Text:        text,
-			Code:        codeStr,
-			Explanation: explanation,
-			Answers:     answers,
-		})
-
-		if err != nil {
-			ShowError(c, "Ошибка добавления вопроса", err.Error())
-			return
-		}
-
-		c.Redirect(http.StatusSeeOther, "/add_questions")
-	}
-}
-
-func (h *TestHandler) RunGoTopicsSeed() func(c *gin.Context) {
-	return func(c *gin.Context) {
-		role, ok := c.Get(code.Role)
-		r, ok := role.(string)
-		if !ok {
-			api.Error(c, http.StatusBadRequest, "Роль пользователя неизвестна")
-			return
-		}
-
-		if r != string(domain.RoleAdmin) {
-			api.Error(c, http.StatusForbidden, "У вас нет прав на это действие")
-			return
-		}
-
-		err := seed.GoTopics(h.dsn)
-		if err != nil {
-			ShowError(c, "Ошибка сидирования", err.Error())
-			return
-		}
-		c.Redirect(http.StatusSeeOther, "/add_questions")
-	}
-}
-
-func (h *TestHandler) RunGoQuestionsSeed() func(c *gin.Context) {
-	return func(c *gin.Context) {
-		ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
-		defer cancel()
-
-		role, ok := c.Get(code.Role)
-		r, ok := role.(string)
-		if !ok {
-			api.Error(c, http.StatusBadRequest, "Роль пользователя неизвестна")
-			return
-		}
-
-		if r != string(domain.RoleAdmin) {
-			api.Error(c, http.StatusForbidden, "У вас нет прав на это действие")
-			return
-		}
-
-		if err := seed.SyncQuestions(ctx, h.dsn); err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{"status": "ok"})
-	}
 }

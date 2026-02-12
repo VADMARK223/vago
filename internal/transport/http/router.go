@@ -47,7 +47,8 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 
 	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret, ctx.Cfg.RefreshTTLInt(), ctx.Log)
 	questionH := handler.NewQuestionHandler(chapterSvc, topicSvc, questionSvc)
-	testH := handler.NewTestHandler(questionSvc, topicSvc, commentSvc, ctx.Cfg.PostgresDsn)
+	testH := handler.NewTestHandler(questionSvc, topicSvc, commentSvc)
+	testEditorH := handler.NewTestEditorHandler(questionSvc, topicSvc, ctx.Cfg.PostgresDsn)
 	adminH := handler.NewAdminHandler(tokenProvider, userSvc, chatSvc, commentSvc)
 	commentH := handler.NewCommentHandler(commentSvc)
 
@@ -82,9 +83,9 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	r.POST(route.Register, handler.SignUp(userSvc))
 	r.GET(route.SignOut, handler.SignOut)
 
-	r.GET("/test", testH.ShowTestRandom())
-	r.GET("/test/:id", testH.ShowTestByID())
-	r.POST("/test/check", testH.Check())
+	r.GET(route.Test, testH.ShowRandom)
+	r.GET(route.Test+"/:id", testH.ShowByID())
+	r.POST(route.Test+"/check", testH.CheckAnswer)
 
 	r.GET(route.Questions, testH.ShowQuestions)
 
@@ -116,13 +117,12 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 		auth.POST("/messagesDeleteAll", messagesHandler.DeleteAll())
 		auth.DELETE("/messages/:id", messagesHandler.Delete())
 
-		auth.GET("/add_questions", testH.ShowAddQuestion())
-		auth.POST("/add_questions", testH.AddQuestion())
+		auth.GET(route.AddQuestions, testEditorH.ShowAddQuestion)
+		auth.POST(route.AddQuestions, testEditorH.AddQuestion)
+		auth.POST(route.RunQuestionsSeed, testEditorH.RunGoQuestionsSeed)
+		auth.POST(route.RunGoTopicsSeed, testEditorH.RunGoTopicsSeed)
 
-		auth.POST("/run_questions_seed", testH.RunGoQuestionsSeed())
-		auth.POST(route.RunGoTopicsSeed, testH.RunGoTopicsSeed())
-
-		auth.POST("/comments", commentH.PostComment)
+		auth.POST(route.Comments, commentH.PostComment)
 	}
 
 	// ========= API =========
@@ -139,11 +139,14 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 		apiGroup.GET(route.Users, adminH.UsersApi)
 		apiGroup.DELETE(route.Users+"/:id", handler.DeleteUser(userSvc))
 
+		apiGroup.GET(route.Tasks, handler.TasksAPI(taskSvc))
 		apiGroup.POST(route.Tasks, handler.PostTaskAPI(taskSvc))
 		apiGroup.DELETE(route.Tasks+"/:id", handler.DeleteTaskAPI(taskSvc))
 		apiGroup.PUT(route.Tasks+"/:id", handler.UpdateTaskAPI(taskSvc))
 
-		apiGroup.GET(route.Tasks, handler.TasksAPI(taskSvc))
+		apiGroup.GET(route.Test, testH.RandomQuestionIdAPI)
+		apiGroup.GET(route.Test+"/:id", testH.QuestionByIdAPI)
+		apiGroup.POST(route.Test+"/check", testH.CheckAnswerAPI)
 	}
 
 	r.NoRoute(handler.NotFoundHandler)
