@@ -75,19 +75,17 @@ func (h *TestHandler) QuestionByIdAPI(c *gin.Context) {
 	response.OK(c, fmt.Sprintf("Вопрос: %d", questionId), dto.QuestionPublicToDTO(q))
 }
 
-func (h *TestHandler) ShowByID() func(c *gin.Context) {
-	return func(c *gin.Context) {
-		idStr := c.Param("id")
-		id64, err := strconv.ParseInt(idStr, 10, 64)
-		if err != nil {
-			c.String(400, "invalid id")
-			return
-		}
-
-		q := h.testSvc.PublicQuestion(&id64)
-
-		renderTestPage(c, h, q)
+func (h *TestHandler) ShowByID(c *gin.Context) {
+	idStr := c.Param("id")
+	id64, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.String(400, "invalid id")
+		return
 	}
+
+	q := h.testSvc.PublicQuestion(&id64)
+
+	renderTestPage(c, h, q)
 }
 
 func (h *TestHandler) CheckAnswerAPI(c *gin.Context) {
