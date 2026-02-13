@@ -123,7 +123,7 @@ func registerReactApp(r *gin.Engine) {
 		// Если запросили конкретный файл — отдадим его
 		if p != "" {
 			fp := filepath.Join(distDir, p)
-			if st, err := os.Stat(fp); err == nil && !st.IsDir() {
+			if st, err := os.Stat(fp); err == nil && !st.IsDir() { // TODO: пофиксить
 				c.File(fp)
 				return
 			}
