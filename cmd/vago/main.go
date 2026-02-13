@@ -17,7 +17,7 @@ import (
 	"vago/internal/infra/logger"
 	"vago/internal/infra/token"
 	"vago/internal/transport/grpc"
-	"vago/internal/transport/http"
+	"vago/internal/transport/http/router"
 	"vago/pkg/timex"
 
 	"github.com/joho/godotenv"
@@ -189,7 +189,7 @@ func initDB(appCtx *ctx.Context) *gorm.DB {
 // startHTTPServer запускает Gin и корректно останавливает его при ctx.Done()
 func startHTTPServer(ctx context.Context, appCtx *ctx.Context, wg *sync.WaitGroup, tokenProvider *token.JWTProvider) *netHttp.Server {
 	defer wg.Done()
-	router := http.SetupRouter(ctx, appCtx, tokenProvider)
+	router := router.SetupRouter(ctx, appCtx, tokenProvider)
 	srv := &netHttp.Server{
 		Addr:    ":" + appCtx.Cfg.Port,
 		Handler: router,

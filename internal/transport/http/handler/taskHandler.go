@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"vago/internal/app"
 	"vago/internal/application/task"
 	"vago/internal/config/code"
 	"vago/internal/domain"
 	"vago/internal/transport/http/api/response"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func Tasks(service *task.Service) gin.HandlerFunc {
@@ -114,12 +114,11 @@ func DeleteTaskAPI(service *task.Service) gin.HandlerFunc {
 	}
 }
 
-func DeleteTask(appCtx *app.Context) gin.HandlerFunc {
+func DeleteTask(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 
-		if err := appCtx.DB.Delete(&domain.Task{}, id).Error; err != nil {
-			appCtx.Log.Errorw("failed to delete task", "error", err)
+		if err := db.Delete(&domain.Task{}, id).Error; err != nil {
 			c.String(http.StatusInternalServerError, "Error deleting task")
 			return
 		}

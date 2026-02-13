@@ -1,4 +1,4 @@
-package http
+package router
 
 import (
 	"context"
@@ -8,52 +8,18 @@ import (
 	"path/filepath"
 	"strings"
 	"vago/internal/app"
-	"vago/internal/application/chapter"
-	"vago/internal/application/chat"
-	"vago/internal/application/comment"
-	"vago/internal/application/task"
-	"vago/internal/application/test"
-	"vago/internal/application/topic"
-	"vago/internal/application/user"
 	"vago/internal/config/route"
-	"vago/internal/infra/gorm"
 	"vago/internal/infra/token"
 	apiq "vago/internal/transport/http/api/question"
 	"vago/internal/transport/http/handler"
 	"vago/internal/transport/http/middleware"
-	questionLoader "vago/internal/transport/http/shared/question"
 	webq "vago/internal/transport/http/web/question"
-	"vago/internal/transport/ws"
 
 	"github.com/gin-gonic/gin"
 )
 
 func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine {
-	// WS
-	hub := ws.NewHub(ctx.Log)
-	go hub.Run(goCtx)
-	// Сервисы
-	taskSvc := task.NewService(gorm.NewTaskRepo(ctx.DB))
-	messageRepo := gorm.NewMessageRepo(ctx.DB)
-	userRepo := gorm.NewUserRepo(ctx)
-	chatSvc := chat.NewService(messageRepo, userRepo)
-
-	userSvc := user.NewService(userRepo, tokenProvider)
-	localCache := app.NewLocalCache()
-
-	// Хендлеры
-	topicRepo := gorm.NewTopicRepo(ctx.DB)
-	testSvc := test.NewService(gorm.NewQuestionRepo(ctx.DB), topicRepo)
-	chapterSvc := chapter.NewService(gorm.NewChapterRepo(ctx.DB))
-	topicSvc := topic.New(topicRepo)
-	commentSvc := comment.NewService(gorm.NewCommentRepo(ctx.DB))
-
-	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret, ctx.Cfg.RefreshTTLInt(), ctx.Log)
-	//questionH := handler.NewQuestionHandler(chapterSvc, topicSvc, testSvc)
-	testH := handler.NewTestHandler(testSvc, topicSvc, commentSvc)
-	testEditorH := handler.NewTestEditorHandler(testSvc, topicSvc, ctx.Cfg.PostgresDsn)
-	adminH := handler.NewAdminHandler(tokenProvider, userSvc, chatSvc, commentSvc)
-	commentH := handler.NewCommentHandler(commentSvc)
+	deps := buildDeps(goCtx, ctx, tokenProvider)
 
 	gin.SetMode(ctx.Cfg.GinMode)
 	r := gin.New()
@@ -73,7 +39,7 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	// Middleware
 	r.Use(middleware.SessionMiddleware())
 	r.Use(middleware.CheckJWT(tokenProvider, ctx.Cfg.RefreshTTLInt()))
-	r.Use(middleware.LoadUserContext(userSvc, localCache))
+	r.Use(middleware.LoadUserContext(deps.Services.User, deps.Cache))
 	r.Use(middleware.NoCache)
 	r.Use(middleware.TemplateContext)
 
@@ -81,22 +47,16 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	r.GET(route.Index, handler.ShowIndex())
 	r.GET(route.Book, handler.ShowBook)
 	r.GET(route.Login, handler.ShowLogin)
-	r.POST(route.Login, authH.Login)
+	r.POST(route.Login, deps.Handlers.Auth.Login)
 	r.GET(route.Register, handler.ShowSignup)
-	r.POST(route.Register, handler.SignUp(userSvc))
+	r.POST(route.Register, handler.SignUp(deps.Services.User))
 	r.GET(route.SignOut, handler.SignOut)
 
-	r.GET(route.Test, testH.ShowRandom)
-	r.GET(route.Test+"/:id", testH.ShowByID())
-	r.POST(route.Test+"/check", testH.CheckAnswer)
+	r.GET(route.Test, deps.Handlers.Test.ShowRandom)
+	r.GET(route.Test+"/:id", deps.Handlers.Test.ShowByID())
+	r.POST(route.Test+"/check", deps.Handlers.Test.CheckAnswer)
 
-	loader := questionLoader.Loader{
-		ChapterSvc: chapterSvc,
-		TopicSvc:   topicSvc,
-		TestSvc:    testSvc,
-	}
-
-	webQ := webq.New(loader)
+	webQ := webq.New(deps.Loaders.Question)
 	r.GET(route.Questions, webQ.Page)
 
 	// Защищенные маршруты
@@ -105,62 +65,62 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	{
 		admin := auth.Group(route.Admin)
 		{
-			admin.GET("", adminH.ShowAdmin)
-			admin.GET(route.User, adminH.ShowUser)
-			admin.GET(route.Comments, adminH.ShowComments)
-			admin.GET(route.Users, adminH.Users)
-			admin.GET(route.Messages, adminH.ShowMessages)
-			admin.GET(route.Grpc, adminH.ShowGrpc)
+			admin.GET("", deps.Handlers.Admin.ShowAdmin)
+			admin.GET(route.User, deps.Handlers.Admin.ShowUser)
+			admin.GET(route.Comments, deps.Handlers.Admin.ShowComments)
+			admin.GET(route.Users, deps.Handlers.Admin.Users)
+			admin.GET(route.Messages, deps.Handlers.Admin.ShowMessages)
+			admin.GET(route.Grpc, deps.Handlers.Admin.ShowGrpc)
 		}
 
-		auth.GET(route.Tasks, handler.Tasks(taskSvc))
-		auth.POST(route.Tasks, handler.PostTask(taskSvc))
-		auth.DELETE(route.Tasks+"/:id", handler.DeleteTask(ctx))
-		auth.PUT(route.Tasks+"/:id", handler.UpdateTask(taskSvc))
-		auth.DELETE("/users/:id", handler.DeleteUser(userSvc))
+		auth.GET(route.Tasks, handler.Tasks(deps.Services.Task))
+		auth.POST(route.Tasks, handler.PostTask(deps.Services.Task))
+		auth.DELETE(route.Tasks+"/:id", handler.DeleteTask(ctx.DB))
+		auth.PUT(route.Tasks+"/:id", handler.UpdateTask(deps.Services.Task))
+		auth.DELETE("/users/:id", handler.DeleteUser(deps.Services.User))
 
-		auth.GET("/ws", handler.ServeSW(hub, ctx.Log, tokenProvider, chatSvc))
-		auth.GET("/chat", handler.ShowChat(ctx.Cfg.Port, chatSvc))
+		auth.GET("/ws", handler.ServeSW(deps.Hub, ctx.Log, tokenProvider, deps.Services.Chat))
+		auth.GET("/chat", handler.ShowChat(ctx.Cfg.Port, deps.Services.Chat))
 
-		messagesHandler := handler.NewMessageHandler(chatSvc, userSvc)
+		messagesHandler := handler.NewMessageHandler(deps.Services.Chat, deps.Services.User)
 		auth.POST("/messages", messagesHandler.AddMessage())
 		auth.POST("/messagesDeleteAll", messagesHandler.DeleteAll())
 		auth.DELETE("/messages/:id", messagesHandler.Delete())
 
-		auth.GET(route.AddQuestions, testEditorH.ShowAddQuestion)
-		auth.POST(route.AddQuestions, testEditorH.AddQuestion)
-		auth.POST(route.RunQuestionsSeed, testEditorH.RunGoQuestionsSeed)
-		auth.POST(route.RunGoTopicsSeed, testEditorH.RunGoTopicsSeed)
+		auth.GET(route.AddQuestions, deps.Handlers.TestEditor.ShowAddQuestion)
+		auth.POST(route.AddQuestions, deps.Handlers.TestEditor.AddQuestion)
+		auth.POST(route.RunQuestionsSeed, deps.Handlers.TestEditor.RunGoQuestionsSeed)
+		auth.POST(route.RunGoTopicsSeed, deps.Handlers.TestEditor.RunGoTopicsSeed)
 
-		auth.POST(route.Comments, commentH.PostComment)
+		auth.POST(route.Comments, deps.Handlers.Comment.PostComment)
 	}
 
 	// ===== temp block =====
 
 	// ========= API =========
 	apiGroup := r.Group("/api")
-	apiGroup.GET(route.Me, authH.MeAPI)
-	apiGroup.POST(route.SignIn, authH.SignInAPI)
-	apiGroup.POST(route.SignUp, handler.SignUpApi(userSvc))
+	apiGroup.GET(route.Me, deps.Handlers.Auth.MeAPI)
+	apiGroup.POST(route.SignIn, deps.Handlers.Auth.SignInAPI)
+	apiGroup.POST(route.SignUp, handler.SignUpApi(deps.Services.User))
 	apiGroup.GET(route.SignOut, handler.SignOut)
 
-	apiQ := apiq.New(loader)
+	apiQ := apiq.New(deps.Loaders.Question)
 	apiGroup.GET(route.Questions, apiQ.Get)
 
 	// Защищенные маршруты (API)
 	apiGroup.Use(middleware.RequireAuthApi)
 	{
-		apiGroup.GET(route.Users, adminH.UsersApi)
-		apiGroup.DELETE(route.Users+"/:id", handler.DeleteUser(userSvc))
+		apiGroup.GET(route.Users, deps.Handlers.Admin.UsersApi)
+		apiGroup.DELETE(route.Users+"/:id", handler.DeleteUser(deps.Services.User))
 
-		apiGroup.GET(route.Tasks, handler.TasksAPI(taskSvc))
-		apiGroup.POST(route.Tasks, handler.PostTaskAPI(taskSvc))
-		apiGroup.DELETE(route.Tasks+"/:id", handler.DeleteTaskAPI(taskSvc))
-		apiGroup.PUT(route.Tasks+"/:id", handler.UpdateTaskAPI(taskSvc))
+		apiGroup.GET(route.Tasks, handler.TasksAPI(deps.Services.Task))
+		apiGroup.POST(route.Tasks, handler.PostTaskAPI(deps.Services.Task))
+		apiGroup.DELETE(route.Tasks+"/:id", handler.DeleteTaskAPI(deps.Services.Task))
+		apiGroup.PUT(route.Tasks+"/:id", handler.UpdateTaskAPI(deps.Services.Task))
 
-		apiGroup.GET(route.Test, testH.RandomQuestionIdAPI)
-		apiGroup.GET(route.Test+"/:id", testH.QuestionByIdAPI)
-		apiGroup.POST(route.Test+"/check", testH.CheckAnswerAPI)
+		apiGroup.GET(route.Test, deps.Handlers.Test.RandomQuestionIdAPI)
+		apiGroup.GET(route.Test+"/:id", deps.Handlers.Test.QuestionByIdAPI)
+		apiGroup.POST(route.Test+"/check", deps.Handlers.Test.CheckAnswerAPI)
 	}
 
 	r.NoRoute(handler.NotFoundHandler)

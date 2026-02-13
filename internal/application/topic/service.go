@@ -8,7 +8,7 @@ type Service struct {
 	repo domain.TopicRepository
 }
 
-func New(repo domain.TopicRepository) *Service {
+func NewService(repo domain.TopicRepository) *Service {
 	return &Service{repo: repo}
 }
 
