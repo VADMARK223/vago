@@ -2,12 +2,11 @@ package chapter
 
 import (
 	"vago/internal/domain"
-	"vago/internal/domain/repository"
-	"vago/internal/infra/persistence/gorm"
+	"vago/internal/infra/gorm"
 )
 
 type Service struct {
-	repo repository.ChapterRepository
+	repo domain.ChapterRepository
 }
 
 func NewService(repo *gorm.ChapterRepo) *Service {

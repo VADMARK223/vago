@@ -2,15 +2,15 @@ package test
 
 import (
 	"vago/internal/domain"
-	"vago/internal/infra/persistence/gorm"
+	gorm2 "vago/internal/infra/gorm"
 )
 
 type Service struct {
-	questionRepo gorm.QuestionRepo
-	topicRepo    gorm.TopicRepo
+	questionRepo gorm2.QuestionRepo
+	topicRepo    gorm2.TopicRepo
 }
 
-func NewService(questionRepo *gorm.QuestionRepo, topicRepo *gorm.TopicRepo) *Service {
+func NewService(questionRepo *gorm2.QuestionRepo, topicRepo *gorm2.TopicRepo) *Service {
 	return &Service{questionRepo: *questionRepo, topicRepo: *topicRepo}
 }
 

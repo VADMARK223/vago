@@ -10,7 +10,7 @@ import (
 	"vago/internal/config/code"
 	"vago/internal/domain"
 	"vago/internal/seed"
-	"vago/internal/transport/http/api"
+	"vago/internal/transport/http/api/response"
 
 	"github.com/gin-gonic/gin"
 )
@@ -44,12 +44,12 @@ func (h *TestEditorHandler) AddQuestion(c *gin.Context) {
 	role, ok := c.Get(code.Role)
 	r, ok := role.(string)
 	if !ok {
-		api.Error(c, http.StatusBadRequest, "Роль пользователя неизвестна")
+		response.Error(c, http.StatusBadRequest, "Роль пользователя неизвестна")
 		return
 	}
 
 	if r != string(domain.RoleAdmin) {
-		api.Error(c, http.StatusForbidden, "У вас нет прав на это действие")
+		response.Error(c, http.StatusForbidden, "У вас нет прав на это действие")
 		return
 	}
 
@@ -100,12 +100,12 @@ func (h *TestEditorHandler) RunGoTopicsSeed(c *gin.Context) {
 	role, ok := c.Get(code.Role)
 	r, ok := role.(string)
 	if !ok {
-		api.Error(c, http.StatusBadRequest, "Роль пользователя неизвестна")
+		response.Error(c, http.StatusBadRequest, "Роль пользователя неизвестна")
 		return
 	}
 
 	if r != string(domain.RoleAdmin) {
-		api.Error(c, http.StatusForbidden, "У вас нет прав на это действие")
+		response.Error(c, http.StatusForbidden, "У вас нет прав на это действие")
 		return
 	}
 
@@ -124,12 +124,12 @@ func (h *TestEditorHandler) RunGoQuestionsSeed(c *gin.Context) {
 	role, ok := c.Get(code.Role)
 	r, ok := role.(string)
 	if !ok {
-		api.Error(c, http.StatusBadRequest, "Роль пользователя неизвестна")
+		response.Error(c, http.StatusBadRequest, "Роль пользователя неизвестна")
 		return
 	}
 
 	if r != string(domain.RoleAdmin) {
-		api.Error(c, http.StatusForbidden, "У вас нет прав на это действие")
+		response.Error(c, http.StatusForbidden, "У вас нет прав на это действие")
 		return
 	}
 

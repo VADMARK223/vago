@@ -6,7 +6,7 @@ import (
 	"vago/internal/config/code"
 	"vago/internal/config/route"
 	"vago/internal/domain"
-	"vago/internal/transport/http/api"
+	"vago/internal/transport/http/api/response"
 	"vago/internal/transport/http/dto"
 	"vago/pkg/strx"
 
@@ -82,24 +82,24 @@ func (h *AuthHandler) MeAPI(c *gin.Context) {
 		return
 	}
 
-	api.OK(c, "Пользователь", dto.Me{Username: u.Username, Role: u.Role})
+	response.OK(c, "Пользователь", dto.Me{Username: u.Username, Role: u.Role})
 }
 
 func (h *AuthHandler) SignInAPI(c *gin.Context) {
 	var req SignInReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		api.Error(c, http.StatusBadRequest, "Некорректные данные")
+		response.Error(c, http.StatusBadRequest, "Некорректные данные")
 		return
 	}
 
 	_, tokens, err := h.service.Login(req.Login, req.Password)
 	if err != nil {
-		api.Error(c, http.StatusUnauthorized, strx.Capitalize(err.Error()))
+		response.Error(c, http.StatusUnauthorized, strx.Capitalize(err.Error()))
 		return
 	}
 
 	domain.SetTokenCookies(c, tokens, h.refreshTTL)
-	api.OKNoData(c, "Успешный вход!")
+	response.OKNoData(c, "Успешный вход!")
 }
 
 func SignUp(service *user.Service) gin.HandlerFunc {
@@ -126,17 +126,17 @@ func SignUpApi(service *user.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req SignUpReq
 		if err := c.ShouldBindJSON(&req); err != nil {
-			api.Error(c, http.StatusBadRequest, "Некорректные данные")
+			response.Error(c, http.StatusBadRequest, "Некорректные данные")
 			return
 		}
 
 		err := service.CreateUser(domain.DTO{Login: req.Login, Password: req.Password, Role: req.Role, Color: "#FF5733", Username: req.Username})
 
 		if err != nil {
-			api.Error(c, http.StatusInternalServerError, strx.Capitalize(err.Error()))
+			response.Error(c, http.StatusInternalServerError, strx.Capitalize(err.Error()))
 			return
 		}
 
-		api.OKNoData(c, "Успешная регистрация!")
+		response.OKNoData(c, "Успешная регистрация!")
 	}
 }

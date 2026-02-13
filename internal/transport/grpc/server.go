@@ -12,8 +12,8 @@ import (
 	"vago/internal/app"
 	"vago/internal/application/user"
 	"vago/internal/config/kafka/topic"
+	"vago/internal/infra/gorm"
 	"vago/internal/infra/kafka"
-	"vago/internal/infra/persistence/gorm"
 	"vago/internal/infra/token"
 
 	"github.com/improbable-eng/grpc-web/go/grpcweb"

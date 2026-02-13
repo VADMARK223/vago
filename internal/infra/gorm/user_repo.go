@@ -40,7 +40,7 @@ func (r *UserRepository) CreateUser(u domain.User) error {
 					return domain.ErrLoginExists
 				}
 			case ValueToLong:
-				return domain.ErrValueToLong
+				return domain.ErrValueTooLong
 			}
 		}
 		return fmt.Errorf("failed to create user: %w", err)

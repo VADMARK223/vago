@@ -4,12 +4,11 @@ import (
 	"context"
 	"errors"
 	"vago/internal/domain"
-	"vago/internal/domain/repository"
-	"vago/internal/infra/persistence/gorm"
+	"vago/internal/infra/gorm"
 )
 
 type Service struct {
-	repo repository.CommentRepo
+	repo domain.CommentRepo
 }
 
 func NewService(repo *gorm.CommentRepo) *Service {

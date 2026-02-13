@@ -12,7 +12,7 @@ import (
 	"vago/internal/config/code"
 	"vago/internal/config/route"
 	"vago/internal/infra/token"
-	"vago/internal/transport/http/api"
+	"vago/internal/transport/http/api/response"
 	"vago/internal/transport/http/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -75,11 +75,11 @@ func (h *AdminHandler) Users(c *gin.Context) {
 func (h *AdminHandler) UsersApi(c *gin.Context) {
 	users, err := h.userSvc.GetAll()
 	if err != nil {
-		api.Error(c, http.StatusInternalServerError, "\"Список пользователей\"")
+		response.Error(c, http.StatusInternalServerError, "\"Список пользователей\"")
 		return
 	}
 
-	api.OK(c, "Список пользователей", UsersApiDTO{Users: usersToDTO(users)})
+	response.OK(c, "Список пользователей", UsersApiDTO{Users: usersToDTO(users)})
 }
 
 func (h *AdminHandler) ShowMessages(c *gin.Context) {

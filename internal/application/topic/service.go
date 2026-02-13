@@ -2,16 +2,14 @@ package topic
 
 import (
 	"vago/internal/domain"
-	"vago/internal/domain/repository"
-	"vago/internal/infra/persistence/gorm"
 )
 
 type Service struct {
-	repo repository.TopicRepository
+	repo domain.TopicRepository
 }
 
-func NewService(repo *gorm.TopicRepo) *Service {
-	return &Service{repo: *repo}
+func New(repo domain.TopicRepository) *Service {
+	return &Service{repo: repo}
 }
 
 func (s *Service) All() ([]*domain.Topic, error) {

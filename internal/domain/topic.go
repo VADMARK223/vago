@@ -8,5 +8,5 @@ type Topic struct {
 type TopicWithCount struct {
 	ID             int64
 	Name           string
-	QuestionsCount int
+	QuestionsCount int64
 }

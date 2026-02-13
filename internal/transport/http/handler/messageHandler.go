@@ -9,7 +9,7 @@ import (
 	"vago/internal/config/code"
 	"vago/internal/config/route"
 	"vago/internal/domain"
-	"vago/internal/transport/http/api"
+	"vago/internal/transport/http/api/response"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,12 +27,12 @@ func (h *MessageHandler) Delete() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		role, errRole := c.Get(code.Role)
 		if !errRole {
-			api.Error(c, http.StatusBadRequest, "Роль пользователя неизвестна")
+			response.Error(c, http.StatusBadRequest, "Роль пользователя неизвестна")
 			return
 		}
 
 		if role != domain.RoleAdmin {
-			api.Error(c, http.StatusForbidden, "У вас нет прав на удаление пользователей")
+			response.Error(c, http.StatusForbidden, "У вас нет прав на удаление пользователей")
 			return
 		}
 

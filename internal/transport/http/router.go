@@ -16,7 +16,7 @@ import (
 	"vago/internal/application/topic"
 	"vago/internal/application/user"
 	"vago/internal/config/route"
-	"vago/internal/infra/persistence/gorm"
+	gorm2 "vago/internal/infra/gorm"
 	"vago/internal/infra/token"
 	"vago/internal/transport/http/handler"
 	"vago/internal/transport/http/middleware"
@@ -30,20 +30,20 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	hub := ws.NewHub(ctx.Log)
 	go hub.Run(goCtx)
 	// Сервисы
-	taskSvc := task.NewService(gorm.NewTaskRepo(ctx.DB))
-	messageRepo := gorm.NewMessageRepo(ctx.DB)
-	userRepo := gorm.NewUserRepo(ctx)
+	taskSvc := task.NewService(gorm2.NewTaskRepo(ctx.DB))
+	messageRepo := gorm2.NewMessageRepo(ctx.DB)
+	userRepo := gorm2.NewUserRepo(ctx)
 	chatSvc := chat.NewService(messageRepo, userRepo)
 
 	userSvc := user.NewService(userRepo, tokenProvider)
 	localCache := app.NewLocalCache()
 
 	// Хендлеры
-	topicRepo := gorm.NewTopicRepo(ctx.DB)
-	questionSvc := test.NewService(gorm.NewQuestionRepo(ctx.DB), topicRepo)
-	chapterSvc := chapter.NewService(gorm.NewChapterRepo(ctx.DB))
-	topicSvc := topic.NewService(topicRepo)
-	commentSvc := comment.NewService(gorm.NewCommentRepo(ctx.DB))
+	topicRepo := gorm2.NewTopicRepo(ctx.DB)
+	questionSvc := test.NewService(gorm2.NewQuestionRepo(ctx.DB), topicRepo)
+	chapterSvc := chapter.NewService(gorm2.NewChapterRepo(ctx.DB))
+	topicSvc := topic.New(topicRepo)
+	commentSvc := comment.NewService(gorm2.NewCommentRepo(ctx.DB))
 
 	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret, ctx.Cfg.RefreshTTLInt(), ctx.Log)
 	questionH := handler.NewQuestionHandler(chapterSvc, topicSvc, questionSvc)
@@ -87,7 +87,7 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	r.GET(route.Test+"/:id", testH.ShowByID())
 	r.POST(route.Test+"/check", testH.CheckAnswer)
 
-	r.GET(route.Questions, testH.ShowQuestions)
+	r.GET(route.Questions, questionH.ShowQuestions)
 
 	// Защищенные маршруты
 	auth := r.Group("/")

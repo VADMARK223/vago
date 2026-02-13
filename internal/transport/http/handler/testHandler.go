@@ -9,7 +9,7 @@ import (
 	"vago/internal/application/topic"
 	"vago/internal/config/code"
 	"vago/internal/config/route"
-	"vago/internal/transport/http/api"
+	"vago/internal/transport/http/api/response"
 	"vago/internal/transport/http/dto"
 
 	"github.com/gin-gonic/gin"
@@ -56,23 +56,23 @@ func (h *TestHandler) ShowRandom(c *gin.Context) {
 func (h *TestHandler) RandomQuestionIdAPI(c *gin.Context) {
 	id, err := h.testSvc.RandomID()
 	if err != nil {
-		api.Error(c, http.StatusInternalServerError, "Ошибка генерации случайного вопроса"+err.Error())
+		response.Error(c, http.StatusInternalServerError, "Ошибка генерации случайного вопроса"+err.Error())
 		return
 	}
 
-	api.OK(c, fmt.Sprintf("Идентификатор вопроса: %d", id), id)
+	response.OK(c, fmt.Sprintf("Идентификатор вопроса: %d", id), id)
 }
 
 func (h *TestHandler) QuestionByIdAPI(c *gin.Context) {
 	questionId, parseIdErr := strconv.ParseInt(c.Param("id"), 10, 64)
 	if parseIdErr != nil {
-		api.Error(c, http.StatusBadRequest, "Некорректные данные")
+		response.Error(c, http.StatusBadRequest, "Некорректные данные")
 		return
 	}
 
 	q := h.testSvc.PublicQuestion(&questionId)
 
-	api.OK(c, fmt.Sprintf("Вопрос: %d", questionId), dto.QuestionPublicToDTO(q))
+	response.OK(c, fmt.Sprintf("Вопрос: %d", questionId), dto.QuestionPublicToDTO(q))
 }
 
 func (h *TestHandler) ShowByID() func(c *gin.Context) {
@@ -93,20 +93,20 @@ func (h *TestHandler) ShowByID() func(c *gin.Context) {
 func (h *TestHandler) CheckAnswerAPI(c *gin.Context) {
 	var req CheckRequestAPI
 	if err := c.ShouldBindJSON(&req); err != nil {
-		api.Error(c, http.StatusBadRequest, err.Error())
+		response.Error(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	correct, explanation, err := h.testSvc.CheckAnswer(req.QuestionID, req.AnswerID)
 	if err != nil {
-		api.Error(c, http.StatusInternalServerError, err.Error())
+		response.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	if correct {
-		api.OK(c, "Правильный ответ", CheckResponse{Correct: correct, Explanation: explanation})
+		response.OK(c, "Правильный ответ", CheckResponse{Correct: correct, Explanation: explanation})
 	} else {
-		api.OK(c, "Неправильный ответ", CheckResponse{Correct: correct})
+		response.OK(c, "Неправильный ответ", CheckResponse{Correct: correct})
 	}
 }
 

@@ -8,7 +8,8 @@ import (
 	"vago/internal/application/topic"
 	"vago/internal/config/code"
 	"vago/internal/domain"
-	"vago/internal/transport/http/api"
+	"vago/internal/transport/http/api/question"
+	"vago/internal/transport/http/api/response"
 	"vago/pkg/strx"
 
 	"github.com/gin-gonic/gin"
@@ -42,7 +43,7 @@ func (h *QuestionHandler) ShowQuestionsAPI(c *gin.Context) {
 
 	chapters, errChapters := h.chapterSvc.All()
 	if errChapters != nil {
-		api.Error(c, http.StatusInternalServerError, strx.Capitalize(errChapters.Error()))
+		response.Error(c, http.StatusInternalServerError, strx.Capitalize(errChapters.Error()))
 		return
 	}
 
@@ -60,10 +61,10 @@ func (h *QuestionHandler) ShowQuestionsAPI(c *gin.Context) {
 		questions, err = h.testSvc.AllQuestions()
 	}
 
-	api.OK(c, "Вопросы", toQuestionsPageDataDTO(chapters, topics, questions))
+	response.OK(c, "Вопросы", question.ToDTO(chapters, topics, questions))
 }
 
-func (h *TestHandler) ShowQuestions(c *gin.Context) {
+func (h *QuestionHandler) ShowQuestions(c *gin.Context) {
 	var (
 		topicID   int64
 		questions []*domain.Question

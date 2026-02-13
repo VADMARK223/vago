@@ -8,7 +8,7 @@ import (
 	"vago/internal/application/task"
 	"vago/internal/config/code"
 	"vago/internal/domain"
-	"vago/internal/transport/http/api"
+	"vago/internal/transport/http/api/response"
 
 	"github.com/gin-gonic/gin"
 )
@@ -39,7 +39,7 @@ func TasksAPI(service *task.Service) gin.HandlerFunc {
 		data := td.(gin.H)
 		tasks, _ := service.GetAllByUser(data[code.UserId].(int64))
 
-		api.OK(c, "Задачи", tasksToDTO(tasks))
+		response.OK(c, "Задачи", tasksToDTO(tasks))
 	}
 }
 
@@ -47,23 +47,23 @@ func PostTaskAPI(service *task.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var dto PostTaskDTO
 		if err := c.ShouldBindJSON(&dto); err != nil {
-			api.Error(c, http.StatusBadRequest, "Некорректные данные")
+			response.Error(c, http.StatusBadRequest, "Некорректные данные")
 			return
 		}
 
 		currentId, errGetUSerId := c.Get(code.UserId)
 		if !errGetUSerId {
-			api.Error(c, http.StatusUnauthorized, "Пользователь не аутентифицировался")
+			response.Error(c, http.StatusUnauthorized, "Пользователь не аутентифицировался")
 			return
 		}
 
 		err := service.PostTask(dto.Name, dto.Description, dto.Completed, currentId.(int64))
 		if err != nil {
-			api.Error(c, http.StatusInternalServerError, err.Error())
+			response.Error(c, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		api.OKNoData(c, "Задача создана")
+		response.OKNoData(c, "Задача создана")
 	}
 }
 
@@ -100,17 +100,17 @@ func DeleteTaskAPI(service *task.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		parseId, parseIdErr := strconv.ParseInt(c.Param("id"), 10, 64)
 		if parseIdErr != nil {
-			api.Error(c, http.StatusBadRequest, "Некорректные данные")
+			response.Error(c, http.StatusBadRequest, "Некорректные данные")
 			return
 		}
 
 		err := service.DeleteTask(parseId)
 		if err != nil {
-			api.Error(c, http.StatusInternalServerError, err.Error())
+			response.Error(c, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		api.OKNoData(c, "Задача удалена.")
+		response.OKNoData(c, "Задача удалена.")
 	}
 }
 
@@ -132,29 +132,29 @@ func UpdateTaskAPI(service *task.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		parseId, parseIdErr := strconv.ParseInt(c.Param("id"), 10, 64)
 		if parseIdErr != nil {
-			api.Error(c, http.StatusBadRequest, "Некорректные данные")
+			response.Error(c, http.StatusBadRequest, "Некорректные данные")
 			return
 		}
 
 		var dto UpdateTaskDTO
 		if err := c.ShouldBindJSON(&dto); err != nil {
-			api.Error(c, http.StatusBadRequest, "Некорректные данные")
+			response.Error(c, http.StatusBadRequest, "Некорректные данные")
 			return
 		}
 
 		currentId, errGetUSerId := c.Get(code.UserId)
 		if !errGetUSerId {
-			api.Error(c, http.StatusUnauthorized, "Пользователь не аутентифицировался")
+			response.Error(c, http.StatusUnauthorized, "Пользователь не аутентифицировался")
 			return
 		}
 
 		errUpdate := service.UpdateCompleted(parseId, currentId.(int64), dto.Completed)
 		if errUpdate != nil {
-			api.Error(c, http.StatusInternalServerError, errUpdate.Error())
+			response.Error(c, http.StatusInternalServerError, errUpdate.Error())
 			return
 		}
 
-		api.OKNoData(c, "Успешное обновление задачи")
+		response.OKNoData(c, "Успешное обновление задачи")
 
 		/*userID := c.MustGet(code.UserId).(int64)
 
