@@ -6,11 +6,9 @@ import (
 	"strconv"
 	"vago/internal/application/task"
 	"vago/internal/config/code"
-	"vago/internal/domain"
 	"vago/internal/transport/http/api/response"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 func Tasks(service *task.Service) gin.HandlerFunc {
@@ -114,11 +112,17 @@ func DeleteTaskAPI(service *task.Service) gin.HandlerFunc {
 	}
 }
 
-func DeleteTask(db *gorm.DB) gin.HandlerFunc {
+func DeleteTask(service *task.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
+		parseId, parseIdErr := strconv.ParseInt(id, 10, 64)
+		if parseIdErr != nil {
+			response.Error(c, http.StatusBadRequest, "Некорректные данные")
+			return
+		}
 
-		if err := db.Delete(&domain.Task{}, id).Error; err != nil {
+		err := service.DeleteTask(parseId)
+		if err != nil {
 			c.String(http.StatusInternalServerError, "Error deleting task")
 			return
 		}

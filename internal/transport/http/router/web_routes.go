@@ -1,9 +1,7 @@
 package router
 
 import (
-	"vago/internal/app"
 	"vago/internal/config/route"
-	"vago/internal/infra/token"
 	"vago/internal/transport/http/handler"
 	"vago/internal/transport/http/middleware"
 	webq "vago/internal/transport/http/web/question"
@@ -11,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func registerWebRoutes(web *gin.RouterGroup, deps *Deps, ctx *app.Context, tokenProvider *token.JWTProvider) {
+func registerWebRoutes(web *gin.RouterGroup, deps *Deps) {
 	// Public
 	web.GET(route.Index, handler.ShowIndex)
 	web.GET(route.Book, handler.ShowBook)
@@ -29,7 +27,7 @@ func registerWebRoutes(web *gin.RouterGroup, deps *Deps, ctx *app.Context, token
 	web.GET(route.Questions, webQ.Page)
 
 	// Protected
-	auth := web.Group("/")
+	auth := web.Group("")
 	auth.Use(middleware.RequireAuthAndRedirect)
 	{
 		admin := auth.Group(route.Admin)
@@ -44,12 +42,12 @@ func registerWebRoutes(web *gin.RouterGroup, deps *Deps, ctx *app.Context, token
 
 		auth.GET(route.Tasks, handler.Tasks(deps.Services.Task))
 		auth.POST(route.Tasks, handler.PostTask(deps.Services.Task))
-		auth.DELETE(route.Tasks+"/:id", handler.DeleteTask(ctx.DB))
+		auth.DELETE(route.Tasks+"/:id", handler.DeleteTask(deps.Services.Task))
 		auth.PUT(route.Tasks+"/:id", handler.UpdateTask(deps.Services.Task))
 		auth.DELETE("/users/:id", handler.DeleteUser(deps.Services.User))
 
-		auth.GET("/ws", handler.ServeSW(deps.Hub, ctx.Log, tokenProvider, deps.Services.Chat))
-		auth.GET("/chat", handler.ShowChat(ctx.Cfg.Port, deps.Services.Chat))
+		auth.GET("/ws", handler.ServeSW(deps.Hub, deps.Log, deps.TokenProv, deps.Services.Chat))
+		auth.GET("/chat", handler.ShowChat(deps.TokenProv.Port, deps.Services.Chat))
 
 		messagesHandler := handler.NewMessageHandler(deps.Services.Chat, deps.Services.User)
 		auth.POST("/messages", messagesHandler.AddMessage)

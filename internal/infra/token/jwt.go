@@ -13,13 +13,19 @@ import (
 )
 
 type JWTProvider struct {
+	Port       string
 	secret     string
 	accessTTL  time.Duration
 	refreshTTL time.Duration
 }
 
 func NewJWTProvider(cfg *config.Config) *JWTProvider {
-	return &JWTProvider{secret: cfg.JwtSecret, accessTTL: cfg.AccessTTLDuration(), refreshTTL: cfg.RefreshTTLDuration()}
+	return &JWTProvider{
+		secret:     cfg.JwtSecret,
+		accessTTL:  cfg.AccessTTLDuration(),
+		refreshTTL: cfg.RefreshTTLDuration(),
+		Port:       cfg.Port,
+	}
 }
 
 func (j *JWTProvider) CreateTokenPair(userID int64, role string) (*domain.TokenPair, error) {

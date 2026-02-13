@@ -15,6 +15,8 @@ import (
 	"vago/internal/transport/http/handler"
 	questionLoader "vago/internal/transport/http/shared/question"
 	"vago/internal/transport/ws"
+
+	"go.uber.org/zap"
 )
 
 type Services struct {
@@ -46,6 +48,7 @@ type Deps struct {
 	Loaders   Loaders
 	Cache     *app.LocalCache
 	TokenProv *token.JWTProvider
+	Log       *zap.SugaredLogger
 }
 
 func buildDeps(goCtx context.Context, ctx *app.Context, tokenProvider *token.JWTProvider) *Deps {
@@ -90,6 +93,7 @@ func buildDeps(goCtx context.Context, ctx *app.Context, tokenProvider *token.JWT
 
 	return &Deps{
 		Hub: hub,
+		Log: ctx.Log,
 		Services: Services{
 			Task:    taskSvc,
 			User:    userSvc,

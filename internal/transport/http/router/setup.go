@@ -24,7 +24,7 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	// Статика и шаблоны
 	r.Static("/static", "web/static")
 	// Шаблоны
-	r.SetHTMLTemplate(loadTemplates("web/templates"))
+	r.SetHTMLTemplate(loadTemplates(ctx, "web/templates"))
 	_ = r.SetTrustedProxies(nil)
 	// Favicon: отдаём напрямую, чтобы не было 404
 	r.GET("/favicon.ico", func(c *gin.Context) {
@@ -40,7 +40,7 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 
 	web := r.Group("")
 	web.Use(middleware.NoCache, middleware.TemplateContext)
-	registerWebRoutes(web, deps, ctx, tokenProvider)
+	registerWebRoutes(web, deps)
 
 	api := r.Group("/api")
 	registerAPIRoutes(api, deps)
@@ -50,7 +50,7 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	return r
 }
 
-func loadTemplates(root string) *template.Template {
+func loadTemplates(ctx *app.Context, root string) *template.Template {
 	tmpl := template.New("").Funcs(template.FuncMap{
 		"dict": dict,
 		"menuActive": func(path, href string) bool {
@@ -63,7 +63,7 @@ func loadTemplates(root string) *template.Template {
 
 	walkErr := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			return err
+			ctx.Log.Fatal(err.Error())
 		}
 
 		if info.IsDir() {
@@ -92,7 +92,7 @@ func loadTemplates(root string) *template.Template {
 	})
 
 	if walkErr != nil {
-		panic(walkErr)
+		ctx.Log.Fatal(walkErr.Error())
 	}
 
 	return tmpl
