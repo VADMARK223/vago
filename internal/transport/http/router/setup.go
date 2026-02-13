@@ -37,11 +37,13 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	r.Use(middleware.SessionMiddleware())
 	r.Use(middleware.CheckJWT(tokenProvider, ctx.Cfg.RefreshTTLInt()))
 	r.Use(middleware.LoadUserContext(deps.Services.User, deps.Cache))
-	r.Use(middleware.NoCache)
-	r.Use(middleware.TemplateContext)
 
-	registerWebRoutes(r, deps, ctx, tokenProvider)
-	registerAPIRoutes(r, deps)
+	web := r.Group("")
+	web.Use(middleware.NoCache, middleware.TemplateContext)
+	registerWebRoutes(web, deps, ctx, tokenProvider)
+
+	api := r.Group("/api")
+	registerAPIRoutes(api, deps)
 
 	r.NoRoute(handler.NotFoundHandler)
 

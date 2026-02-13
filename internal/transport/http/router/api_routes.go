@@ -9,10 +9,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func registerAPIRoutes(r *gin.Engine, deps *Deps) {
+func registerAPIRoutes(api *gin.RouterGroup, deps *Deps) {
 	apiHandlerQuestion := apiq.New(deps.Loaders.Question)
 
-	api := r.Group("/api")
 	// Public
 	api.GET(route.Me, deps.Handlers.Auth.MeAPI)
 	api.POST(route.SignIn, deps.Handlers.Auth.SignInAPI)

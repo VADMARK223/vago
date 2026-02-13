@@ -11,25 +11,25 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func registerWebRoutes(r *gin.Engine, deps *Deps, ctx *app.Context, tokenProvider *token.JWTProvider) {
+func registerWebRoutes(web *gin.RouterGroup, deps *Deps, ctx *app.Context, tokenProvider *token.JWTProvider) {
 	// Public
-	r.GET(route.Index, handler.ShowIndex)
-	r.GET(route.Book, handler.ShowBook)
-	r.GET(route.Login, handler.ShowLogin)
-	r.POST(route.Login, deps.Handlers.Auth.Login)
-	r.GET(route.Register, handler.ShowSignup)
-	r.POST(route.Register, handler.SignUp(deps.Services.User))
-	r.GET(route.SignOut, handler.SignOut)
+	web.GET(route.Index, handler.ShowIndex)
+	web.GET(route.Book, handler.ShowBook)
+	web.GET(route.Login, handler.ShowLogin)
+	web.POST(route.Login, deps.Handlers.Auth.Login)
+	web.GET(route.Register, handler.ShowSignup)
+	web.POST(route.Register, handler.SignUp(deps.Services.User))
+	web.GET(route.SignOut, handler.SignOut)
 
-	r.GET(route.Test, deps.Handlers.Test.ShowRandom)
-	r.GET(route.Test+"/:id", deps.Handlers.Test.ShowByID)
-	r.POST(route.Test+"/check", deps.Handlers.Test.CheckAnswer)
+	web.GET(route.Test, deps.Handlers.Test.ShowRandom)
+	web.GET(route.Test+"/:id", deps.Handlers.Test.ShowByID)
+	web.POST(route.Test+"/check", deps.Handlers.Test.CheckAnswer)
 
 	webQ := webq.New(deps.Loaders.Question)
-	r.GET(route.Questions, webQ.Page)
+	web.GET(route.Questions, webQ.Page)
 
 	// Protected
-	auth := r.Group("/")
+	auth := web.Group("/")
 	auth.Use(middleware.RequireAuthAndRedirect)
 	{
 		admin := auth.Group(route.Admin)
