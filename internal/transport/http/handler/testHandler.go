@@ -132,7 +132,7 @@ func renderTestPage(c *gin.Context, h *TestHandler, q test.QuestionPublic) {
 		return
 	}
 
-	data := tplWithMetaData(c, "Тест")
+	data := TplWithMetaData(c, "Тест")
 	data[code.Question] = q
 	data[code.CommentsCount] = count
 	data[code.Comments] = comments

@@ -33,7 +33,7 @@ func (h *TestEditorHandler) ShowAddQuestion(c *gin.Context) {
 	topics, _ := h.topicSvc.AllWithCount()
 	questions, _ := h.testSvc.AllQuestions()
 
-	data := tplWithMetaData(c, "Добавление вопроса")
+	data := TplWithMetaData(c, "Добавление вопроса")
 	data[code.Topics] = topics
 	data[code.QuestionsCount] = len(questions)
 

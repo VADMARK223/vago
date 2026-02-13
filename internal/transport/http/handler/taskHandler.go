@@ -15,7 +15,7 @@ import (
 
 func Tasks(service *task.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		data := tplWithMetaData(c, "Задачи пользователя")
+		data := TplWithMetaData(c, "Задачи пользователя")
 
 		tasks, err := service.GetAllByUser(data[code.UserId].(int64))
 		if err != nil {

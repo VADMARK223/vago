@@ -103,7 +103,7 @@ func (h *AdminHandler) ShowGrpc(c *gin.Context) {
 }
 
 func baseAdminData(c *gin.Context, name string) gin.H {
-	data := tplWithMetaData(c, "Админка ("+name+")")
+	data := TplWithMetaData(c, "Админка ("+name+")")
 	return data
 }
 

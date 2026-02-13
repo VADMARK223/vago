@@ -7,6 +7,6 @@ import (
 )
 
 func NotFoundHandler(c *gin.Context) {
-	data := tplWithMetaData(c, "Страница не найдена")
+	data := TplWithMetaData(c, "Страница не найдена")
 	c.HTML(http.StatusInternalServerError, "404.html", data)
 }

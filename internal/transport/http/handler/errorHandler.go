@@ -8,7 +8,7 @@ import (
 )
 
 func ShowError(c *gin.Context, capture string, err string) {
-	data := tplWithMetaData(c, capture)
+	data := TplWithMetaData(c, capture)
 	data[code.Error] = err
 	c.HTML(http.StatusInternalServerError, "error.html", data)
 }

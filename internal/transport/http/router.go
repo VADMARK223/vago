@@ -16,10 +16,13 @@ import (
 	"vago/internal/application/topic"
 	"vago/internal/application/user"
 	"vago/internal/config/route"
-	gorm2 "vago/internal/infra/gorm"
+	"vago/internal/infra/gorm"
 	"vago/internal/infra/token"
+	apiq "vago/internal/transport/http/api/question"
 	"vago/internal/transport/http/handler"
 	"vago/internal/transport/http/middleware"
+	questionLoader "vago/internal/transport/http/shared/question"
+	webq "vago/internal/transport/http/web/question"
 	"vago/internal/transport/ws"
 
 	"github.com/gin-gonic/gin"
@@ -30,25 +33,25 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	hub := ws.NewHub(ctx.Log)
 	go hub.Run(goCtx)
 	// Сервисы
-	taskSvc := task.NewService(gorm2.NewTaskRepo(ctx.DB))
-	messageRepo := gorm2.NewMessageRepo(ctx.DB)
-	userRepo := gorm2.NewUserRepo(ctx)
+	taskSvc := task.NewService(gorm.NewTaskRepo(ctx.DB))
+	messageRepo := gorm.NewMessageRepo(ctx.DB)
+	userRepo := gorm.NewUserRepo(ctx)
 	chatSvc := chat.NewService(messageRepo, userRepo)
 
 	userSvc := user.NewService(userRepo, tokenProvider)
 	localCache := app.NewLocalCache()
 
 	// Хендлеры
-	topicRepo := gorm2.NewTopicRepo(ctx.DB)
-	questionSvc := test.NewService(gorm2.NewQuestionRepo(ctx.DB), topicRepo)
-	chapterSvc := chapter.NewService(gorm2.NewChapterRepo(ctx.DB))
+	topicRepo := gorm.NewTopicRepo(ctx.DB)
+	testSvc := test.NewService(gorm.NewQuestionRepo(ctx.DB), topicRepo)
+	chapterSvc := chapter.NewService(gorm.NewChapterRepo(ctx.DB))
 	topicSvc := topic.New(topicRepo)
-	commentSvc := comment.NewService(gorm2.NewCommentRepo(ctx.DB))
+	commentSvc := comment.NewService(gorm.NewCommentRepo(ctx.DB))
 
 	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret, ctx.Cfg.RefreshTTLInt(), ctx.Log)
-	questionH := handler.NewQuestionHandler(chapterSvc, topicSvc, questionSvc)
-	testH := handler.NewTestHandler(questionSvc, topicSvc, commentSvc)
-	testEditorH := handler.NewTestEditorHandler(questionSvc, topicSvc, ctx.Cfg.PostgresDsn)
+	//questionH := handler.NewQuestionHandler(chapterSvc, topicSvc, testSvc)
+	testH := handler.NewTestHandler(testSvc, topicSvc, commentSvc)
+	testEditorH := handler.NewTestEditorHandler(testSvc, topicSvc, ctx.Cfg.PostgresDsn)
 	adminH := handler.NewAdminHandler(tokenProvider, userSvc, chatSvc, commentSvc)
 	commentH := handler.NewCommentHandler(commentSvc)
 
@@ -87,7 +90,14 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	r.GET(route.Test+"/:id", testH.ShowByID())
 	r.POST(route.Test+"/check", testH.CheckAnswer)
 
-	r.GET(route.Questions, questionH.ShowQuestions)
+	loader := questionLoader.Loader{
+		ChapterSvc: chapterSvc,
+		TopicSvc:   topicSvc,
+		TestSvc:    testSvc,
+	}
+
+	webQ := webq.New(loader)
+	r.GET(route.Questions, webQ.Page)
 
 	// Защищенные маршруты
 	auth := r.Group("/")
@@ -125,13 +135,17 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 		auth.POST(route.Comments, commentH.PostComment)
 	}
 
+	// ===== temp block =====
+
 	// ========= API =========
 	apiGroup := r.Group("/api")
 	apiGroup.GET(route.Me, authH.MeAPI)
 	apiGroup.POST(route.SignIn, authH.SignInAPI)
 	apiGroup.POST(route.SignUp, handler.SignUpApi(userSvc))
 	apiGroup.GET(route.SignOut, handler.SignOut)
-	apiGroup.GET(route.Questions, questionH.ShowQuestionsAPI)
+
+	apiQ := apiq.New(loader)
+	apiGroup.GET(route.Questions, apiQ.Get)
 
 	// Защищенные маршруты (API)
 	apiGroup.Use(middleware.RequireAuthApi)

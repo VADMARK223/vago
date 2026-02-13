@@ -14,7 +14,7 @@ func ShowIndex() gin.HandlerFunc {
 		if gin.Mode() == gin.DebugMode {
 			caption += " (debug)"
 		}
-		data := tplWithMetaData(c, caption)
+		data := TplWithMetaData(c, caption)
 		data["version"] = version
 		c.HTML(http.StatusOK, "index.html", data)
 	}

@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func tplWithMetaData(c *gin.Context, caption string) gin.H {
+func TplWithMetaData(c *gin.Context, caption string) gin.H {
 	td, exists := c.Get(code.TemplateData)
 	if !exists {
 		panic("TemplateData not found")

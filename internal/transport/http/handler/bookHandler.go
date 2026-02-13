@@ -56,7 +56,7 @@ func ShowBook(c *gin.Context) {
 		}
 	}
 
-	data := tplWithMetaData(c, "Книга по Golang")
+	data := TplWithMetaData(c, "Книга по Golang")
 	data["chapter_id"] = chapterID
 	data["chapters"] = bookChapters
 	c.HTML(http.StatusOK, "book.html", data)

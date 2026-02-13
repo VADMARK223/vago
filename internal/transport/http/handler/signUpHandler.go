@@ -8,7 +8,7 @@ import (
 )
 
 func ShowSignup(c *gin.Context) {
-	data := tplWithMetaData(c, "Регистрация")
+	data := TplWithMetaData(c, "Регистрация")
 	if errVal, exists := c.Get(code.Error); exists {
 		data[code.Error] = errVal
 	}

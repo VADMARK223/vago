@@ -23,7 +23,7 @@ func ShowChat(port string, chatSvc *chat.Service) gin.HandlerFunc {
 			return
 		}
 
-		data := tplWithMetaData(c, "Чат")
+		data := TplWithMetaData(c, "Чат")
 		data[code.Port] = port
 		jsonBytes, _ := json.Marshal(all)
 		data[code.MessagesJson] = string(jsonBytes)

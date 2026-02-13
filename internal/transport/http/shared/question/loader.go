@@ -19,8 +19,8 @@ type Loader struct {
 type Data struct {
 	TopicID   int64
 	Chapters  []*domain.Chapter
-	Topics    []domain.TopicWithCount
 	Questions []*domain.Question
+	Topics    []domain.TopicWithCount
 }
 
 func (l Loader) Load(c *gin.Context) (Data, error) {
