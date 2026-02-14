@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -14,6 +13,7 @@ import (
 	"vago/internal/infra/token"
 	"vago/internal/transport/http/api/response"
 	"vago/internal/transport/http/middleware"
+	"vago/internal/transport/http/shared/template"
 
 	"github.com/gin-gonic/gin"
 )
@@ -39,7 +39,7 @@ func (h *AdminHandler) ShowAdmin(c *gin.Context) {
 }
 
 func (h *AdminHandler) ShowUser(c *gin.Context) {
-	data := baseAdminData(c, "Пользователь")
+	data := template.BaseAdminData(c, "Пользователь")
 	updateTokenInfo(c, data)
 	updateRefreshTokenInfo(c, data, h.provider)
 	data["Active"] = "user"
@@ -54,7 +54,7 @@ func (h *AdminHandler) ShowComments(c *gin.Context) {
 	}
 
 	value := strconv.Itoa(len(comments))
-	data := baseAdminData(c, "Комментарии: "+value)
+	data := template.BaseAdminData(c, "Комментарии: "+value)
 	data["Active"] = "comments"
 	c.HTML(http.StatusOK, "admin/layout", data)
 }
@@ -66,7 +66,7 @@ func (h *AdminHandler) Users(c *gin.Context) {
 		return
 	}
 
-	data := baseAdminData(c, "Пользователи")
+	data := template.BaseAdminData(c, "Пользователи")
 	data["Users"] = users
 	data["Active"] = "users"
 	c.HTML(http.StatusOK, "admin/layout", data)
@@ -82,29 +82,10 @@ func (h *AdminHandler) UsersApi(c *gin.Context) {
 	response.OK(c, "Список пользователей", UsersApiDTO{Users: usersToDTO(users)})
 }
 
-func (h *AdminHandler) ShowMessages(c *gin.Context) {
-	all, err := h.chatSvc.ListMessagesWithAuthors(context.Background())
-	if err != nil {
-		ShowError(c, "Ошибка получения списка сообщений", err.Error())
-		return
-	}
-
-	data := baseAdminData(c, "Сообщения")
-	data[code.Messages] = all
-	data[code.MessagesCount] = len(all)
-	data["Active"] = "messages"
-	c.HTML(http.StatusOK, "admin/layout", data)
-}
-
 func (h *AdminHandler) ShowGrpc(c *gin.Context) {
-	data := baseAdminData(c, "Тест gRPC")
+	data := template.BaseAdminData(c, "Тест gRPC")
 	data["Active"] = "grpc"
 	c.HTML(http.StatusOK, "admin/layout", data)
-}
-
-func baseAdminData(c *gin.Context, name string) gin.H {
-	data := TplWithMetaData(c, "Админка ("+name+")")
-	return data
 }
 
 func updateTokenInfo(c *gin.Context, data gin.H) {

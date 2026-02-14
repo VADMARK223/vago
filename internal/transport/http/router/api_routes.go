@@ -2,6 +2,7 @@ package router
 
 import (
 	"vago/internal/config/route"
+	apim "vago/internal/transport/http/api/message"
 	apiq "vago/internal/transport/http/api/question"
 	"vago/internal/transport/http/handler"
 	"vago/internal/transport/http/middleware"
@@ -24,6 +25,7 @@ func registerAPIRoutes(api *gin.RouterGroup, deps *Deps) {
 	apiAuth.Use(middleware.RequireAuthApi)
 
 	apiAuth.GET(route.Users, deps.Handlers.Admin.UsersApi)
+
 	apiAuth.DELETE(route.Users+"/:id", handler.DeleteUser(deps.Services.User))
 
 	apiAuth.GET(route.Tasks, handler.TasksAPI(deps.Services.Task))
@@ -34,4 +36,9 @@ func registerAPIRoutes(api *gin.RouterGroup, deps *Deps) {
 	apiAuth.GET(route.Test, deps.Handlers.Test.RandomQuestionIdAPI)
 	apiAuth.GET(route.Test+"/:id", deps.Handlers.Test.QuestionByIdAPI)
 	apiAuth.POST(route.Test+"/check", deps.Handlers.Test.CheckAnswerAPI)
+
+	apiHandlerMessage := apim.New(deps.Loaders.Message, deps.Services.Message)
+	apiAuth.GET(route.Messages, apiHandlerMessage.GetAllWithUsername)
+	apiAuth.POST("/messagesDeleteAll", apiHandlerMessage.DeleteAll)
+	apiAuth.DELETE("/messages/:id", apiHandlerMessage.Delete)
 }

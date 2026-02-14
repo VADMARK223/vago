@@ -6,6 +6,7 @@ import (
 	"vago/internal/application/chapter"
 	"vago/internal/application/chat"
 	"vago/internal/application/comment"
+	"vago/internal/application/message"
 	"vago/internal/application/task"
 	"vago/internal/application/test"
 	"vago/internal/application/topic"
@@ -13,6 +14,7 @@ import (
 	"vago/internal/infra/gorm"
 	"vago/internal/infra/token"
 	"vago/internal/transport/http/handler"
+	messageLoader "vago/internal/transport/http/shared/message"
 	questionLoader "vago/internal/transport/http/shared/question"
 	"vago/internal/transport/ws"
 
@@ -27,6 +29,7 @@ type Services struct {
 	Chapter *chapter.Service
 	Test    *test.Service
 	Comment *comment.Service
+	Message *message.Service
 }
 type Handlers struct {
 	Auth       *handler.AuthHandler
@@ -39,6 +42,7 @@ type Handlers struct {
 
 type Loaders struct {
 	Question questionLoader.Loader
+	Message  messageLoader.Loader
 }
 
 type Deps struct {
@@ -73,6 +77,7 @@ func buildDeps(goCtx context.Context, ctx *app.Context, tokenProvider *token.JWT
 	chapterSvc := chapter.NewService(chapterRepo)
 	topicSvc := topic.NewService(topicRepo)
 	commentSvc := comment.NewService(commentRepo)
+	messageSvc := message.NewService(messageRepo, userRepo)
 
 	// cache
 	localCache := app.NewLocalCache()
@@ -91,6 +96,10 @@ func buildDeps(goCtx context.Context, ctx *app.Context, tokenProvider *token.JWT
 		TestSvc:    testSvc,
 	}
 
+	mLoader := messageLoader.Loader{
+		MessageSvc: messageSvc,
+	}
+
 	return &Deps{
 		Hub: hub,
 		Log: ctx.Log,
@@ -102,6 +111,7 @@ func buildDeps(goCtx context.Context, ctx *app.Context, tokenProvider *token.JWT
 			Chapter: chapterSvc,
 			Test:    testSvc,
 			Comment: commentSvc,
+			Message: messageSvc,
 		},
 		Handlers: Handlers{
 			Auth:       authH,
@@ -112,6 +122,7 @@ func buildDeps(goCtx context.Context, ctx *app.Context, tokenProvider *token.JWT
 		},
 		Loaders: Loaders{
 			Question: qLoader,
+			Message:  mLoader,
 		},
 		Cache:     localCache,
 		TokenProv: tokenProvider,

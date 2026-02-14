@@ -7,6 +7,7 @@ import (
 	"vago/internal/config/code"
 	"vago/internal/domain"
 	"vago/internal/transport/http/api/response"
+	error2 "vago/internal/transport/http/shared/error"
 	"vago/pkg/strx"
 
 	"github.com/gin-gonic/gin"
@@ -45,7 +46,7 @@ func DeleteUser(service *user.Service) func(c *gin.Context) {
 
 		err := service.DeleteUser(parseId)
 		if err != nil {
-			response.Error(c, mapErrorToHTTP(err), strx.Capitalize(err.Error()))
+			response.Error(c, error2.MapErrorToHTTP(err), strx.Capitalize(err.Error()))
 			return
 		}
 

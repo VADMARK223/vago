@@ -5,6 +5,7 @@ import (
 	"vago/internal/config/code"
 	"vago/internal/transport/http/handler"
 	shared "vago/internal/transport/http/shared/question"
+	"vago/internal/transport/http/shared/template"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,7 +27,7 @@ func (h *Handler) Page(c *gin.Context) {
 
 	vm := ToViewModel(data)
 
-	tpl := handler.TplWithMetaData(c, "Редактор вопросов") // твоя функция
+	tpl := template.TplWithMetaData(c, "Редактор вопросов") // твоя функция
 	tpl[code.Topics] = vm.Topics
 	tpl["topic_id"] = vm.TopicID
 	tpl[code.Questions] = vm.Questions

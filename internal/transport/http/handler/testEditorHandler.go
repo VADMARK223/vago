@@ -11,6 +11,7 @@ import (
 	"vago/internal/domain"
 	"vago/internal/seed"
 	"vago/internal/transport/http/api/response"
+	"vago/internal/transport/http/shared/template"
 
 	"github.com/gin-gonic/gin"
 )
@@ -33,7 +34,7 @@ func (h *TestEditorHandler) ShowAddQuestion(c *gin.Context) {
 	topics, _ := h.topicSvc.AllWithCount()
 	questions, _ := h.testSvc.AllQuestions()
 
-	data := TplWithMetaData(c, "Добавление вопроса")
+	data := template.TplWithMetaData(c, "Добавление вопроса")
 	data[code.Topics] = topics
 	data[code.QuestionsCount] = len(questions)
 

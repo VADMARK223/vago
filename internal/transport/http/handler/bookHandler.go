@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"strconv"
+	"vago/internal/transport/http/shared/template"
 
 	"github.com/gin-gonic/gin"
 )
@@ -56,7 +57,7 @@ func ShowBook(c *gin.Context) {
 		}
 	}
 
-	data := TplWithMetaData(c, "Книга по Golang")
+	data := template.TplWithMetaData(c, "Книга по Golang")
 	data["chapter_id"] = chapterID
 	data["chapters"] = bookChapters
 	c.HTML(http.StatusOK, "book.html", data)

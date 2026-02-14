@@ -11,6 +11,7 @@ import (
 	"vago/internal/config/route"
 	"vago/internal/transport/http/api/response"
 	"vago/internal/transport/http/dto"
+	"vago/internal/transport/http/shared/template"
 
 	"github.com/gin-gonic/gin"
 )
@@ -130,7 +131,7 @@ func renderTestPage(c *gin.Context, h *TestHandler, q test.QuestionPublic) {
 		return
 	}
 
-	data := TplWithMetaData(c, "Тест")
+	data := template.TplWithMetaData(c, "Тест")
 	data[code.Question] = q
 	data[code.CommentsCount] = count
 	data[code.Comments] = comments

@@ -7,13 +7,14 @@ import (
 	"vago/internal/application/task"
 	"vago/internal/config/code"
 	"vago/internal/transport/http/api/response"
+	"vago/internal/transport/http/shared/template"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Tasks(service *task.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		data := TplWithMetaData(c, "Задачи пользователя")
+		data := template.TplWithMetaData(c, "Задачи пользователя")
 
 		tasks, err := service.GetAllByUser(data[code.UserId].(int64))
 		if err != nil {

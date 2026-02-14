@@ -24,8 +24,8 @@ const (
 	MessageTypeSystem MessageType = "system"
 )*/
 
-func NewMessage(author UserID, body Body, messageType string) *Message {
-	return &Message{author: author, body: body, sentAt: time.Now(), MessageType: messageType}
+func NewMessage(author UserID, body Body, messageType string) Message {
+	return Message{author: author, body: body, sentAt: time.Now(), MessageType: messageType}
 }
 
 func (m *Message) Author() UserID        { return m.author }

@@ -23,12 +23,15 @@
     {{range .messages}}
     <div class="item" id="message-{{.ID}}">
         <div class="item-info">
-            <p>Идентификатор сообщения: {{.ID}}</p>
-            <p>Идентификатор автора: {{.AuthorID}}</p>
-            <p>Никнейм: {{.Username}}</p>
-            <p>Содержание: {{.Body}}</p>
-            <p>Тип: {{.MessageType}}</p>
-            <p>Отправлено: {{.SentAt}}</p>
+            <h3>ID: {{.ID}}</h3>
+            <div>
+                Username: {{.Username}} (Id: {{.AuthorID}})
+            </div>
+            <div>
+                Body: <b>{{.Body}}</b>
+            </div>
+            <div>Type: {{.MessageType}}</div>
+            <div>Sent at: {{.SentAt}}</div>
         </div>
         <div>
             <button class="btn btn-danger btn-sm" onclick="deleteMessage('{{.ID}}')"><i
@@ -42,7 +45,7 @@
 
 <script>
     async function deleteMessage(id) {
-        if (!confirm('Удалить сообщение?')) return;
+        // if (!confirm('Удалить сообщение?')) return;
 
         const res = await fetch(`/messages/${id}`, {method: 'DELETE'});
         if (res.ok) {
