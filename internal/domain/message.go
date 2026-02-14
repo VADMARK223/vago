@@ -4,16 +4,25 @@ import (
 	"time"
 )
 
+type MessageID int64
+
 type UserID int64
 type Body string
 
 type Message struct {
-	ID          int64
+	ID          MessageID
 	author      UserID
 	body        Body
 	sentAt      time.Time
 	MessageType string
 }
+
+/*type MessageType string
+
+const (
+	MessageTypeText   MessageType = "text"
+	MessageTypeSystem MessageType = "system"
+)*/
 
 func NewMessage(author UserID, body Body, messageType string) *Message {
 	return &Message{author: author, body: body, sentAt: time.Now(), MessageType: messageType}

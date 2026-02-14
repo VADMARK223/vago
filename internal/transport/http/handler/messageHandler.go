@@ -30,7 +30,7 @@ func (h *MessageHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	if role != domain.RoleAdmin {
+	if role != string(domain.RoleAdmin) {
 		response.Error(c, http.StatusForbidden, "У вас нет прав на удаление пользователей")
 		return
 	}
@@ -58,7 +58,7 @@ func (h *MessageHandler) DeleteAll(c *gin.Context) {
 		return
 	}
 
-	if role != domain.RoleAdmin {
+	if role != string(domain.RoleAdmin) {
 		ShowError(c, "Ошибка удаления всех сообщений", "У вас нет прав на удаление пользователей")
 		return
 	}

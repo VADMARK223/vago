@@ -3,10 +3,10 @@ package ws
 import (
 	"context"
 	"encoding/json"
-	"log"
 	"time"
 	"vago/internal/app"
 	"vago/internal/application/chat"
+	"vago/internal/domain"
 
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
@@ -54,19 +54,20 @@ func (c *Client) IncomingLoop() {
 
 	for {
 		_, message, err := c.Conn.ReadMessage()
+
 		if err != nil {
-			log.Println("WS read error:", err)
+			c.log.Infow("WS read error:", err)
 			break
 		}
 
 		var packet ClientPacket
 		if errUnmarshal := json.Unmarshal(message, &packet); errUnmarshal != nil {
-			log.Println("WS json error:", errUnmarshal)
+			c.log.Errorw("WS json error:", errUnmarshal)
 			continue
 		}
 
 		c.log.Infow("Received message", "packet", packet)
-		createDTO := chat.MessageCreateDTO{AuthorID: c.UserID, Body: packet.Text, MessageType: "text"}
+		createDTO := chat.MessageCreateDTO{AuthorID: domain.UserID(c.UserID), Body: packet.Text, MessageType: "text"}
 		dto, errSendMessage := c.messageSvc.CreateMessage(context.Background(), createDTO)
 		if errSendMessage != nil {
 			// TODO: доделать.
@@ -100,7 +101,7 @@ func (c *Client) OutgoingLoop() {
 			if !ok {
 				err := c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
 				if err != nil {
-					log.Println("OutgoingLoop", "Channel closed:", err)
+					c.log.Infow("OutgoingLoop", "Channel closed:", err)
 				}
 				return
 			}

@@ -50,7 +50,7 @@ func registerWebRoutes(web *gin.RouterGroup, deps *Deps) {
 		auth.GET("/chat", handler.ShowChat(deps.TokenProv.Port, deps.Services.Chat))
 
 		messagesHandler := handler.NewMessageHandler(deps.Services.Chat, deps.Services.User)
-		auth.POST("/messages", messagesHandler.AddMessage)
+		auth.POST(route.Messages, messagesHandler.AddMessage)
 		auth.POST("/messagesDeleteAll", messagesHandler.DeleteAll)
 		auth.DELETE("/messages/:id", messagesHandler.Delete)
 

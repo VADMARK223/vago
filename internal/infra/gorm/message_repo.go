@@ -17,7 +17,7 @@ func NewMessageRepo(db *gorm.DB) *MessageRepo {
 	return &MessageRepo{db: db}
 }
 
-func (r *MessageRepo) Save(ctx context.Context, m *domain.Message) (int64, error) {
+func (r *MessageRepo) Save(ctx context.Context, m *domain.Message) (domain.MessageID, error) {
 	entity := MessageEntity{
 		UserID:    int64(m.Author()),
 		Content:   string(m.Body()),
@@ -29,18 +29,13 @@ func (r *MessageRepo) Save(ctx context.Context, m *domain.Message) (int64, error
 		return 0, err
 	}
 
-	return entity.ID, nil
+	return domain.MessageID(entity.ID), nil
 }
 
 func (r *MessageRepo) ListAll(ctx context.Context) ([]*domain.Message, error) {
 	var entities []MessageEntity
 
 	err := r.db.WithContext(ctx).Find(&entities).Error
-
-	/*err := r.db.WithContext(ctx).
-	Order("id DESC").
-	Limit(limit).
-	Find(&entities).Error*/
 
 	if err != nil {
 		return nil, err
@@ -49,7 +44,7 @@ func (r *MessageRepo) ListAll(ctx context.Context) ([]*domain.Message, error) {
 	result := make([]*domain.Message, 0, len(entities))
 	for _, entity := range entities {
 		m := domain.NewMessage(domain.UserID(entity.UserID), domain.Body(entity.Content), entity.Type)
-		m.ID = entity.ID
+		m.ID = domain.MessageID(entity.ID)
 		m.MessageType = entity.Type
 		m.SetSentAt(entity.CreatedAt)
 		result = append(result, m)

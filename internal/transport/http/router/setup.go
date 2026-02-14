@@ -21,12 +21,12 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	gin.SetMode(ctx.Cfg.GinMode)
 	r := gin.New()
 	r.Use(gin.Logger(), gin.Recovery())
-	// Статика и шаблоны
-	r.Static("/static", "web/static")
-	// Шаблоны
 	r.SetHTMLTemplate(loadTemplates(ctx, "web/templates"))
+
 	_ = r.SetTrustedProxies(nil)
-	// Favicon: отдаём напрямую, чтобы не было 404
+
+	r.Static("/static", "web/static")
+
 	r.GET("/favicon.ico", func(c *gin.Context) {
 		c.File("web/static/favicon.ico")
 	})
@@ -38,6 +38,9 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	r.Use(middleware.CheckJWT(tokenProvider, ctx.Cfg.RefreshTTLInt()))
 	r.Use(middleware.LoadUserContext(deps.Services.User, deps.Cache))
 
+	//r.Use(middleware.NoCache)
+	//r.Use(middleware.TemplateContext)
+
 	web := r.Group("")
 	web.Use(middleware.NoCache, middleware.TemplateContext)
 	registerWebRoutes(web, deps)
@@ -45,7 +48,7 @@ func SetupRouter(goCtx context.Context, ctx *app.Context, tokenProvider *token.J
 	api := r.Group("/api")
 	registerAPIRoutes(api, deps)
 
-	r.NoRoute(handler.NotFoundHandler)
+	r.NoRoute(middleware.NoCache, middleware.TemplateContext, handler.NotFoundHandler)
 
 	return r
 }

@@ -17,7 +17,7 @@ import (
 
 func ShowChat(port string, chatSvc *chat.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		all, err := chatSvc.MessagesDTO(context.Background())
+		all, err := chatSvc.ListMessagesWithAuthors(context.Background())
 		if err != nil {
 			ShowError(c, "Ошибка получения списка сообщений", err.Error())
 			return
@@ -34,8 +34,7 @@ func ShowChat(port string, chatSvc *chat.Service) gin.HandlerFunc {
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
-	// Разрешаем любые origins (можно ужесточить)
-	CheckOrigin: func(r *http.Request) bool { return true },
+	CheckOrigin:     func(r *http.Request) bool { return true }, // TODO: лучше явно разрешить нужные origin
 }
 
 func ServeSW(hub *ws.Hub, log *zap.SugaredLogger, provider *token.JWTProvider, svc *chat.Service) gin.HandlerFunc {

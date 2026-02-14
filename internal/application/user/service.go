@@ -34,7 +34,7 @@ func (s *Service) DeleteUser(id int64) error {
 	return s.repo.DeleteUser(id)
 }
 
-func (s *Service) GetByID(id int64) (domain.User, error) {
+func (s *Service) GetByID(id domain.UserID) (domain.User, error) {
 	return s.repo.GetByID(id)
 }
 
@@ -62,7 +62,7 @@ func (s *Service) Refresh(token string) (domain.User, string, error) {
 	if errParseToken != nil {
 		return domain.User{}, "", status.Error(codes.Unauthenticated, "token read error")
 	}
-	u, errGetUser := s.repo.GetByID(claims.UserID())
+	u, errGetUser := s.repo.GetByID(domain.UserID(claims.UserID()))
 	if errGetUser != nil {
 		return domain.User{}, "", domain.ErrUserNotFound
 	}

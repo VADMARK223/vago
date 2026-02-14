@@ -37,7 +37,7 @@ func DeleteUser(service *user.Service) func(c *gin.Context) {
 			return
 		}
 
-		if role != domain.RoleAdmin {
+		if role != string(domain.RoleAdmin) {
 			// Пользователь аутентифицирован, но не авторизован для этого действия
 			response.Error(c, http.StatusForbidden, "У вас нет прав на удаление пользователей")
 			return

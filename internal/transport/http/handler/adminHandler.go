@@ -83,7 +83,7 @@ func (h *AdminHandler) UsersApi(c *gin.Context) {
 }
 
 func (h *AdminHandler) ShowMessages(c *gin.Context) {
-	all, err := h.chatSvc.MessagesDTO(context.Background())
+	all, err := h.chatSvc.ListMessagesWithAuthors(context.Background())
 	if err != nil {
 		ShowError(c, "Ошибка получения списка сообщений", err.Error())
 		return

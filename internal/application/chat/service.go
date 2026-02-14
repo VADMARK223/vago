@@ -29,7 +29,7 @@ func (s *Service) CreateMessage(ctx context.Context, dto MessageCreateDTO) (Mess
 
 	return MessageDTO{
 		ID:          id,
-		AuthorID:    user.ID,
+		AuthorID:    domain.UserID(user.ID),
 		Username:    user.Username,
 		Body:        dto.Body,
 		MessageType: dto.MessageType,
@@ -37,30 +37,43 @@ func (s *Service) CreateMessage(ctx context.Context, dto MessageCreateDTO) (Mess
 	}, nil
 }
 
-func (s *Service) MessagesDTO(ctx context.Context) ([]MessageDTO, error) {
+func (s *Service) ListMessagesWithAuthors(ctx context.Context) ([]MessageDTO, error) {
 	msgs, err := s.msgRepo.ListAll(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// collect user ids
-	ids := make([]int64, 0, len(msgs))
-	for _, m := range msgs {
-		ids = append(ids, int64(m.Author()))
+	if len(msgs) == 0 {
+		return []MessageDTO{}, nil
 	}
 
-	// load users
+	// Collect unique user ids (dedup)
+	seen := make(map[int64]struct{}, len(msgs))
+	ids := make([]int64, 0, len(msgs))
+	for _, m := range msgs {
+		uid := int64(m.Author())
+
+		if _, exists := seen[uid]; exists {
+			continue
+		}
+
+		seen[uid] = struct{}{}
+		ids = append(ids, uid)
+	}
+
+	// Load users
 	users, err := s.userRepo.GetByIDs(ids)
 	if err != nil {
 		return nil, err
 	}
 
+	// Build user map
 	userMap := map[int64]string{}
 	for _, u := range users {
 		userMap[u.ID] = u.Username
 	}
 
-	// build DTO
+	// Build DTO
 	result := make([]MessageDTO, 0, len(msgs))
 	for _, m := range msgs {
 		uid := int64(m.Author())
@@ -71,7 +84,7 @@ func (s *Service) MessagesDTO(ctx context.Context) ([]MessageDTO, error) {
 
 		result = append(result, MessageDTO{
 			ID:          m.ID,
-			AuthorID:    uid,
+			AuthorID:    domain.UserID(uid),
 			Username:    username,
 			Body:        string(m.Body()),
 			SentAt:      timex.Format(m.SentAt()),

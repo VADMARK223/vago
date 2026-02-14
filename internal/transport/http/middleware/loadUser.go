@@ -36,7 +36,7 @@ func LoadUserContext(svc *user.Service, cache *app.LocalCache) gin.HandlerFunc {
 			return
 		}
 
-		u, err := svc.GetByID(userID)
+		u, err := svc.GetByID(domain.UserID(userID))
 		if err != nil {
 			domain.ClearTokenCookies(c)
 			//c.Redirect(http.StatusFound, route.Login)

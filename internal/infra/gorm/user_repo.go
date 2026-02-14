@@ -71,7 +71,7 @@ func (r *UserRepository) GetByLogin(login string) (domain.User, error) {
 	return toDomain(entity), nil
 }
 
-func (r *UserRepository) GetByID(id int64) (domain.User, error) {
+func (r *UserRepository) GetByID(id domain.UserID) (domain.User, error) {
 	var entity UserEntity
 	if err := r.db.First(&entity, id).Error; err != nil {
 		return domain.User{}, err
