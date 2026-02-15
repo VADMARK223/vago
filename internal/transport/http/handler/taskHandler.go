@@ -31,12 +31,13 @@ func Tasks(service *task.Service) gin.HandlerFunc {
 
 func TasksAPI(service *task.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		td, exists := c.Get(code.TemplateData)
-		if !exists {
-			panic("TemplateData not found")
+		currentId, errGetUSerId := c.Get(code.UserId)
+		if !errGetUSerId {
+			response.Error(c, http.StatusUnauthorized, "Пользователь не аутентифицировался")
+			return
 		}
-		data := td.(gin.H)
-		tasks, _ := service.GetAllByUser(data[code.UserId].(int64))
+
+		tasks, _ := service.GetAllByUser(currentId.(int64))
 
 		response.OK(c, "Задачи", tasksToDTO(tasks))
 	}
