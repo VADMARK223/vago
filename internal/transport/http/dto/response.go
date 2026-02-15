@@ -8,6 +8,11 @@ import (
 type Me struct {
 	Username string      `json:"username"`
 	Role     domain.Role `json:"role"`
+	Color    string      `json:"color"`
+}
+
+func MeToDTO(u domain.User) Me {
+	return Me{Username: u.Username, Role: u.Role, Color: u.Color}
 }
 
 type QuestionPublicResponse struct {
