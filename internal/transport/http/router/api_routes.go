@@ -20,6 +20,10 @@ func registerAPIRoutes(api *gin.RouterGroup, deps *Deps) {
 	api.GET(route.SignOut, handler.SignOut)
 	api.GET(route.Questions, apiHandlerQuestion.Get)
 
+	api.GET(route.Test, deps.Handlers.Test.RandomQuestionIdAPI)
+	api.GET(route.Test+"/:id", deps.Handlers.Test.QuestionByIdAPI)
+	api.POST(route.Test+"/check", deps.Handlers.Test.CheckAnswerAPI)
+
 	// Protected
 	apiAuth := api.Group("")
 	apiAuth.Use(middleware.RequireAuthApi)
@@ -33,12 +37,8 @@ func registerAPIRoutes(api *gin.RouterGroup, deps *Deps) {
 	apiAuth.DELETE(route.Tasks+"/:id", handler.DeleteTaskAPI(deps.Services.Task))
 	apiAuth.PUT(route.Tasks+"/:id", handler.UpdateTaskAPI(deps.Services.Task))
 
-	apiAuth.GET(route.Test, deps.Handlers.Test.RandomQuestionIdAPI)
-	apiAuth.GET(route.Test+"/:id", deps.Handlers.Test.QuestionByIdAPI)
-	apiAuth.POST(route.Test+"/check", deps.Handlers.Test.CheckAnswerAPI)
-
 	apiHandlerMessage := apim.New(deps.Loaders.Message, deps.Services.Message)
 	apiAuth.GET(route.Messages, apiHandlerMessage.GetAllWithUsername)
-	apiAuth.POST("/messagesDeleteAll", apiHandlerMessage.DeleteAll)
-	apiAuth.DELETE("/messages/:id", apiHandlerMessage.Delete)
+	apiAuth.DELETE(route.Messages, apiHandlerMessage.DeleteAll)
+	apiAuth.DELETE(route.Messages+"/:id", apiHandlerMessage.Delete)
 }

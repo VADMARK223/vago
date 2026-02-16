@@ -3,6 +3,7 @@ package message
 import (
 	"net/http"
 	"strconv"
+	"vago/internal/app"
 	"vago/internal/application/message"
 	"vago/internal/config/code"
 	"vago/internal/domain"
@@ -66,17 +67,17 @@ func (h *Handler) Delete(c *gin.Context) {
 }
 
 func (h *Handler) DeleteAll(c *gin.Context) {
+
+	app.Dump("DELETE ALL", nil)
+
 	role, errRole := c.Get(code.Role)
 	if !errRole {
 		response.Error(c, http.StatusInternalServerError, "Ошибка удаления всех сообщений")
-
-		//handler.ShowError(c, "Ошибка удаления всех сообщений", "Роль пользователя неизвестна")
 		return
 	}
 
 	if role != string(domain.RoleAdmin) {
 		response.Error(c, http.StatusInternalServerError, "У вас нет прав на удаление сообщений")
-		//handler.ShowError(c, "Ошибка удаления всех сообщений", "У вас нет прав на удаление пользователей")
 		return
 	}
 
