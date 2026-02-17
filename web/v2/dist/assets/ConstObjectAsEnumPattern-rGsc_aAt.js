@@ -1,4 +1,4 @@
-import{c as e,d as t}from"./index-DfkK-lgJ.js";import{t as n}from"./Book.module-DeRDuBeZ.js";import{t as r}from"./BookHashLink-Dm7WJAm7.js";var i=t();function a(){return(0,i.jsxs)(i.Fragment,{children:[(0,i.jsx)(`nav`,{className:n.toc,children:(0,i.jsx)(r,{id:`why_not_enum`,children:`Почему не enum?`})}),(0,i.jsx)(e,{code:`export const ROLE = {
+import{c as e,d as t}from"./index-5Iak_7Bb.js";import{t as n}from"./Book.module-DeRDuBeZ.js";import{t as r}from"./BookHashLink-BMl38gQc.js";var i=t();function a(){return(0,i.jsxs)(i.Fragment,{children:[(0,i.jsx)(`nav`,{className:n.toc,children:(0,i.jsx)(r,{id:`why_not_enum`,children:`Почему не enum?`})}),(0,i.jsx)(e,{code:`export const ROLE = {
     user: 'user',
     moderator: 'moderator',
     admin: 'admin',
