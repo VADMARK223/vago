@@ -65,7 +65,7 @@ func ServeSW(hub *ws.Hub, log *zap.SugaredLogger, provider *token.JWTProvider, s
 			return
 		}
 
-		client := ws.NewClient(conn, hub, claims.UserID(), log, svc)
+		client := ws.NewClient(conn, hub, claims.UserID(), svc, log)
 		hub.Register <- client
 
 		go client.OutgoingLoop()

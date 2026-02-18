@@ -20,7 +20,7 @@ func NewService(messageRepo domain.MessageRepository, userRepo domain.UserReposi
 	}
 }
 
-func (s *Service) CreateMessage(ctx context.Context, dto MessageCreateDTO) (message.MessageApiDTO, error) {
+func (s *Service) SaveMessage(ctx context.Context, dto MessageCreateDTO) (message.MessageApiDTO, error) {
 	msg := domain.NewMessage(dto.AuthorID, domain.Body(dto.Body), dto.MessageType)
 	id, err := s.msgRepo.Save(ctx, msg)
 	if err != nil {

@@ -19,7 +19,7 @@ func NewMessageHandler(chatSvc *chat.Service) *MessageHandler {
 
 func (h *MessageHandler) AddMessage(c *gin.Context) {
 	createDTO := chat.MessageCreateDTO{AuthorID: 1, Body: "Test", MessageType: "text"}
-	_, err := h.chatSvc.CreateMessage(context.Background(), createDTO)
+	_, err := h.chatSvc.SaveMessage(context.Background(), createDTO)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error add message")
 		return

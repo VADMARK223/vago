@@ -7,11 +7,11 @@ import (
 )
 
 type Hub struct {
-	Register   chan *Client
-	Unregister chan *Client
-	Broadcast  chan []byte
-	Clients    map[*Client]bool
-	log        *zap.SugaredLogger
+	Register   chan *Client       // Канал "подключился новый клиент"
+	Unregister chan *Client       // Канал "клиент отключился/нужно убрать"
+	Broadcast  chan []byte        // Канал "надо разослать всем одно сообщение"
+	Clients    map[*Client]bool   // Текущее множество подключенных клиентов.
+	log        *zap.SugaredLogger // Логгер
 }
 
 func NewHub(log *zap.SugaredLogger) *Hub {
@@ -24,39 +24,38 @@ func NewHub(log *zap.SugaredLogger) *Hub {
 	}
 }
 
-// Run запускает Hub и слушает ctx.Done() для graceful shutdown
+// Run единственная горутина, которая владеет Clients и изменяет его
 func (h *Hub) Run(ctx context.Context) {
 	h.log.Info("WebSocket Hub started")
 	defer h.log.Info("WebSocket Hub stopped")
 
 	for {
 		select {
-		case <-ctx.Done():
+		case <-ctx.Done(): // Выключения сервера
 			h.log.Infow("Hub shutting down, disconnecting clients", "count", len(h.Clients))
 			for client := range h.Clients {
-				close(client.Send)
-				delete(h.Clients, client)
+				close(client.Send)        // Закрываем канал отправки клиенту
+				delete(h.Clients, client) // Удаляем из карты
 			}
-			return
+			return // Прерываем бесконечный цикл
 
-		case c := <-h.Register:
+		case c := <-h.Register: // Пришел новый клиент
 			h.log.Info("Registered client")
-			h.Clients[c] = true
+			h.Clients[c] = true // Добавляем клиента в карту Clients
 
-		case c := <-h.Unregister:
+		case c := <-h.Unregister: // Клиент ушел
 			h.log.Info("Unregistered client")
-			if _, ok := h.Clients[c]; ok {
-				delete(h.Clients, c)
-				close(c.Send)
+			if _, ok := h.Clients[c]; ok { // Проходимся по карте
+				delete(h.Clients, c) // Удаляем клиента из карты
+				close(c.Send)        // закрываем канал (Сигнал для OutgoingLoop, что порка завершиться)
 			}
 
-		case msg := <-h.Broadcast:
-			for c := range h.Clients {
+		case msg := <-h.Broadcast: // Общая рассылка
+			for c := range h.Clients { // Проходим по карте
 				select {
-				case c.Send <- msg:
-				default:
-					// Клиент не успевает читать, отключаем его
-					delete(h.Clients, c)
+				case c.Send <- msg: // Клиентам пытаемся отослать сообщение
+				default: // Если клиент не успевает читать (буфер Send забит)
+					delete(h.Clients, c) // Клиент не успевает читать, отключаем его (Жесткий кик медленного клиента)
 					close(c.Send)
 				}
 			}
