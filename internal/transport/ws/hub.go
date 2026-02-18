@@ -16,9 +16,9 @@ type Hub struct {
 
 func NewHub(log *zap.SugaredLogger) *Hub {
 	return &Hub{
-		Register:   make(chan *Client),
-		Unregister: make(chan *Client),
-		Broadcast:  make(chan []byte),
+		Register:   make(chan *Client, 64),
+		Unregister: make(chan *Client, 64),
+		Broadcast:  make(chan []byte, 256),
 		Clients:    make(map[*Client]bool),
 		log:        log,
 	}

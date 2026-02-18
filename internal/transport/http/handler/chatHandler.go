@@ -51,7 +51,6 @@ func ServeSW(hub *ws.Hub, log *zap.SugaredLogger, provider *token.JWTProvider, s
 				return
 			}
 		}
-		log.Infow("ServeSW", "tokenStr", tokenStr)
 
 		claims, err := provider.ParseToken(tokenStr)
 		if err != nil {
@@ -66,7 +65,13 @@ func ServeSW(hub *ws.Hub, log *zap.SugaredLogger, provider *token.JWTProvider, s
 		}
 
 		client := ws.NewClient(conn, hub, claims.UserID(), svc, log)
-		hub.Register <- client
+
+		select {
+		case hub.Register <- client:
+		default:
+			_ = conn.Close()
+			return
+		}
 
 		go client.OutgoingLoop()
 		go client.IncomingLoop()

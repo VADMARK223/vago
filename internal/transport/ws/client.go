@@ -42,8 +42,12 @@ func NewClient(conn *websocket.Conn, hub *Hub, userID int64, svc *chat.Service, 
 // IncomingLoop читает от клиента
 func (c *Client) IncomingLoop() {
 	defer func() {
-		c.Hub.Unregister <- c // При выходе из метода, отправит, что клиент покинул чат
-		_ = c.Conn.Close()    // Закрываем сокет
+		select {
+		case c.Hub.Unregister <- c: // При выходе из метода, отправит, что клиент покинул чат
+		default: // Hub уже не работает или канал занят (тут не блокируемся)
+		}
+
+		_ = c.Conn.Close() // Закрываем сокет
 	}()
 
 	// TODO: Увеличить, очень мало для реального сообщения
@@ -86,7 +90,14 @@ func (c *Client) IncomingLoop() {
 		switch packet.Type {
 		case "message":
 			serverMsgBytes, _ := json.Marshal(dto)
-			c.Hub.Broadcast <- serverMsgBytes // Отправляем в канал общей рассылки другим клиентам
+
+			select {
+			case c.Hub.Broadcast <- serverMsgBytes: // Отправляем в канал общей рассылки другим клиентам
+			default:
+				// Hub не читает/остановлен/забит — не блокируемся
+				c.log.Warn("Broadcast skipped: hub is not accepting messages")
+			}
+
 		default:
 			c.log.Warnw("Unknown message type", "type", packet.Type)
 		}
