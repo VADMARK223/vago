@@ -65,6 +65,7 @@ func ServeSW(hub *ws.Hub, log *zap.SugaredLogger, provider *token.JWTProvider, s
 		}
 
 		client := ws.NewClient(conn, hub, claims.UserID(), svc, log)
+		client.Username = claims.Username
 
 		select {
 		case hub.Register <- client:

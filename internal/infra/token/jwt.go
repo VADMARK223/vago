@@ -28,13 +28,13 @@ func NewJWTProvider(cfg *config.Config) *JWTProvider {
 	}
 }
 
-func (j *JWTProvider) CreateTokenPair(userID int64, role string) (*domain.TokenPair, error) {
-	access, err := j.CreateToken(userID, role, true)
+func (j *JWTProvider) CreateTokenPair(userID int64, role string, username string) (*domain.TokenPair, error) {
+	access, err := j.CreateToken(userID, role, username, true)
 	if err != nil {
 		return nil, err
 	}
 
-	refresh, err := j.CreateToken(userID, role, false)
+	refresh, err := j.CreateToken(userID, role, username, false)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (j *JWTProvider) CreateTokenPair(userID int64, role string) (*domain.TokenP
 	}, nil
 }
 
-func (j *JWTProvider) CreateToken(userID int64, role string, accessToken bool) (string, error) {
+func (j *JWTProvider) CreateToken(userID int64, role string, username string, accessToken bool) (string, error) {
 	now := time.Now()
 
 	var duration time.Duration
@@ -56,7 +56,8 @@ func (j *JWTProvider) CreateToken(userID int64, role string, accessToken bool) (
 	}
 
 	claims := domain.CustomClaims{
-		Role: role,
+		Role:     role,
+		Username: username,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   strconv.Itoa(int(userID)),
 			ExpiresAt: jwt.NewNumericDate(now.Add(duration)),

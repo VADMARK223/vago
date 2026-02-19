@@ -41,7 +41,7 @@ func tryRefresh(c *gin.Context, refreshTTL int, provider *token.JWTProvider) boo
 		return false
 	}
 
-	newAccess, err := provider.CreateToken(refreshClaims.UserID(), refreshClaims.Role, true)
+	newAccess, err := provider.CreateToken(refreshClaims.UserID(), refreshClaims.Role, refreshClaims.Username, true)
 	if err != nil {
 		return false
 	}

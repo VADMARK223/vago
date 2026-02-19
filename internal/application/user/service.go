@@ -49,7 +49,7 @@ func (s *Service) Login(login, password string) (domain.User, *domain.TokenPair,
 		return u, nil, domain.ErrIncorrectPassword
 	}
 
-	tokens, err := s.tokens.CreateTokenPair(u.ID, string(u.Role))
+	tokens, err := s.tokens.CreateTokenPair(u.ID, string(u.Role), u.Username)
 	if err != nil {
 		return domain.User{}, nil, fmt.Errorf("error creating tokens: %s", err.Error())
 	}
@@ -67,7 +67,7 @@ func (s *Service) Refresh(token string) (domain.User, string, error) {
 		return domain.User{}, "", domain.ErrUserNotFound
 	}
 
-	newToken, errToken := s.tokens.CreateToken(u.ID, string(u.Role), true)
+	newToken, errToken := s.tokens.CreateToken(u.ID, string(u.Role), u.Username, true)
 	if errToken != nil {
 		return domain.User{}, "", status.Error(codes.Unauthenticated, fmt.Sprintf("Error creating new token: %s", errToken.Error()))
 	}

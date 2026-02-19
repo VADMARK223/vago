@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const version = "1.24.0"
+const version = "1.25.0"
 
 func ShowIndex(c *gin.Context) {
 	caption := "Портал по изучению Golang"

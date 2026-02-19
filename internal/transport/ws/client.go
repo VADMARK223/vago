@@ -16,7 +16,8 @@ type Client struct {
 	Conn       *websocket.Conn    // Соединение
 	Hub        *Hub               // Ссылка на менеджер
 	Send       chan []byte        // Очередь исходящих сообщений (от сервера к клиенту)
-	UserID     int64              // Идентификатор клиента
+	UserID     int64              // Идентификатор пользователя
+	Username   string             // Никнейм пользователя
 	messageSvc *chat.Service      // Сервис для работы с сообщениями (сохранение в БД)
 	log        *zap.SugaredLogger // Логгер
 }

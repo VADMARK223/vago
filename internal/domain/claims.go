@@ -7,12 +7,13 @@ import (
 )
 
 type CustomClaims struct {
-	Role string `json:"role"`
+	Role     string `json:"role"`
+	Username string `json:"username"`
 	jwt.RegisteredClaims
 }
 
 func (c *CustomClaims) UserID() int64 {
-	sub := c.Subject
+	sub := c.Subject // Сюда складывается UserId
 	res, err := strconv.Atoi(sub)
 	if err != nil {
 		return 0
