@@ -31,7 +31,6 @@
             "Path" .Path
             }}
 
-
             {{ template "component.href_btn" dict
             "Href" "/tasks"
             "Name" "Задачи"
@@ -41,8 +40,8 @@
             }}
 
             {{ template "component.href_btn" dict
-            "Href" "/chat"
-            "Name" "Чат"
+            "Href" "/v2/chat"
+            "Name" "Чат (React)"
             "Icon" "fa-solid fa-comment"
             "Disabled" (not .user_id)
             "Path" .Path

@@ -37,7 +37,6 @@ type Handlers struct {
 	TestEditor *handler.TestEditorHandler
 	Admin      *handler.AdminHandler
 	Comment    *handler.CommentHandler
-	Message    *handler.MessageHandler
 }
 
 type Loaders struct {

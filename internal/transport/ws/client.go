@@ -3,8 +3,8 @@ package ws
 import (
 	"context"
 	"encoding/json"
+	"strings"
 	"time"
-	"vago/internal/app"
 	"vago/internal/application/chat"
 	"vago/internal/domain"
 
@@ -19,12 +19,6 @@ type Client struct {
 	UserID     int64              // Идентификатор клиента
 	messageSvc *chat.Service      // Сервис для работы с сообщениями (сохранение в БД)
 	log        *zap.SugaredLogger // Логгер
-}
-
-// ClientPacket формат сообщений, которые приходит от клиента
-type ClientPacket struct {
-	Type string `json:"type"` // Типа сообщения
-	Text string `json:"text"` // Содержание сообщения
 }
 
 func NewClient(conn *websocket.Conn, hub *Hub, userID int64, svc *chat.Service, log *zap.SugaredLogger) *Client {
@@ -50,8 +44,7 @@ func (c *Client) IncomingLoop() {
 		_ = c.Conn.Close() // Закрываем сокет
 	}()
 
-	// TODO: Увеличить, очень мало для реального сообщения
-	c.Conn.SetReadLimit(512)                                     // Максимум входящего сообщения 512 байт
+	c.Conn.SetReadLimit(8 * 1024)                                // Максимум входящего сообщения 8 КБайт
 	_ = c.Conn.SetReadDeadline(time.Now().Add(60 * time.Second)) // Если 60 сек нет данных/понга, то read отвалится
 	c.Conn.SetPongHandler(func(string) error {                   // На pong продлеваем read deadline еще на 60 сек
 		_ = c.Conn.SetReadDeadline(time.Now().Add(60 * time.Second))
@@ -62,34 +55,49 @@ func (c *Client) IncomingLoop() {
 		_, message, err := c.Conn.ReadMessage() // Читаем фрейм
 
 		if err != nil { // Если есть ошибка чтения фрейма, то прерываем цикл чтения
-			c.log.Infow("WS read error:", err)
+			c.log.Infow("WS read error", "err", err)
 			break
 		}
 
-		var packet ClientPacket
-		if errUnmarshal := json.Unmarshal(message, &packet); errUnmarshal != nil {
-			c.log.Errorw("WS json error:", errUnmarshal)
+		var in Inbound
+		if err := json.Unmarshal(message, &in); err != nil {
+			c.log.Errorw("Error unmarshal inbound", "err", err)
 			continue
 		}
 
-		c.log.Infow("Received message", "packet", packet)
-		dto, errSaveMessage := c.messageSvc.SaveMessage( // Сохраняем сообщение в БД через сервис
-			context.Background(),
-			chat.MessageCreateDTO{
+		switch in.Type {
+		case TypeMessageSend:
+			var p MessageSendPayload
+			if errUnmarshalPayload := json.Unmarshal(in.Payload, &p); errUnmarshalPayload != nil {
+				c.log.Errorw("Error unmarshal payload", "err", errUnmarshalPayload)
+				continue
+			}
+
+			text := strings.TrimSpace(p.Text)
+			if text == "" {
+				continue
+			}
+
+			c.log.Infow("Received message", "in", in)
+			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second) // Тайм-аут на сохранение в БД
+			// Сохраняем, сообщение в БД через сервис
+			dto, err := c.messageSvc.SaveMessage(ctx, chat.MessageCreateDTO{
 				AuthorID:    domain.UserID(c.UserID),
-				Body:        packet.Text,
+				Body:        text,
 				MessageType: "text",
 			})
+			cancel()
+			if err != nil {
+				c.log.Errorw("Send message error", err)
+				return
+			}
 
-		if errSaveMessage != nil {
-			// TODO: доделать.
-			app.Dump("Send message error", errSaveMessage)
-			return
-		}
-
-		switch packet.Type {
-		case "message":
-			serverMsgBytes, _ := json.Marshal(dto)
+			out := Outbound{Type: TypeMessageNew, Payload: dto}
+			serverMsgBytes, err := json.Marshal(out)
+			if err != nil {
+				c.log.Errorw("Marshal error", "err", err)
+				continue
+			}
 
 			select {
 			case c.Hub.Broadcast <- serverMsgBytes: // Отправляем в канал общей рассылки другим клиентам
@@ -99,7 +107,7 @@ func (c *Client) IncomingLoop() {
 			}
 
 		default:
-			c.log.Warnw("Unknown message type", "type", packet.Type)
+			c.log.Warnw("Unknown message type", "type", in.Type)
 		}
 	}
 }
@@ -120,7 +128,7 @@ func (c *Client) OutgoingLoop() {
 			if !ok {                                                      // Если канал закрыт
 				err := c.Conn.WriteMessage(websocket.CloseMessage, []byte{}) // Отправляем close frame
 				if err != nil {
-					c.log.Infow("OutgoingLoop", "Channel closed:", err)
+					c.log.Infow("OutgoingLoop", "Channel closed", err)
 				}
 				return
 			}

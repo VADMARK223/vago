@@ -51,9 +51,6 @@ func registerWebRoutes(web *gin.RouterGroup, deps *Deps) {
 		auth.GET("/ws", handler.ServeSW(deps.Hub, deps.Log, deps.TokenProv, deps.Services.Chat))
 		auth.GET("/chat", handler.ShowChat(deps.TokenProv.Port, deps.Services.Message))
 
-		messagesHandlerOld := handler.NewMessageHandler(deps.Services.Chat)
-		auth.POST(route.Messages, messagesHandlerOld.AddMessage)
-
 		auth.GET(route.AddQuestions, deps.Handlers.TestEditor.ShowAddQuestion)
 		auth.POST(route.AddQuestions, deps.Handlers.TestEditor.AddQuestion)
 		auth.POST(route.RunQuestionsSeed, deps.Handlers.TestEditor.RunGoQuestionsSeed)
