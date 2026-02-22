@@ -1,4 +1,4 @@
-import{g as e,s as t}from"./index-BTwSYiR7.js";var n=e();function r(){return(0,n.jsxs)(n.Fragment,{children:[(0,n.jsxs)(`p`,{children:[`Это `,(0,n.jsx)(`b`,{children:`встроенные типы-утилиты`}),`, которые помогают преобразовывать типы.`]}),(0,n.jsx)(t,{code:`type User = {
+import{_ as e,c as t}from"./index-C7KgGvvy.js";var n=e();function r(){return(0,n.jsxs)(n.Fragment,{children:[(0,n.jsxs)(`p`,{children:[`Это `,(0,n.jsx)(`b`,{children:`встроенные типы-утилиты`}),`, которые помогают преобразовывать типы.`]}),(0,n.jsx)(t,{code:`type User = {
 	id: number
 	name: string
 	age: number
