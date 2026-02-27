@@ -1,9 +1,9 @@
 package message
 
 import (
+	"time"
 	"vago/internal/application/message"
 	"vago/internal/domain"
-	"vago/pkg/timex"
 )
 
 type MessageApiDTO struct {
@@ -26,7 +26,7 @@ func messageToDTO(m message.WithUsername) MessageApiDTO {
 		Username:    m.Username,
 		MessageType: m.MessageType,
 		Body:        m.Body,
-		SentAt:      timex.Format(m.SentAt),
+		SentAt:      m.SentAt.UTC().Format(time.RFC3339Nano),
 	}
 }
 

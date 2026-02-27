@@ -41,12 +41,12 @@ func registerWebRoutes(web *gin.RouterGroup, deps *Deps) {
 			admin.GET(route.Messages, webHandlerMessage.Page)
 			admin.GET(route.Grpc, deps.Handlers.Admin.ShowGrpc)
 		}
+		auth.DELETE("/users/:id", handler.DeleteUser(deps.Services.User))
 
 		auth.GET(route.Tasks, handler.Tasks(deps.Services.Task))
 		auth.POST(route.Tasks, handler.PostTask(deps.Services.Task))
 		auth.DELETE(route.Tasks+"/:id", handler.DeleteTask(deps.Services.Task))
 		auth.PUT(route.Tasks+"/:id", handler.UpdateTask(deps.Services.Task))
-		auth.DELETE("/users/:id", handler.DeleteUser(deps.Services.User))
 
 		auth.GET("/ws", handler.ServeSW(deps.Hub, deps.Log, deps.TokenProv, deps.Services.Chat))
 		auth.GET("/chat", handler.ShowChat(deps.TokenProv.Port, deps.Services.Message))

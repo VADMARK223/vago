@@ -45,4 +45,5 @@ CREATE TABLE IF NOT EXISTS messages
 );
 comment on table messages is 'Таблица сообщений';
 CREATE INDEX idx_messages_user_id ON messages (user_id);
+CREATE INDEX idx_messages_created_at ON messages (created_at);
 CREATE INDEX idx_messages_messages_type ON messages (message_type);

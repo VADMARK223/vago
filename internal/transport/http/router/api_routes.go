@@ -29,7 +29,6 @@ func registerAPIRoutes(api *gin.RouterGroup, deps *Deps) {
 	apiAuth.Use(middleware.RequireAuthApi)
 
 	apiAuth.GET(route.Users, deps.Handlers.Admin.UsersApi)
-
 	apiAuth.DELETE(route.Users+"/:id", handler.DeleteUser(deps.Services.User))
 
 	apiAuth.GET(route.Tasks, handler.TasksAPI(deps.Services.Task))

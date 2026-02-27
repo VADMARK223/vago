@@ -35,7 +35,11 @@ func (r *MessageRepo) Save(ctx context.Context, m domain.Message) (domain.Messag
 func (r *MessageRepo) ListAll(ctx context.Context) ([]domain.Message, error) {
 	var entities []MessageEntity
 
-	err := r.db.WithContext(ctx).Find(&entities).Error
+	err := r.db.
+		WithContext(ctx).
+		Order("created_at ASC").
+		Find(&entities).
+		Error
 
 	if err != nil {
 		return nil, err

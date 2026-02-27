@@ -2,10 +2,10 @@ package chat
 
 import (
 	"context"
+	"time"
 
 	"vago/internal/domain"
 	"vago/internal/transport/http/api/message"
-	"vago/pkg/timex"
 )
 
 type Service struct {
@@ -38,6 +38,6 @@ func (s *Service) SaveMessage(ctx context.Context, dto MessageCreateDTO) (messag
 		Username:    user.Username,
 		Body:        dto.Body,
 		MessageType: dto.MessageType,
-		SentAt:      timex.Format(msg.SentAt()),
+		SentAt:      msg.SentAt().UTC().Format(time.RFC3339Nano),
 	}, nil
 }
